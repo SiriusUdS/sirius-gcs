@@ -21,6 +21,7 @@ void Logging::updateSpdLog() {
     spdlog::set_default_logger(logger);
     spdlog::set_level(spdlog::level::trace);
     spdlog::flush_every(std::chrono::seconds(5));
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
 }
 
 void Logging::linkLoggingWindow(LoggingWindow* loggingWindow) {
