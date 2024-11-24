@@ -13,6 +13,7 @@ call vcpkg\bootstrap-vcpkg.bat
 REM Generate project files
 .\tools\premake5 vs2022
 
-REM Go back to current directory
+REM Go back to current directory and exit
 popd
 popd
+exit /b 0
