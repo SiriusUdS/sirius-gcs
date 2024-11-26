@@ -12,7 +12,7 @@ class MarkItem;
 
 class MarkStorage {
     friend class MarkEditorWidget;
-    friend class ControlsWindow;
+    friend class MapWindow;
 
 public:
     MarkStorage();

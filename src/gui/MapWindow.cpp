@@ -1,12 +1,9 @@
-#include "ControlsWindow.h"
+#include "MapWindow.h"
 
 #include "Logging.h"
 #include "TileLoaderImpl.h"
 
-#include <imgui.h>
-#include <implot.h>
-
-ControlsWindow::ControlsWindow() {
+MapWindow::MapWindow() {
     _mapPlot = std::make_shared<RichMapPlot>();
     _storage = std::make_shared<MarkStorage>();
 
@@ -14,21 +11,8 @@ ControlsWindow::ControlsWindow() {
     _mapPlot->addItem(std::reinterpret_pointer_cast<IRichItem>(_storage->markItems().back().ptr));
 }
 
-void ControlsWindow::draw() {
-    float x[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f};
-    float y[] = {10.0f, 20.0f, 15.0f, 25.0f, 30.0f};
-
+void MapWindow::draw() {
     ImGui::Begin("Controls");
-    ImGui::Button("Launch la fusée");
-
-    ImGui::Dummy(ImVec2{0.0f, 20.0f});
-
-    if (ImPlot::BeginPlot("Line Plot")) {
-        ImPlot::PlotLine("Static Data", x, y, IM_ARRAYSIZE(x));
-        ImPlot::EndPlot();
-    }
-
-    ImGui::Dummy(ImVec2{0.0f, 20.0f});
 
     ImGui::Text("Type de vue: ");
     ImGui::SameLine();

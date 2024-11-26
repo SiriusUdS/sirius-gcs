@@ -11,7 +11,7 @@ call vcpkg\bootstrap-vcpkg.bat
 .\vcpkg\vcpkg integrate install
 
 REM Generate project files
-.\tools\premake5 vs2022
+call setup\premake.bat
 
 REM Go back to current directory and exit
 popd

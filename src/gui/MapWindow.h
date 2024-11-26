@@ -1,12 +1,12 @@
-#ifndef CONTROLSWINDOW_H
-#define CONTROLSWINDOW_H
+#ifndef MAPWINDOW_H
+#define MAPWINDOW_H
 
 #include "RichMapPlot.h"
 #include "RichMarkStorage.h"
 
-class ControlsWindow {
+class MapWindow {
 public:
-    ControlsWindow();
+    MapWindow();
     void draw();
 
 private:
@@ -19,4 +19,4 @@ private:
     int _prevMapView{0};
 };
 
-#endif // CONTROLSWINDOW_H
+#endif // MAPWINDOW_H

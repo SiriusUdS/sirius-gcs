@@ -1,5 +1,5 @@
 #include "Altimeter/AltimeterData.h"
-#include "ImGuiManager.h"
+#include "Application.h"
 #include "Logging.h"
 #include "hello_imgui/hello_imgui.h"
 
@@ -22,7 +22,7 @@ int main(int, char*[]) {
     GCS_LOG_INFO(data.status.value);
     GCS_LOG_INFO(data.timeStamp_ms);
 
-    ImGuiManager::init();
+    Application::init();
 
     HelloImGui::RunnerParams runnerParams;
 
@@ -38,13 +38,13 @@ int main(int, char*[]) {
 
     runnerParams.imGuiWindowParams.showMenuBar = true;
 
-    runnerParams.callbacks.ShowGui = ImGuiManager::render;
+    runnerParams.callbacks.ShowGui = Application::render;
 
     runnerParams.imGuiWindowParams.defaultImGuiWindowType = HelloImGui::DefaultImGuiWindowType::ProvideFullScreenDockSpace;
 
     HelloImGui::Run(runnerParams);
 
-    ImGuiManager::shutdown();
+    Application::shutdown();
 
     WSACleanup();
 }
