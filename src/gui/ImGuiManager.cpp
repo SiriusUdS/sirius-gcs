@@ -23,18 +23,20 @@ void ImGuiManager::init() {
         return; // Handle error here (add logs)
     }
 
-    AltimeterData data = {1, 2, 3};
-    GCS_LOG_INFO("The following is AltimeterData:");
-    GCS_LOG_INFO(data.altitude);
-    GCS_LOG_INFO(data.status.value);
-    GCS_LOG_INFO(data.timeStamp_ms);
-
     ImPlot::CreateContext();
 
     controlsWindow = std::make_unique<ControlsWindow>();
     loggingWindow = std::make_unique<LoggingWindow>();
 
     Logging::linkLoggingWindow(loggingWindow.get());
+
+    AltimeterData data = {1, 2, 3};
+    GCS_LOG_INFO(
+        "The following is AltimeterData - Altitude: {}, Valeur: {}, Timestamp: {}",
+        data.altitude,
+        data.status.value,
+        data.timeStamp_ms
+    );
 }
 
 void ImGuiManager::render() {
