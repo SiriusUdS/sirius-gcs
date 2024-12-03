@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Logging.h"
-#include "hello_imgui/hello_imgui.h"
+
+#include <hello_imgui/hello_imgui.h>
 
 int main(int, char*[]) {
     HelloImGui::RunnerParams runnerParams;
@@ -17,6 +18,7 @@ int main(int, char*[]) {
 
     runnerParams.imGuiWindowParams.showMenuBar = true;
 
+    runnerParams.callbacks.LoadAdditionalFonts = Application::loadFonts;
     runnerParams.callbacks.PostInit = Application::init;
     runnerParams.callbacks.ShowGui = Application::render;
     runnerParams.callbacks.BeforeExit = Application::shutdown;

@@ -6,6 +6,7 @@
 #include "PlotWindow.h"
 
 namespace Application {
+void loadFonts();
 void init();
 void render();
 void shutdown();

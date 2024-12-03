@@ -5,6 +5,7 @@
 
 #include <WinSock2.h>
 #include <imgui.h>
+#include <hello_imgui/hello_imgui.h>
 #include <implot.h>
 #include <windows.h>
 #pragma comment(lib, "ws2_32.lib")
@@ -14,6 +15,11 @@ std::unique_ptr<MapWindow> mapWindow;
 std::unique_ptr<PlotWindow> plotWindow;
 std::unique_ptr<LoggingWindow> loggingWindow;
 } // namespace Application
+
+void Application::loadFonts() {
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("assets/fonts/Comic Sans MS.ttf", 24.f);
+}
 
 void Application::init() {
     Logging::initSpdLog();
