@@ -2,12 +2,11 @@
 
 #include "Logging.h"
 
-LoggingWindow::LoggingWindow() : _autoScroll(true) {
+LoggingWindow::LoggingWindow() : Window("Logs"), _autoScroll(true) {
     clear();
 }
 
-void LoggingWindow::draw() {
-    ImGui::Begin("Logs");
+void LoggingWindow::renderContent() {
     ImGui::Checkbox("Auto Scroll", &_autoScroll);
     ImGui::SameLine();
     if (ImGui::Button("Add test log")) {
@@ -43,7 +42,6 @@ void LoggingWindow::draw() {
     }
     ImGui::EndChild();
     ImGui::LogText("Bonjour");
-    ImGui::End();
 }
 
 void LoggingWindow::clear() {
@@ -55,7 +53,9 @@ void LoggingWindow::clear() {
 void LoggingWindow::addLog(const char* str, const char* strEnd) {
     int oldSize = _buf.size();
     _buf.append(str, strEnd);
-    for (const int newSize = _buf.size(); oldSize < newSize; oldSize++)
-        if (_buf[oldSize] == '\n')
+    for (const int newSize = _buf.size(); oldSize < newSize; oldSize++) {
+        if (_buf[oldSize] == '\n') {
             _lineOffsets.push_back(oldSize + 1);
+        }
+    }
 }

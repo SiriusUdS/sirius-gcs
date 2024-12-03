@@ -3,11 +3,12 @@
 
 #include "RichMapPlot.h"
 #include "RichMarkStorage.h"
+#include "Window.h"
 
-class MapWindow {
+class MapWindow : public Window {
 public:
     MapWindow();
-    void draw();
+    void renderContent();
 
 private:
     enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };

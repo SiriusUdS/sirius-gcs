@@ -18,7 +18,7 @@ std::unique_ptr<LoggingWindow> loggingWindow;
 
 void Application::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("assets/fonts/Comic Sans MS.ttf", 24.f);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/Comic Sans MS.ttf", 28.f);
 }
 
 void Application::init() {
@@ -42,10 +42,21 @@ void Application::init() {
     GCS_LOG_INFO("The following is AltimeterData - Altitude: {}, Value: {}, Timestamp: {}", data.altitude, data.status.value, data.timeStamp_ms);
 }
 
+void Application::menuItems() {
+    if (ImGui::BeginMenu("Windows")) {
+        // TODO - Do this dynamically
+        ImGui::MenuItem(loggingWindow->name, NULL, &loggingWindow->visible);
+        ImGui::MenuItem(plotWindow->name, NULL, &plotWindow->visible);
+        ImGui::MenuItem(mapWindow->name, NULL, &mapWindow->visible);
+    
+        ImGui::EndMenu();
+    }
+}
+
 void Application::render() {
-    mapWindow->draw();
-    plotWindow->draw();
-    loggingWindow->draw();
+    mapWindow->render();
+    plotWindow->render();
+    loggingWindow->render();
 }
 
 void Application::shutdown() {

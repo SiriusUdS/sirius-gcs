@@ -8,6 +8,7 @@
 namespace Application {
 void loadFonts();
 void init();
+void menuItems();
 void render();
 void shutdown();
 

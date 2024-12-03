@@ -3,10 +3,12 @@
 
 #include "RichMapPlot.h"
 #include "RichMarkStorage.h"
+#include "Window.h"
 
-class PlotWindow {
+class PlotWindow : public Window {
 public:
-    void draw();
+    PlotWindow();
+    void renderContent();
 };
 
 #endif // PLOTWINDOW_H

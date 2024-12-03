@@ -1,12 +1,14 @@
 #ifndef LOGGINGWINDOW_H
 #define LOGGINGWINDOW_H
 
+#include "Window.h"
+
 #include <imgui.h>
 
-class LoggingWindow {
+class LoggingWindow : public Window {
 public:
     explicit LoggingWindow();
-    void draw();
+    void renderContent();
     void clear();
     void addLog(const char* str, const char* strEnd);
 

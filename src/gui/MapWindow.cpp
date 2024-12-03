@@ -3,7 +3,7 @@
 #include "Logging.h"
 #include "TileLoaderImpl.h"
 
-MapWindow::MapWindow() {
+MapWindow::MapWindow() : Window("Map") {
     _mapPlot = std::make_shared<RichMapPlot>();
     _storage = std::make_shared<MarkStorage>();
 
@@ -11,9 +11,7 @@ MapWindow::MapWindow() {
     _mapPlot->addItem(std::reinterpret_pointer_cast<IRichItem>(_storage->markItems().back().ptr));
 }
 
-void MapWindow::draw() {
-    ImGui::Begin("Controls");
-
+void MapWindow::renderContent() {
     ImGui::Text("Type de vue: ");
     ImGui::SameLine();
     ImGui::RadioButton("Cartographique", &_mapView, MAP_VIEW);
@@ -30,6 +28,4 @@ void MapWindow::draw() {
     }
 
     _mapPlot->paint();
-
-    ImGui::End();
 }

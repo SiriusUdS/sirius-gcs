@@ -20,6 +20,7 @@ int main(int, char*[]) {
 
     runnerParams.callbacks.LoadAdditionalFonts = Application::loadFonts;
     runnerParams.callbacks.PostInit = Application::init;
+    runnerParams.callbacks.ShowMenus = Application::menuItems;
     runnerParams.callbacks.ShowGui = Application::render;
     runnerParams.callbacks.BeforeExit = Application::shutdown;
 
