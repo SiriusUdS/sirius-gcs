@@ -1,17 +1,20 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+#include "ImGuiTextBufferSink.h"
 #include "LoggingWindow.h"
 
 #include <spdlog/spdlog.h>
 
 namespace Logging {
 void initSpdLog();
-void updateSpdLog();
 void linkLoggingWindow(LoggingWindow* loggingWindow);
-void removeLoggingWindow();
+void unlinkLoggingWindow();
 
-extern std::vector<spdlog::sink_ptr> _sinks;
+extern spdlog::sink_ptr consoleSink;
+extern spdlog::sink_ptr fileSink;
+extern std::shared_ptr<ImGuiTextBufferSink> imguiSink;
+extern std::vector<spdlog::sink_ptr> sinks;
 } // namespace Logging
 
 #define GCS_LOG_DEBUG(msg, ...) spdlog::debug(msg, __VA_ARGS__)

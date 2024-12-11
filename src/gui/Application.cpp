@@ -4,8 +4,8 @@
 #include "Logging.h"
 
 #include <WinSock2.h>
-#include <imgui.h>
 #include <hello_imgui/hello_imgui.h>
+#include <imgui.h>
 #include <implot.h>
 #include <windows.h>
 #pragma comment(lib, "ws2_32.lib")
@@ -48,7 +48,7 @@ void Application::menuItems() {
         ImGui::MenuItem(loggingWindow->name, NULL, &loggingWindow->visible);
         ImGui::MenuItem(plotWindow->name, NULL, &plotWindow->visible);
         ImGui::MenuItem(mapWindow->name, NULL, &mapWindow->visible);
-    
+
         ImGui::EndMenu();
     }
 }
@@ -64,7 +64,7 @@ void Application::shutdown() {
     plotWindow = nullptr;
     loggingWindow = nullptr;
 
-    Logging::removeLoggingWindow();
+    Logging::unlinkLoggingWindow();
 
     ImPlot::DestroyContext();
 

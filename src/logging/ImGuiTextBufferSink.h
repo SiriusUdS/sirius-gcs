@@ -7,14 +7,15 @@
 
 class ImGuiTextBufferSink : public spdlog::sinks::base_sink<std::mutex> {
 public:
-    explicit ImGuiTextBufferSink(LoggingWindow* loggingWindow) : _loggingWindow(loggingWindow){};
+    void linkLoggingWindow(LoggingWindow* window);
+    void unlinkLoggingWindow();
 
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override;
     void flush_() override;
 
 private:
-    LoggingWindow* _loggingWindow;
+    LoggingWindow* loggingWindow;
 };
 
 #endif // IMGUITEXTBUFFERSINK_H

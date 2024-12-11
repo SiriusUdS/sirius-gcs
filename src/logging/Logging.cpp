@@ -6,18 +6,19 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace Logging {
-std::vector<spdlog::sink_ptr> _sinks;
-}
+spdlog::sink_ptr consoleSink;
+spdlog::sink_ptr fileSink;
+std::shared_ptr<ImGuiTextBufferSink> imguiSink;
+std::vector<spdlog::sink_ptr> sinks;
+} // namespace Logging
 
 void Logging::initSpdLog() {
-    const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    const auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/gcs-log.txt");
-    _sinks = {console_sink, file_sink};
-    updateSpdLog();
-}
+    consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/gcs-log.txt");
+    imguiSink = std::make_shared<ImGuiTextBufferSink>();
+    sinks = {consoleSink, fileSink, imguiSink};
 
-void Logging::updateSpdLog() {
-    const auto logger = std::make_shared<spdlog::logger>("multi_sink", _sinks.begin(), _sinks.end());
+    const auto logger = std::make_shared<spdlog::logger>("multi_sink", sinks.begin(), sinks.end());
     spdlog::set_default_logger(logger);
     spdlog::set_level(spdlog::level::trace);
     spdlog::flush_every(std::chrono::seconds(5));
@@ -25,12 +26,9 @@ void Logging::updateSpdLog() {
 }
 
 void Logging::linkLoggingWindow(LoggingWindow* loggingWindow) {
-    const auto imgui_sink = std::make_shared<ImGuiTextBufferSink>(loggingWindow);
-    _sinks.push_back(imgui_sink);
-    updateSpdLog();
+    imguiSink->linkLoggingWindow(loggingWindow);
 }
 
-void Logging::removeLoggingWindow() {
-    _sinks.pop_back(); // TODO - Store position of each type of sink, add option to remove whichever type of sink we want
-    updateSpdLog();
+void Logging::unlinkLoggingWindow() {
+    imguiSink->unlinkLoggingWindow();
 }

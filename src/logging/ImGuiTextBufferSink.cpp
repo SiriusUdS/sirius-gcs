@@ -1,9 +1,21 @@
 #include "ImGuiTextBufferSink.h"
 
+void ImGuiTextBufferSink::linkLoggingWindow(LoggingWindow* window) {
+    loggingWindow = window;
+}
+
+void ImGuiTextBufferSink::unlinkLoggingWindow() {
+    loggingWindow = nullptr;
+}
+
 void ImGuiTextBufferSink::sink_it_(const spdlog::details::log_msg& msg) {
+    if (!loggingWindow) {
+        return;
+    }
+
     spdlog::memory_buf_t formatted;
     formatter_->format(msg, formatted);
-    _loggingWindow->addLog(formatted.data(), formatted.data() + formatted.size());
+    loggingWindow->addLog(formatted.data(), formatted.data() + formatted.size());
 }
 
 void ImGuiTextBufferSink::flush_(){
