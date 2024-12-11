@@ -11,9 +11,10 @@
 #pragma comment(lib, "ws2_32.lib")
 
 namespace Application {
-std::unique_ptr<MapWindow> mapWindow;
-std::unique_ptr<PlotWindow> plotWindow;
-std::unique_ptr<LoggingWindow> loggingWindow;
+std::shared_ptr<MapWindow> mapWindow;
+std::shared_ptr<PlotWindow> plotWindow;
+std::shared_ptr<LoggingWindow> loggingWindow;
+std::vector<std::shared_ptr<Window>> windows;
 } // namespace Application
 
 void Application::loadFonts() {
@@ -27,14 +28,16 @@ void Application::init() {
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         GCS_LOG_ERROR("WSAStartup failed");
-        return; // Handle error here (add logs)
+        return; // TODO : Handle error here (add logs)
     }
 
     ImPlot::CreateContext();
 
-    mapWindow = std::make_unique<MapWindow>();
-    plotWindow = std::make_unique<PlotWindow>();
-    loggingWindow = std::make_unique<LoggingWindow>();
+    mapWindow = std::make_shared<MapWindow>();
+    plotWindow = std::make_shared<PlotWindow>();
+    loggingWindow = std::make_shared<LoggingWindow>();
+
+    windows = {mapWindow, plotWindow, loggingWindow};
 
     Logging::linkLoggingWindow(loggingWindow.get());
 
@@ -44,25 +47,23 @@ void Application::init() {
 
 void Application::menuItems() {
     if (ImGui::BeginMenu("Windows")) {
-        // TODO - Do this dynamically
-        ImGui::MenuItem(loggingWindow->name, NULL, &loggingWindow->visible);
-        ImGui::MenuItem(plotWindow->name, NULL, &plotWindow->visible);
-        ImGui::MenuItem(mapWindow->name, NULL, &mapWindow->visible);
-
+        for (const auto& window : windows) {
+            ImGui::MenuItem(window->name, NULL, &window->visible);
+        }
         ImGui::EndMenu();
     }
 }
 
 void Application::render() {
-    mapWindow->render();
-    plotWindow->render();
-    loggingWindow->render();
+    for (const auto& window : windows) {
+        window->render();
+    }
 }
 
 void Application::shutdown() {
-    mapWindow = nullptr;
-    plotWindow = nullptr;
-    loggingWindow = nullptr;
+    for (auto& window : windows) {
+        window = nullptr;
+    }
 
     Logging::unlinkLoggingWindow();
 

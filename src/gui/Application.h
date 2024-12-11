@@ -12,9 +12,10 @@ void menuItems();
 void render();
 void shutdown();
 
-extern std::unique_ptr<LoggingWindow> loggingWindow;
-extern std::unique_ptr<MapWindow> mapWindow;
-extern std::unique_ptr<PlotWindow> plotWindow;
+extern std::shared_ptr<LoggingWindow> loggingWindow;
+extern std::shared_ptr<MapWindow> mapWindow;
+extern std::shared_ptr<PlotWindow> plotWindow;
+extern std::vector<std::shared_ptr<Window>> windows;
 } // namespace Application
 
 #endif // APPLICATION_H
