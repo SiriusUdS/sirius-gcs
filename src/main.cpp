@@ -1,5 +1,4 @@
 #include "Application.h"
-#include "Logging.h"
 
 #include <hello_imgui/hello_imgui.h>
 

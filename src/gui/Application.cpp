@@ -28,7 +28,7 @@ void Application::init() {
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         GCS_LOG_ERROR("WSAStartup failed");
-        return; // TODO : Handle error here (add logs)
+        return;
     }
 
     ImPlot::CreateContext();
