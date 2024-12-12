@@ -13,10 +13,10 @@ public:
     void addLog(const char* str, const char* strEnd);
 
 private:
-    ImGuiTextBuffer _buf;
-    ImGuiTextFilter _filter;
-    ImVector<int> _lineOffsets;
-    bool _autoScroll;
+    ImGuiTextBuffer buf;
+    ImGuiTextFilter filter;
+    ImVector<int> lineOffsets;
+    bool autoScroll;
 };
 
 #endif // LOGGINGWINDOW_H
