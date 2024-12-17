@@ -17,7 +17,7 @@ public:
     virtual void beginLoad(int z, int xmin, int xmax, int ymin, int ymax) override;
     virtual ImTextureID tileAt(int z, int x, int y) override;
     virtual int tileCount() const override {
-        return _tiles.size();
+        return (int) _tiles.size();
     }
     virtual void endLoad() override {
     }

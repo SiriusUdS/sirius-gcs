@@ -45,7 +45,7 @@ void MarkItem::paint() {
     if (_style.radiusEnabled) {
         ImPlot::SetNextLineStyle(_style.markerFill, _style.radiusWeight);
         ImGui::PushID(_rx.data());
-        ImPlot::PlotLine("##", _rx.data(), _ry.data(), _rx.size());
+        ImPlot::PlotLine("##", _rx.data(), _ry.data(), (int) _rx.size());
         ImGui::PopID();
     }
 }
@@ -69,8 +69,8 @@ void MarkItem::updateRadiusPoints() {
     const double x0{x}, y0{y + r};
     double phi{};
     for (int i{}; i != _rx.size(); ++i, phi += dphi) {
-        _rx[i] = x0 + r * cos(phi);
-        _ry[i] = y0 + r * sin(phi);
+        _rx[i] = (float) (x0 + r * cos(phi));
+        _ry[i] = (float) (y0 + r * sin(phi));
     }
 }
 

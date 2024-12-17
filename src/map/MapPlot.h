@@ -74,16 +74,16 @@ public:
     void getBoundsLocal(float& minX, float& maxX, float& minY, float& maxY) const;
 
     inline int minLocalX() const {
-        return _minX;
+        return (int) _minX;
     };
     inline int maxLocalX() const {
-        return _maxX;
+        return (int) _maxX;
     };
     inline int minLocalY() const {
-        return _minY;
+        return (int) _minY;
     };
     inline int maxLocalY() const {
-        return _maxY;
+        return (int) _maxY;
     };
 
     inline bool inBoundsLocal(float x, float y) const {

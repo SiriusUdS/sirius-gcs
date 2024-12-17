@@ -24,5 +24,5 @@ void PlotData::setColor(ImVec4 c) {
 
 void PlotData::plot() const {
     ImPlot::SetNextLineStyle(color, weight);
-    ImPlot::PlotLine(name, vx.data(), vy.data(), vx.size());
+    ImPlot::PlotLine(name, vx.data(), vy.data(), (int) vx.size());
 }
