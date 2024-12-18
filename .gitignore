@@ -4,8 +4,7 @@
 
 *.sln
 *.vcxproj*
-Sirius_GCS.ini
-imgui.ini
+*.ini
 
 ####################################################################
 # Visual Studio

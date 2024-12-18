@@ -5,6 +5,7 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <ini.h>
 
 PlotWindow::PlotWindow() : Window("Plot"), flags(ImPlotFlags_None) {
     PlotData d1;
@@ -27,6 +28,18 @@ PlotWindow::PlotWindow() : Window("Plot"), flags(ImPlotFlags_None) {
 
     data.push_back(d1);
     data.push_back(d2);
+}
+
+void PlotWindow::loadState(const mINI::INIStructure& ini) {
+    if (ini.has("GCS")) {
+        if (ini.get("GCS").has("plot_window_auto_fit")) {
+            autofit = std::stoi(ini.get("GCS").get("plot_window_auto_fit"));
+        }
+    }
+}
+
+void PlotWindow::saveState(mINI::INIStructure& ini) const {
+    ini["GCS"].set("plot_window_auto_fit", std::to_string(autofit));
 }
 
 void PlotWindow::renderContent() {

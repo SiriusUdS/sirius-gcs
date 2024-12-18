@@ -8,7 +8,7 @@
 class MapWindow : public Window {
 public:
     MapWindow();
-    void renderContent();
+    void renderContent() override;
 
 private:
     enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };

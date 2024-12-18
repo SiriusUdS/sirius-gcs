@@ -5,6 +5,8 @@
 #include "MapWindow.h"
 #include "PlotWindow.h"
 
+#include <ini.h>
+
 namespace Application {
 void loadFonts();
 void init();
@@ -12,6 +14,8 @@ void menuItems();
 void render();
 void shutdown();
 
+extern mINI::INIFile iniFile;
+extern mINI::INIStructure iniStructure;
 extern std::shared_ptr<LoggingWindow> loggingWindow;
 extern std::shared_ptr<MapWindow> mapWindow;
 extern std::shared_ptr<PlotWindow> plotWindow;

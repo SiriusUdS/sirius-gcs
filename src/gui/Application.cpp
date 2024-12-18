@@ -11,6 +11,8 @@
 #pragma comment(lib, "ws2_32.lib")
 
 namespace Application {
+mINI::INIFile iniFile("sirius_gcs.ini"); // TODO - Put this filename in a constant somewhere
+mINI::INIStructure iniStructure;
 std::shared_ptr<MapWindow> mapWindow;
 std::shared_ptr<PlotWindow> plotWindow;
 std::shared_ptr<LoggingWindow> loggingWindow;
@@ -36,10 +38,14 @@ void Application::init() {
     mapWindow = std::make_shared<MapWindow>();
     plotWindow = std::make_shared<PlotWindow>();
     loggingWindow = std::make_shared<LoggingWindow>();
-
     windows = {mapWindow, plotWindow, loggingWindow};
 
     Logging::linkLoggingWindow(loggingWindow.get());
+
+    iniFile.read(iniStructure);
+    for (auto& window : windows) {
+        window->loadState(iniStructure);
+    }
 
     AltimeterData data = {1, 2, 3};
     GCS_LOG_INFO("The following is AltimeterData - Altitude: {}, Value: {}, Timestamp: {}", data.altitude, data.status.value, data.timeStamp_ms);
@@ -62,8 +68,10 @@ void Application::render() {
 
 void Application::shutdown() {
     for (auto& window : windows) {
+        window->saveState(iniStructure);
         window = nullptr;
     }
+    iniFile.write(iniStructure);
 
     Logging::unlinkLoggingWindow();
 

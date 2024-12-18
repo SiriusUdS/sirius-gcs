@@ -8,7 +8,7 @@
 class LoggingWindow : public Window {
 public:
     explicit LoggingWindow();
-    void renderContent();
+    void renderContent() override;
     void clear();
     void addLog(const char* str, const char* strEnd);
 

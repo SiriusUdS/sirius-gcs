@@ -9,7 +9,9 @@
 class PlotWindow : public Window {
 public:
     PlotWindow();
-    void renderContent();
+    void loadState(const mINI::INIStructure& ini) override;
+    void saveState(mINI::INIStructure& ini) const override;
+    void renderContent() override;
 
 private:
     std::vector<PlotData> data;
