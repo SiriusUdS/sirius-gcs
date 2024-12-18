@@ -6,7 +6,7 @@
 #include <imgui.h>
 #include <implot.h>
 
-PlotWindow::PlotWindow() : Window("Plot") {
+PlotWindow::PlotWindow() : Window("Plot"), flags(ImPlotFlags_None) {
     PlotData d1;
     d1.addData(0.0f, 0.0f);
     d1.addData(1.0f, 10.0f);
@@ -30,7 +30,24 @@ PlotWindow::PlotWindow() : Window("Plot") {
 }
 
 void PlotWindow::renderContent() {
-    if (ImPlot::BeginPlot("Line Plot", ImGui::GetContentRegionAvail())) {
+    static float x = 5.0f;
+    static float y = 2.5f;
+
+    ImGui::Checkbox("Auto-fit", &autofit);
+    if (autofit) {
+        flags = ImPlotFlags_NoInputs;
+        ImPlot::SetNextAxesToFit();
+    } else {
+        flags = ImPlotFlags_None;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Add test data")) {
+        for (auto& d : data) {
+            d.addData(x, y++);
+        }
+        x++;
+    }
+    if (ImPlot::BeginPlot("Line Plot", ImGui::GetContentRegionAvail(), flags)) {
         for (const auto& plotData : data) {
             plotData.plot();
         }

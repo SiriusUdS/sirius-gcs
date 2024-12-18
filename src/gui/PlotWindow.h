@@ -13,6 +13,8 @@ public:
 
 private:
     std::vector<PlotData> data;
+    ImPlotFlags flags;
+    bool autofit{};
 };
 
 #endif // PLOTWINDOW_H
