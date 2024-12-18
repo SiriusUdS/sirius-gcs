@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include "Altimeter/AltimeterData.h"
+#include "Constants.h"
 #include "Logging.h"
 
 #include <WinSock2.h>
@@ -11,7 +12,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 namespace Application {
-mINI::INIFile iniFile("sirius_gcs.ini"); // TODO - Put this filename in a constant somewhere
+mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
 mINI::INIStructure iniStructure;
 std::shared_ptr<MapWindow> mapWindow;
 std::shared_ptr<PlotWindow> plotWindow;
@@ -21,7 +22,7 @@ std::vector<std::shared_ptr<Window>> windows;
 
 void Application::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("assets/fonts/Comic Sans MS.ttf", 28.f);
+    io.Fonts->AddFontFromFileTTF(Constants::IMGUI_MAIN_FONT_FILENAME, Constants::IMGUI_MAIN_FONT_SIZE);
 }
 
 void Application::init() {

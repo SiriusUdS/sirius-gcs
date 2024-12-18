@@ -2,13 +2,13 @@ workspace "sirius-gcs"
     architecture "x64"
     configurations { "Debug", "Release" }
     startproject "sirius-gcs"
-    
+
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
     targetdir "out/bin/%{cfg.buildcfg}"
     objdir "out/obj"
-    
+
     filter "configurations:Debug"
         symbols "On"
 
@@ -17,6 +17,7 @@ workspace "sirius-gcs"
 
 project "sirius-gcs"
     includedirs {
+        "src",
         "src/gui",
         "src/logging",
         "src/map",
@@ -24,7 +25,7 @@ project "sirius-gcs"
         "external/sirius-headers-common"
     }
 
-    files { 
+    files {
         "src/**.h",
         "src/**.cpp",
         "external/mINI/ini.h",
@@ -40,13 +41,13 @@ project "sirius-gcs"
             "/wd26498",
             "/wd26800"
         }
-        
+
 project "sirius-gcs-tests"
     includedirs {
         "src/test"
     }
-    
-    files { 
+
+    files {
         "tests/**.h",
         "tests/**.cpp"
     }
