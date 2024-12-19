@@ -8,6 +8,8 @@
 class MapWindow : public Window {
 public:
     MapWindow();
+    void loadState(const mINI::INIStructure& ini) override;
+    void saveState(mINI::INIStructure& ini) const override;
     void renderContent() override;
 
 private:
