@@ -4,10 +4,11 @@
 #include <hello_imgui/hello_imgui.h>
 
 int main(int, char*[]) {
+    Application::init();
+
     HelloImGui::RunnerParams runnerParams;
 
     runnerParams.appWindowParams.windowTitle = Constants::HELLO_IMGUI_WINDOW_TITLE;
-    runnerParams.appWindowParams.windowGeometry.size = {800, 600};
     runnerParams.appWindowParams.restorePreviousGeometry = true;
 
     runnerParams.appWindowParams.borderless = false;
@@ -15,8 +16,10 @@ int main(int, char*[]) {
     runnerParams.appWindowParams.borderlessResizable = true;
     runnerParams.appWindowParams.borderlessClosable = true;
 
+    runnerParams.dockingParams.dockingSplits = Application::createBaseDockingSplits();
+    runnerParams.dockingParams.dockableWindows = Application::createDockableWindows();
+
     runnerParams.callbacks.LoadAdditionalFonts = Application::loadFonts;
-    runnerParams.callbacks.PostInit = Application::init;
     runnerParams.callbacks.ShowMenus = Application::menuItems;
     runnerParams.callbacks.ShowGui = Application::render;
     runnerParams.callbacks.BeforeExit = Application::shutdown;

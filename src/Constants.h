@@ -2,6 +2,9 @@
 #define CONSTANTS_H
 
 namespace Constants {
+constexpr const char* GCS_LOGGING_WINDOW_ID = "Logs";
+constexpr const char* GCS_MAP_WINDOW_ID = "Map";
+constexpr const char* GCS_PLOT_WINDOW_ID = "Plot";
 constexpr const char* GCS_INI_SECTION = "GCS";
 constexpr const char* GCS_INI_FILENAME = "sirius_gcs.ini";
 constexpr const char* GCS_INI_MAP_WINDOW_MAP_VIEW = "map_window_map_view";

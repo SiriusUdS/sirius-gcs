@@ -5,6 +5,7 @@
 #include "MapWindow.h"
 #include "PlotWindow.h"
 
+#include <hello_imgui/hello_imgui.h>
 #include <ini.h>
 
 namespace Application {
@@ -13,6 +14,9 @@ void init();
 void menuItems();
 void render();
 void shutdown();
+
+std::vector<HelloImGui::DockingSplit> createBaseDockingSplits();
+std::vector<HelloImGui::DockableWindow> createDockableWindows();
 
 extern mINI::INIFile iniFile;
 extern mINI::INIStructure iniStructure;

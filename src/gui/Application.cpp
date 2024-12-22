@@ -5,7 +5,6 @@
 #include "Logging.h"
 
 #include <WinSock2.h>
-#include <hello_imgui/hello_imgui.h>
 #include <imgui.h>
 #include <implot.h>
 #include <windows.h>
@@ -62,9 +61,10 @@ void Application::menuItems() {
 }
 
 void Application::render() {
-    for (const auto& window : windows) {
-        window->render();
-    }
+    // Already rendered from DockableWindow object, see if some code cleanup should be done in this area.
+    // for (const auto& window : windows) {
+    //    window->render();
+    //}
 }
 
 void Application::shutdown() {
@@ -79,4 +79,28 @@ void Application::shutdown() {
     ImPlot::DestroyContext();
 
     WSACleanup();
+}
+
+std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
+    HelloImGui::DockingSplit splitPlotLogs;
+    splitPlotLogs.initialDock = "MainDockSpace";
+    splitPlotLogs.newDock = "LogSpace";
+    splitPlotLogs.direction = ImGuiDir_Down;
+    splitPlotLogs.ratio = 0.33f;
+
+    HelloImGui::DockingSplit splitPlotMap;
+    splitPlotMap.initialDock = "MainDockSpace";
+    splitPlotMap.newDock = "MapSpace";
+    splitPlotMap.direction = ImGuiDir_Left;
+    splitPlotMap.ratio = 0.5f;
+
+    std::vector<HelloImGui::DockingSplit> splits = {splitPlotLogs, splitPlotMap};
+    return splits;
+}
+
+std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
+    std::vector<HelloImGui::DockableWindow> dockableWindows = {plotWindow->getDockableWindowObject("MainDockSpace"),
+                                                               mapWindow->getDockableWindowObject("MapSpace"),
+                                                               loggingWindow->getDockableWindowObject("LogSpace")};
+    return dockableWindows;
 }
