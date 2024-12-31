@@ -3,6 +3,9 @@
 
 #include <hello_imgui/hello_imgui.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 int main(int, char*[]) {
     Application::init();
 
@@ -21,7 +24,6 @@ int main(int, char*[]) {
 
     runnerParams.callbacks.LoadAdditionalFonts = Application::loadFonts;
     runnerParams.callbacks.ShowMenus = Application::menuItems;
-    runnerParams.callbacks.ShowGui = Application::render;
     runnerParams.callbacks.BeforeExit = Application::shutdown;
 
     runnerParams.imGuiWindowParams.menuAppTitle = Constants::HELLO_IMGUI_MENU_APP_TITLE;

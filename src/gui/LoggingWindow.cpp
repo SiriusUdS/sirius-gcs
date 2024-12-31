@@ -3,8 +3,13 @@
 #include "Constants.h"
 #include "Logging.h"
 
-LoggingWindow::LoggingWindow() : Window(Constants::GCS_LOGGING_WINDOW_ID), autoScroll(true) {
+LoggingWindow::LoggingWindow() : autoScroll(true) {
+    Logging::linkLoggingWindow(this);
     clear();
+}
+
+LoggingWindow::~LoggingWindow() {
+    Logging::unlinkLoggingWindow();
 }
 
 void LoggingWindow::renderContent() {

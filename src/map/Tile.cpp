@@ -3,8 +3,10 @@
 // clang-format off
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb_image.h>
 // clang-format on
+// #define STB_IMAGE_IMPLEMENTATION
+
+#include <stb_image.h>
 
 Tile::Tile(int z, int x, int y, const std::vector<std::byte>& rawBlob, bool preload) : TileDummy(z, x, y), _rawBlob{rawBlob} {
     if (preload) {

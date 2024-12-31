@@ -8,7 +8,7 @@
 #include <implot.h>
 #include <ini.h>
 
-PlotWindow::PlotWindow() : Window(Constants::GCS_PLOT_WINDOW_ID), flags(ImPlotFlags_None) {
+PlotWindow::PlotWindow() : flags(ImPlotFlags_None) {
     PlotData d1;
     d1.addData(0.0f, 0.0f);
     d1.addData(1.0f, 10.0f);

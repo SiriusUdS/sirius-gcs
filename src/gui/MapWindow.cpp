@@ -4,7 +4,7 @@
 #include "Logging.h"
 #include "TileLoaderImpl.h"
 
-MapWindow::MapWindow() : Window(Constants::GCS_MAP_WINDOW_ID) {
+MapWindow::MapWindow() {
     mapPlot = std::make_shared<RichMapPlot>();
     storage = std::make_shared<MarkStorage>();
 

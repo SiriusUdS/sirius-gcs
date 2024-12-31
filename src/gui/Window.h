@@ -7,16 +7,16 @@
 
 class Window {
 public:
-    Window(const char* name);
+    Window();
     void render();
     virtual void loadState(const mINI::INIStructure& ini);
     virtual void saveState(mINI::INIStructure& ini) const;
     virtual void renderContent() = 0;
 
-    HelloImGui::DockableWindow getDockableWindowObject(const char* dockSpaceName);
+    std::string getName();
+    bool& isVisible();
 
-    bool visible;
-    const char* name;
+    size_t dockableWindowIndex{};
 };
 
 #endif // WINDOW_H

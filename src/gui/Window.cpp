@@ -2,14 +2,11 @@
 
 #include <imgui.h>
 
-Window::Window(const char* name) : name(name), visible(true) {
+Window::Window() {
 }
 
 void Window::render() {
-    if (!visible)
-        return;
-
-    ImGui::Begin(name, &visible);
+    ImGui::Begin(getName().c_str(), &isVisible());
     renderContent();
     ImGui::End();
 }
@@ -20,11 +17,10 @@ void Window::loadState(const mINI::INIStructure& ini) {
 void Window::saveState(mINI::INIStructure& ini) const {
 }
 
-HelloImGui::DockableWindow Window::getDockableWindowObject(const char* dockSpaceName) {
-    HelloImGui::DockableWindow dockableWindow;
-    dockableWindow.label = name;
-    dockableWindow.dockSpaceName = dockSpaceName;
-    dockableWindow.GuiFunction = [this]() { render(); };
+std::string Window::getName() {
+    return HelloImGui::GetRunnerParams()->dockingParams.dockableWindows[dockableWindowIndex].label;
+}
 
-    return dockableWindow;
+bool& Window::isVisible() {
+    return HelloImGui::GetRunnerParams()->dockingParams.dockableWindows[dockableWindowIndex].isVisible;
 }

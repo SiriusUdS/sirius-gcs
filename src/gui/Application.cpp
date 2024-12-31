@@ -13,9 +13,10 @@
 namespace Application {
 mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
 mINI::INIStructure iniStructure;
+std::shared_ptr<LedWindow> ledWindow;
+std::shared_ptr<LoggingWindow> loggingWindow;
 std::shared_ptr<MapWindow> mapWindow;
 std::shared_ptr<PlotWindow> plotWindow;
-std::shared_ptr<LoggingWindow> loggingWindow;
 std::vector<std::shared_ptr<Window>> windows;
 } // namespace Application
 
@@ -35,12 +36,11 @@ void Application::init() {
 
     ImPlot::CreateContext();
 
+    ledWindow = std::make_shared<LedWindow>();
+    loggingWindow = std::make_shared<LoggingWindow>();
     mapWindow = std::make_shared<MapWindow>();
     plotWindow = std::make_shared<PlotWindow>();
-    loggingWindow = std::make_shared<LoggingWindow>();
-    windows = {mapWindow, plotWindow, loggingWindow};
-
-    Logging::linkLoggingWindow(loggingWindow.get());
+    windows = {ledWindow, loggingWindow, mapWindow, plotWindow};
 
     iniFile.read(iniStructure);
     for (auto& window : windows) {
@@ -54,17 +54,10 @@ void Application::init() {
 void Application::menuItems() {
     if (ImGui::BeginMenu("Windows")) {
         for (const auto& window : windows) {
-            ImGui::MenuItem(window->name, NULL, &window->visible);
+            ImGui::MenuItem(window->getName().c_str(), NULL, &window->isVisible());
         }
         ImGui::EndMenu();
     }
-}
-
-void Application::render() {
-    // Already rendered from DockableWindow object, see if some code cleanup should be done in this area.
-    // for (const auto& window : windows) {
-    //    window->render();
-    //}
 }
 
 void Application::shutdown() {
@@ -73,8 +66,6 @@ void Application::shutdown() {
         window = nullptr;
     }
     iniFile.write(iniStructure);
-
-    Logging::unlinkLoggingWindow();
 
     ImPlot::DestroyContext();
 
@@ -99,8 +90,15 @@ std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
 }
 
 std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
-    std::vector<HelloImGui::DockableWindow> dockableWindows = {plotWindow->getDockableWindowObject("MainDockSpace"),
-                                                               mapWindow->getDockableWindowObject("MapSpace"),
-                                                               loggingWindow->getDockableWindowObject("LogSpace")};
-    return dockableWindows;
+    HelloImGui::DockableWindow ledDockWin(Constants::GCS_LED_WINDOW_ID, Constants::GCS_LED_DOCKSPACE, []() { ledWindow->render(); });
+    HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { loggingWindow->render(); });
+    HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { mapWindow->render(); });
+    HelloImGui::DockableWindow plotDockWin(Constants::GCS_PLOT_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { plotWindow->render(); });
+
+    ledWindow->dockableWindowIndex = 0;
+    loggingWindow->dockableWindowIndex = 1;
+    mapWindow->dockableWindowIndex = 2;
+    plotWindow->dockableWindowIndex = 3;
+
+    return {ledDockWin, loggingDockWin, mapDockWin, plotDockWin};
 }

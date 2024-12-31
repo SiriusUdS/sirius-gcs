@@ -1,6 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "LedWindow.h"
 #include "LoggingWindow.h"
 #include "MapWindow.h"
 #include "PlotWindow.h"
@@ -12,7 +13,6 @@ namespace Application {
 void loadFonts();
 void init();
 void menuItems();
-void render();
 void shutdown();
 
 std::vector<HelloImGui::DockingSplit> createBaseDockingSplits();
@@ -20,6 +20,7 @@ std::vector<HelloImGui::DockableWindow> createDockableWindows();
 
 extern mINI::INIFile iniFile;
 extern mINI::INIStructure iniStructure;
+extern std::shared_ptr<LedWindow> ledWindow;
 extern std::shared_ptr<LoggingWindow> loggingWindow;
 extern std::shared_ptr<MapWindow> mapWindow;
 extern std::shared_ptr<PlotWindow> plotWindow;

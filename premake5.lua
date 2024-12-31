@@ -19,6 +19,7 @@ project "sirius-gcs"
     includedirs {
         "src",
         "src/gui",
+        "src/led",
         "src/logging",
         "src/map",
         "external/mINI",
@@ -31,8 +32,6 @@ project "sirius-gcs"
         "external/mINI/ini.h",
         "external/sirius-headers-common/**.h"
     }
-
-    defines { "STB_IMAGE_IMPLEMENTATION" }
 
     filter "system:windows"
         buildoptions {
