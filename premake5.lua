@@ -18,10 +18,11 @@ workspace "sirius-gcs"
 project "sirius-gcs"
     includedirs {
         "src",
-        "src/gui",
         "src/led",
         "src/logging",
         "src/map",
+        "src/plot",
+        "src/windows",
         "external/mINI",
         "external/sirius-headers-common"
     }
