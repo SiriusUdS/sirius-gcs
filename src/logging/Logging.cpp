@@ -12,7 +12,7 @@ std::shared_ptr<ImGuiTextBufferSink> imguiSink;
 std::vector<spdlog::sink_ptr> sinks;
 } // namespace Logging
 
-void Logging::initSpdLog() {
+void Logging::init() {
     consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/gcs-log.txt");
     imguiSink = std::make_shared<ImGuiTextBufferSink>();
@@ -23,12 +23,4 @@ void Logging::initSpdLog() {
     spdlog::set_level(spdlog::level::trace);
     spdlog::flush_every(std::chrono::seconds(5));
     spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
-}
-
-void Logging::linkLoggingWindow(LoggingWindow* loggingWindow) {
-    imguiSink->linkLoggingWindow(loggingWindow);
-}
-
-void Logging::unlinkLoggingWindow() {
-    imguiSink->unlinkLoggingWindow();
 }

@@ -3,23 +3,18 @@
 
 #include "RichMapPlot.h"
 #include "RichMarkStorage.h"
-#include "Window.h"
 
-class MapWindow : public Window {
-public:
-    MapWindow();
-    void render() override;
-    void loadState(const mINI::INIStructure& ini) override;
-    void saveState(mINI::INIStructure& ini) const override;
+namespace MapWindow {
+enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };
 
-private:
-    enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };
+void render();
+void loadState(const mINI::INIStructure& ini);
+void saveState(mINI::INIStructure& ini);
 
-    std::shared_ptr<RichMapPlot> mapPlot;
-    std::shared_ptr<MarkStorage> storage;
-
-    int mapView{0};
-    int prevMapView{0};
-};
+extern int mapView;
+extern int prevMapView;
+extern std::shared_ptr<RichMapPlot> mapPlot;
+extern std::shared_ptr<MarkStorage> storage;
+} // namespace MapWindow
 
 #endif // MAPWINDOW_H

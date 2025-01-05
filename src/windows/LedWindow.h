@@ -1,15 +1,10 @@
 #ifndef LEDWINDOW_H
 #define LEDWINDOW_H
 
-#include "Window.h"
+namespace LedWindow {
+void render();
 
-class LedWindow : public Window {
-public:
-    explicit LedWindow();
-    void render() override;
-
-private:
-    bool open{};
-};
+extern bool open;
+} // namespace LedWindow
 
 #endif // LEDWINDOW_H

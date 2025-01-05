@@ -12,7 +12,6 @@ class MarkItem;
 
 class MarkStorage {
     friend class MarkEditorWidget;
-    friend class MapWindow;
 
 public:
     MarkStorage();
@@ -29,11 +28,8 @@ public:
         _pickState = true;
     }
 
-private:
     void addMark(const GeoCoords& coords, const std::string& name);
     void rmMarks();
-    bool handlePickState();
-    bool handleLoadState();
 
     struct ItemNode;
     inline std::vector<ItemNode>& markItems() {
@@ -44,6 +40,10 @@ private:
     }
 
 private:
+    bool handlePickState();
+    bool handleLoadState();
+
+private:
     // Load State
     bool _loadState{false};
 
@@ -51,11 +51,14 @@ private:
     GeoCoords _pickCoords{};
     bool _pickState{false};
 
-    // Mark Items
+public:
     struct ItemNode {
         std::shared_ptr<MarkItem> ptr;
         mutable bool rmFlag{false};
     };
+
+private:
+    // Mark Items
     std::vector<ItemNode> _markItems;
 };
 

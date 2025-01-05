@@ -3,13 +3,15 @@
 #include "Constants.h"
 #include "Logging.h"
 
-LoggingWindow::LoggingWindow() : autoScroll(true) {
-    Logging::linkLoggingWindow(this);
-    clear();
-}
+namespace LoggingWindow {
+bool autoScroll{};
+ImGuiTextBuffer buf;
+ImGuiTextFilter filter;
+ImVector<int> lineOffsets;
+} // namespace LoggingWindow
 
-LoggingWindow::~LoggingWindow() {
-    Logging::unlinkLoggingWindow();
+void LoggingWindow::init() {
+    clear();
 }
 
 void LoggingWindow::render() {

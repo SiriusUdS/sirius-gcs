@@ -2,14 +2,11 @@
 #define LOGGING_H
 
 #include "ImGuiTextBufferSink.h"
-#include "LoggingWindow.h"
 
 #include <spdlog/spdlog.h>
 
 namespace Logging {
-void initSpdLog();
-void linkLoggingWindow(LoggingWindow* loggingWindow);
-void unlinkLoggingWindow();
+void init();
 
 extern spdlog::sink_ptr consoleSink;
 extern spdlog::sink_ptr fileSink;

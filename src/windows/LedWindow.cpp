@@ -3,8 +3,9 @@
 #include "Constants.h"
 #include "Led.h"
 
-LedWindow::LedWindow() {
-}
+namespace LedWindow {
+bool open{};
+} // namespace LedWindow
 
 void LedWindow::render() {
     const ImVec2 small(50, 50);

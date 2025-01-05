@@ -4,19 +4,15 @@
 #include "PlotData.h"
 #include "RichMapPlot.h"
 #include "RichMarkStorage.h"
-#include "Window.h"
 
-class PlotWindow : public Window {
-public:
-    PlotWindow();
-    void render() override;
-    void loadState(const mINI::INIStructure& ini) override;
-    void saveState(mINI::INIStructure& ini) const override;
+namespace PlotWindow {
+void render();
+void loadState(const mINI::INIStructure& ini);
+void saveState(mINI::INIStructure& ini);
 
-private:
-    std::vector<PlotData> data;
-    ImPlotFlags flags;
-    bool autofit{};
-};
+extern ImPlotFlags flags;
+extern bool autofit;
+extern std::vector<PlotData> data;
+} // namespace PlotWindow
 
 #endif // PLOTWINDOW_H
