@@ -8,9 +8,9 @@
 class MapWindow : public Window {
 public:
     MapWindow();
+    void render() override;
     void loadState(const mINI::INIStructure& ini) override;
     void saveState(mINI::INIStructure& ini) const override;
-    void renderContent() override;
 
 private:
     enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };

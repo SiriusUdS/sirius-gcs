@@ -51,15 +51,6 @@ void Application::init() {
     GCS_LOG_INFO("The following is AltimeterData - Altitude: {}, Value: {}, Timestamp: {}", data.altitude, data.status.value, data.timeStamp_ms);
 }
 
-void Application::menuItems() {
-    if (ImGui::BeginMenu("Windows")) {
-        for (const auto& window : windows) {
-            ImGui::MenuItem(window->getName().c_str(), NULL, &window->isVisible());
-        }
-        ImGui::EndMenu();
-    }
-}
-
 void Application::shutdown() {
     for (auto& window : windows) {
         window->saveState(iniStructure);
@@ -94,11 +85,6 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { loggingWindow->render(); });
     HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { mapWindow->render(); });
     HelloImGui::DockableWindow plotDockWin(Constants::GCS_PLOT_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { plotWindow->render(); });
-
-    ledWindow->dockableWindowIndex = 0;
-    loggingWindow->dockableWindowIndex = 1;
-    mapWindow->dockableWindowIndex = 2;
-    plotWindow->dockableWindowIndex = 3;
 
     return {ledDockWin, loggingDockWin, mapDockWin, plotDockWin};
 }

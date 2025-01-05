@@ -31,19 +31,7 @@ PlotWindow::PlotWindow() : flags(ImPlotFlags_None) {
     data.push_back(d2);
 }
 
-void PlotWindow::loadState(const mINI::INIStructure& ini) {
-    if (ini.has(Constants::GCS_INI_SECTION)) {
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT)) {
-            autofit = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT));
-        }
-    }
-}
-
-void PlotWindow::saveState(mINI::INIStructure& ini) const {
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT, std::to_string(autofit));
-}
-
-void PlotWindow::renderContent() {
+void PlotWindow::render() {
     static float x = 5.0f;
     static float y = 2.5f;
 
@@ -67,4 +55,16 @@ void PlotWindow::renderContent() {
         }
         ImPlot::EndPlot();
     }
+}
+
+void PlotWindow::loadState(const mINI::INIStructure& ini) {
+    if (ini.has(Constants::GCS_INI_SECTION)) {
+        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT)) {
+            autofit = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT));
+        }
+    }
+}
+
+void PlotWindow::saveState(mINI::INIStructure& ini) const {
+    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT, std::to_string(autofit));
 }

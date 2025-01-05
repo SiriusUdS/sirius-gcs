@@ -6,7 +6,7 @@
 class LedWindow : public Window {
 public:
     explicit LedWindow();
-    void renderContent() override;
+    void render() override;
 
 private:
     bool open{};

@@ -12,7 +12,6 @@
 namespace Application {
 void loadFonts();
 void init();
-void menuItems();
 void shutdown();
 
 std::vector<HelloImGui::DockingSplit> createBaseDockingSplits();

@@ -9,7 +9,7 @@ class LoggingWindow : public Window {
 public:
     explicit LoggingWindow();
     ~LoggingWindow();
-    void renderContent() override;
+    void render() override;
     void clear();
     void addLog(const char* str, const char* strEnd);
 

@@ -3,10 +3,10 @@
 #include "Constants.h"
 #include "Led.h"
 
-LedWindow::LedWindow() : Window() {
+LedWindow::LedWindow() {
 }
 
-void LedWindow::renderContent() {
+void LedWindow::render() {
     const ImVec2 small(50, 50);
     const ImVec2 big(100, 100);
 

@@ -12,7 +12,7 @@ LoggingWindow::~LoggingWindow() {
     Logging::unlinkLoggingWindow();
 }
 
-void LoggingWindow::renderContent() {
+void LoggingWindow::render() {
     ImGui::Checkbox("Auto Scroll", &autoScroll);
     ImGui::SameLine();
     if (ImGui::Button("Add test log")) {

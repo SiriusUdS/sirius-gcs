@@ -23,7 +23,6 @@ int main(int, char*[]) {
     runnerParams.dockingParams.dockableWindows = Application::createDockableWindows();
 
     runnerParams.callbacks.LoadAdditionalFonts = Application::loadFonts;
-    runnerParams.callbacks.ShowMenus = Application::menuItems;
     runnerParams.callbacks.BeforeExit = Application::shutdown;
 
     runnerParams.imGuiWindowParams.menuAppTitle = Constants::HELLO_IMGUI_MENU_APP_TITLE;
