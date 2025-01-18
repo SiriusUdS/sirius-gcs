@@ -7,7 +7,7 @@
 #include <implot.h>
 
 struct MapPlot::Impl {
-    constexpr static const ImPlotFlags plotFlags{ImPlotFlags_Equal | ImPlotFlags_NoLegend};
+    constexpr static const ImPlotFlags plotFlags{ImPlotFlags_Equal | ImPlotFlags_NoLegend | ImPlotFlags_NoMouseText | ImPlotFlags_NoMenus};
 
     constexpr static const ImPlotAxisFlags xFlags{ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks
                                                   | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoInitialFit | ImPlotAxisFlags_NoMenus
@@ -21,6 +21,7 @@ struct MapPlot::Impl {
     ImPlotPoint mousePos{};
     ImPlotRect plotLims{};
     ImVec2 plotSize{};
+    ImVec2 plotPos{};
 };
 
 MapPlot::MapPlot() : _impl{std::make_unique<Impl>()}, _loader{std::make_shared<TileLoaderOsmMap>()} {
@@ -58,6 +59,7 @@ void MapPlot::paint() {
 
         _impl->mousePos = ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
         _impl->plotLims = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
+        _impl->plotPos = ImPlot::GetPlotPos();
         _impl->plotSize = ImPlot::GetPlotSize();
 
         _mouseLon = (float) x2lon(_impl->mousePos.x, 0);
@@ -108,6 +110,17 @@ void MapPlot::paint() {
         }
 
         _loader->endLoad();
+
+        // Show longitude and latitude at the bottom right of the plot area
+        if (mouseOnPlot()) {
+            std::string latlonText = std::to_string(_mouseLon) + ", " + std::to_string(_mouseLat);
+            ImVec2 textSize = ImGui::CalcTextSize(latlonText.c_str());
+            ImVec2 textPos =
+              ImVec2(_impl->plotPos.x + _impl->plotSize.x - textSize.x - 20.0f, _impl->plotPos.y + _impl->plotSize.y - textSize.y - 20.0f);
+
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), latlonText.c_str());
+        }
 
         paintOverMap();
 
