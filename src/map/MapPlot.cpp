@@ -59,8 +59,8 @@ void MapPlot::paint() {
 
         _impl->mousePos = ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
         _impl->plotLims = ImPlot::GetPlotLimits(ImAxis_X1, ImAxis_Y1);
-        _impl->plotPos = ImPlot::GetPlotPos();
         _impl->plotSize = ImPlot::GetPlotSize();
+        _impl->plotPos = ImPlot::GetPlotPos();
 
         _mouseLon = (float) x2lon(_impl->mousePos.x, 0);
         _mouseLat = (float) y2lat(_impl->mousePos.y, 0);
@@ -81,8 +81,8 @@ void MapPlot::paint() {
         _tilesNum = POW2[_zoom];
         _tileSize = 1.0f / float(_tilesNum);
 
-        const auto minMaxLat{std::minmax(y2lat(_minY * _tilesNum, _zoom), y2lat(_maxY * _tilesNum, _zoom))};
-        const auto minMaxLon{std::minmax(x2lon(_minX * _tilesNum, _zoom), x2lon(_maxX * _tilesNum, _zoom))};
+        const auto minMaxLat{std::minmax({y2lat(_minY * _tilesNum, _zoom), y2lat(_maxY * _tilesNum, _zoom)})};
+        const auto minMaxLon{std::minmax({x2lon(_minX * _tilesNum, _zoom), x2lon(_maxX * _tilesNum, _zoom)})};
 
         _minLat = (float) minMaxLat.first;
         _maxLat = (float) minMaxLat.second;
@@ -105,7 +105,7 @@ void MapPlot::paint() {
             for (auto y{_minTY}; y != _maxTY + 1; ++y) {
                 bmin.y = float(y) * _tileSize;
                 bmax.y = float(y + 1) * _tileSize;
-                ImPlot::PlotImage("##", _loader->tileAt(_zoom, x, y), bmin, bmax, _impl->uv0, _impl->uv1, _impl->tint);
+                ImPlot::PlotImage("##", _loader->tileAt(_zoom, x, y), bmin, bmax, MapPlot::Impl::uv0, MapPlot::Impl::uv1, MapPlot::Impl::tint);
             }
         }
 
