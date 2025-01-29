@@ -2,10 +2,12 @@
 #define LOGGINGWINDOW_H
 
 #include <imgui.h>
+#include <ini.h>
 
 namespace LoggingWindow {
-void init();
 void render();
+void loadState(const mINI::INIStructure& ini);
+void saveState(mINI::INIStructure& ini);
 void clear();
 void addLog(const char* str, const char* strEnd);
 

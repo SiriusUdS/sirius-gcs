@@ -14,11 +14,12 @@ constexpr const char* GCS_LOGGING_DOCKSPACE = "LogSpace";
 constexpr const char* GCS_MAP_DOCKSPACE = "MapSpace";
 constexpr const char* GCS_PLOT_DOCKSPACE = "MainDockSpace";
 
-// .ini file sections
+// .ini file & sections (where application state is saved)
 constexpr const char* GCS_INI_SECTION = "GCS";
 constexpr const char* GCS_INI_FILENAME = "sirius_gcs.ini";
 constexpr const char* GCS_INI_MAP_WINDOW_MAP_VIEW = "map_window_map_view";
 constexpr const char* GCS_INI_PLOT_WINDOW_AUTO_FIT = "plot_window_auto_fit";
+constexpr const char* GCS_INI_LOG_WINDOW_AUTO_SCROLL = "log_window_auto_scroll";
 
 // HelloImGui specific params
 constexpr const char* HELLO_IMGUI_INI_FILENAME = "hello_imgui.ini";

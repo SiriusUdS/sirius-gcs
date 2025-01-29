@@ -3,16 +3,14 @@
 #include "Constants.h"
 #include "Logging.h"
 
+#include <ini.h>
+
 namespace LoggingWindow {
-bool autoScroll{};
+bool autoScroll{true};
 ImGuiTextBuffer buf;
 ImGuiTextFilter filter;
 ImVector<int> lineOffsets;
 } // namespace LoggingWindow
-
-void LoggingWindow::init() {
-    clear();
-}
 
 void LoggingWindow::render() {
     ImGui::Checkbox("Auto Scroll", &autoScroll);
@@ -50,6 +48,20 @@ void LoggingWindow::render() {
     }
     ImGui::EndChild();
     ImGui::LogText("Bonjour");
+}
+
+void LoggingWindow::loadState(const mINI::INIStructure& ini) {
+    clear();
+
+    if (ini.has(Constants::GCS_INI_SECTION)) {
+        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_LOG_WINDOW_AUTO_SCROLL)) {
+            autoScroll = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_LOG_WINDOW_AUTO_SCROLL));
+        }
+    }
+}
+
+void LoggingWindow::saveState(mINI::INIStructure& ini) {
+    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_LOG_WINDOW_AUTO_SCROLL, std::to_string(autoScroll));
 }
 
 void LoggingWindow::clear() {

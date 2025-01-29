@@ -2,8 +2,9 @@
 #define PLOTWINDOW_H
 
 #include "PlotData.h"
-#include "RichMapPlot.h"
-#include "RichMarkStorage.h"
+
+#include <implot.h>
+#include <ini.h>
 
 namespace PlotWindow {
 void render();
