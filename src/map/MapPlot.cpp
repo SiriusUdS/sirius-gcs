@@ -112,15 +112,15 @@ void MapPlot::paint() {
         _loader->endLoad();
 
         // Show longitude and latitude at the bottom right of the plot area
-        if (mouseOnPlot()) {
-            std::string latlonText = std::to_string(_mouseLon) + ", " + std::to_string(_mouseLat);
-            ImVec2 textSize = ImGui::CalcTextSize(latlonText.c_str());
-            ImVec2 textPos =
-              ImVec2(_impl->plotPos.x + _impl->plotSize.x - textSize.x - 20.0f, _impl->plotPos.y + _impl->plotSize.y - textSize.y - 20.0f);
+        // if (mouseOnPlot()) {
+        //    std::string latlonText = std::to_string(_mouseLon) + ", " + std::to_string(_mouseLat);
+        //    ImVec2 textSize = ImGui::CalcTextSize(latlonText.c_str());
+        //    ImVec2 textPos =
+        //      ImVec2(_impl->plotPos.x + _impl->plotSize.x - textSize.x - 20.0f, _impl->plotPos.y + _impl->plotSize.y - textSize.y - 20.0f);
 
-            ImDrawList* drawList = ImGui::GetWindowDrawList();
-            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), latlonText.c_str());
-        }
+        //    ImDrawList* drawList = ImGui::GetWindowDrawList();
+        //    drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), latlonText.c_str());
+        // }
 
         paintOverMap();
 
