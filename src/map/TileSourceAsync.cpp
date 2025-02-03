@@ -1,7 +1,6 @@
 #include "TileSourceAsync.h"
 
 #include "ITileSaver.h"
-#include "Logging.h"
 #include "Tile.h"
 #include "TileAsync.h"
 
