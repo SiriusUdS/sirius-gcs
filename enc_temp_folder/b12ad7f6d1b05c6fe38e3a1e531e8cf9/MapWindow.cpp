@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "Logging.h"
 #include "TileLoaderImpl.h"
+#include "TileSaver.h"
 
 namespace MapWindow {
 int mapView{};
