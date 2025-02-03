@@ -1,6 +1,7 @@
 #include "TileSourceUrl.h"
 
 #include <curl/curl.h>
+#include <future>
 
 size_t onWrite(void* data, size_t size, size_t nmemb, void* userp);
 size_t onProgress(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow);
@@ -11,6 +12,10 @@ TileSourceUrl::TileSourceUrl(int requestLimit, bool preload, const std::string& 
 }
 
 TileSourceUrl::~TileSourceUrl() {
+}
+
+void TileSourceUrl::testFetch() {
+    std::async(std::launch::async, &TileSourceUrl::fetchTest, this);
 }
 
 bool TileSourceUrl::receiveTile(int z, int x, int y, TileData& tileData) {
@@ -34,6 +39,20 @@ bool TileSourceUrl::receiveTile(int z, int x, int y, TileData& tileData) {
     curl_easy_cleanup(curl);
 
     return ok;
+}
+
+void TileSourceUrl::fetchTest() {
+    if (fetchTestMutex.try_lock()) {
+        CURL* curl = {curl_easy_init()};
+        curl_easy_setopt(curl, CURLOPT_URL, makeUrl(0, 0, 0).c_str());
+        curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 1);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
+        lastFetchSuccessful.store(curl_easy_perform(curl) == CURLE_OK);
+        curl_easy_cleanup(curl);
+    
+        fetchTestMutex.unlock();
+    }
 }
 
 size_t onWrite(void* data, size_t size, size_t nmemb, void* userp) {
