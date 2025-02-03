@@ -92,6 +92,8 @@ public:
 
     bool mouseOnPlot() const;
 
+    bool failedToFetchTiles() const;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> _impl;

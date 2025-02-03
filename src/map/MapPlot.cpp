@@ -177,3 +177,7 @@ bool MapPlot::mouseOnPlot() const {
     return _impl->mousePos.x > _impl->plotLims.X.Min && _impl->mousePos.x < _impl->plotLims.X.Max && _impl->mousePos.y > _impl->plotLims.Y.Min
            && _impl->mousePos.y < _impl->plotLims.Y.Max;
 }
+
+bool MapPlot::failedToFetchTiles() const {
+    return _loader->failedLoad();
+}

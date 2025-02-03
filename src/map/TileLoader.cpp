@@ -31,3 +31,7 @@ ImTextureID TileLoader::tileAt(int z, int x, int y) {
 
     return 0;
 }
+
+bool TileLoader::failedLoad() {
+    return _source->hasFailedManyRequests();
+}

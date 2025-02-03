@@ -7,6 +7,9 @@
 namespace MapWindow {
 int mapView{};
 int prevMapView{};
+bool sourceIsFs{};
+std::chrono::seconds autoSourceSwitchDelay{3};
+std::chrono::steady_clock::time_point lastAutoSourceSwitchTime{std::chrono::steady_clock::now()};
 std::shared_ptr<RichMapPlot> mapPlot;
 std::shared_ptr<MarkStorage> storage;
 } // namespace MapWindow
@@ -18,11 +21,31 @@ void MapWindow::render() {
     ImGui::SameLine();
     ImGui::RadioButton("Satellite", &mapView, SATELLITE_VIEW);
 
-    if (mapView != prevMapView) {
-        if (mapView == MAP_VIEW) {
-            mapPlot->setTileLoader(std::make_shared<TileLoaderOsmMap>());
-        } else if (mapView == SATELLITE_VIEW) {
-            mapPlot->setTileLoader(std::make_shared<TileLoaderArcMap>());
+    auto now = std::chrono::steady_clock::now();
+    bool autoSourceSwitchDelayElapsed = now - lastAutoSourceSwitchTime > autoSourceSwitchDelay;
+    bool shouldSwitchSource = mapPlot->failedToFetchTiles() && autoSourceSwitchDelayElapsed;
+    if (shouldSwitchSource) {
+        sourceIsFs = !sourceIsFs;
+        lastAutoSourceSwitchTime = now;
+        GCS_LOG_WARN("Failed to fetch tiles, switching sources: {}", sourceIsFs);
+    }
+
+    if (mapView != prevMapView || shouldSwitchSource) {
+        if (sourceIsFs) {
+            std::string mapViewFolder;
+            if (mapView == MAP_VIEW) {
+                mapViewFolder = "map";
+            } else if (mapView == SATELLITE_VIEW) {
+                mapViewFolder = "satellite";
+            }
+            std::string tileDir = (std::filesystem::current_path() / "tiles" / mapViewFolder).string();
+            mapPlot->setTileLoader(std::make_shared<TileLoaderFsMap>(tileDir));
+        } else {
+            if (mapView == MAP_VIEW) {
+                mapPlot->setTileLoader(std::make_shared<TileLoaderOsmMap>());
+            } else if (mapView == SATELLITE_VIEW) {
+                mapPlot->setTileLoader(std::make_shared<TileLoaderArcMap>());
+            }
         }
         prevMapView = mapView;
     }

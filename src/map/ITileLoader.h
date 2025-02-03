@@ -15,6 +15,9 @@ public:
     };
     virtual void endLoad() {
     }
+    virtual bool failedLoad() {
+        return false;
+    }
 };
 
 #endif // ITILELOADER_H

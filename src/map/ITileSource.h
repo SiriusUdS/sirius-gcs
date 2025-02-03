@@ -14,6 +14,7 @@ public:
     virtual bool hasRequest() = 0;
     virtual bool hasRequest(int z, int x, int y) = 0;
     virtual bool canRequest() = 0;
+    virtual bool hasFailedManyRequests() = 0;
     virtual bool request(int z, int x, int y) = 0;
 
     virtual void waitAll() = 0;

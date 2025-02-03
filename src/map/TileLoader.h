@@ -21,6 +21,7 @@ public:
     }
     virtual void endLoad() override {
     }
+    virtual bool failedLoad() override;
 
 private:
     std::shared_ptr<ITileSource> _source;

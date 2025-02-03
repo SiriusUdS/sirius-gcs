@@ -1,6 +1,7 @@
 #include "TileSourceAsync.h"
 
 #include "ITileSaver.h"
+#include "Logging.h"
 #include "Tile.h"
 #include "TileAsync.h"
 
@@ -26,6 +27,10 @@ bool TileSourceAsync::hasRequest(int z, int x, int y) {
 
 bool TileSourceAsync::canRequest() {
     return _requests.size() < _requestLimit;
+}
+
+bool TileSourceAsync::hasFailedManyRequests() {
+    return _failedFetches == _failedFetchesThreshold;
 }
 
 bool TileSourceAsync::request(int z, int x, int y) {
@@ -79,8 +84,10 @@ TileAsync::FutureData TileSourceAsync::onHandleRequest(int z, int x, int y) {
     TileAsync::FutureData futureData;
     if (receiveTile(z, x, y, tileData)) {
         futureData.tile = std::make_shared<Tile>(z, x, y, tileData.blob, _preload);
+        _failedFetches = 0;
     } else {
         futureData.tile = std::make_shared<TileDummy>(z, x, y);
+        _failedFetches = std::min(_failedFetches + 1, _failedFetchesThreshold);
     }
     return futureData;
 }

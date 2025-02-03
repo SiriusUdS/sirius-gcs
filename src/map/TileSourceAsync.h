@@ -15,6 +15,7 @@ public:
     virtual bool hasRequest() override;
     virtual bool hasRequest(int z, int x, int y) override;
     virtual bool canRequest() override;
+    virtual bool hasFailedManyRequests() override;
     virtual bool request(int z, int x, int y) override;
 
     virtual void waitAll() override;
@@ -45,6 +46,8 @@ private:
     int _requestLimit{10};
     bool _preload{true};
     std::atomic_bool _interrupt;
+    int _failedFetches{};
+    int _failedFetchesThreshold{10};
 };
 
 #endif // TILESOURCEASYNC_H
