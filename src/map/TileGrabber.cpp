@@ -20,10 +20,19 @@ void TileGrabber::grab(const double minLat, const double maxLat,
 
 void TileGrabber::stop() { _stop = true; }
 
+bool TileGrabber::isStopping() {
+  return _stop;
+}
+
+bool TileGrabber::done() {
+  return _isDone.load();
+}
+
 TileGrabber::FutureData
 TileGrabber::onLaunchGrab(const double minLat, const double maxLat,
                           const double minLon, const double maxLon,
                           const int minZ, const int maxZ) {
+  _isDone = false;
   _tileCounter = 0;
   std::vector<std::shared_ptr<ITile>> tiles;
   tiles.reserve(_source->requestLimit());
@@ -35,6 +44,7 @@ TileGrabber::onLaunchGrab(const double minLat, const double maxLat,
     for (auto x{tx.first}; x != tx.second + 1; ++x) {
       for (auto y{ty.first}; y != ty.second + 1; ++y) {
         if (_stop) {
+          _isDone = true;
           return data;
         }
         if (!_source->canRequest()) {
@@ -62,5 +72,6 @@ TileGrabber::onLaunchGrab(const double minLat, const double maxLat,
   _saver->saveMulti(tiles);
   _tileCounter += tiles.size();
 
+  _isDone = true;
   return data;
 }

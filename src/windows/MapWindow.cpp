@@ -11,6 +11,11 @@ int mapView{};
 int prevMapView{};
 bool sourceIsFs{};
 bool canFetchTilesFromUrl{false};
+int downloadMinZ{0};
+int downloadMaxZ{18};
+int downloadTileCount{0};
+int downloadTileTotal{};
+float downloadProgress{0};
 std::chrono::seconds autoSourceSwitchDelay{3};
 std::chrono::steady_clock::time_point lastAutoSourceSwitchTime{std::chrono::steady_clock::now()};
 std::shared_ptr<RichMapPlot> mapPlot;
@@ -24,10 +29,21 @@ void MapWindow::render() {
         ImGui::Indent(20.0f);
         ImGui::Text("Min Lat %.6f, Min Lon %.6f", mapPlot->minLat(), mapPlot->minLon());
         ImGui::Text("Max Lat %.6f, Max Lon %.6f", mapPlot->maxLat(), mapPlot->maxLon());
-        ImGui::Text("Zoom %d", mapPlot->zoom());
+
+        ImGui::SetNextItemWidth(150);
+        ImGui::InputInt("Min Z", &downloadMinZ);
+        downloadMinZ = std::clamp(downloadMinZ, 0, MAX_ZOOM);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(150);
+        ImGui::InputInt("Max Z", &downloadMaxZ);
+        downloadMaxZ = std::clamp(downloadMaxZ, 0, MAX_ZOOM);
+        ImGui::SameLine();
+        ImGui::Text("Tiles Count: %lu", countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ));
+
         ImGui::BeginDisabled(sourceIsFs);
         if (ImGui::Button("Download")) {
-            tileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), mapPlot->zoom(), mapPlot->zoom());
+            downloadTileTotal = countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
+            tileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
             if (sourceIsFs) {
@@ -37,6 +53,22 @@ void MapWindow::render() {
             }
         }
         ImGui::EndDisabled();
+        ImGui::SameLine();
+
+        ImGui::BeginDisabled(tileGrabber->done() || tileGrabber->isStopping());
+        if (ImGui::Button("Stop")) {
+            tileGrabber->stop();
+        }
+        ImGui::EndDisabled();
+
+        downloadTileCount = tileGrabber->tileCounter();
+        downloadProgress = float(downloadTileCount) / float(downloadTileTotal);
+        downloadProgress = std::isnan(downloadProgress) ? 0.f : downloadProgress;
+        ImGui::SameLine();
+        ImGui::Text("%d/%d", downloadTileCount, downloadTileTotal);
+        ImGui::SameLine();
+        ImGui::ProgressBar(downloadProgress);
+
         ImGui::Unindent(20.0f);
     }
 
@@ -92,14 +124,12 @@ void MapWindow::render() {
 void MapWindow::loadState(const mINI::INIStructure& ini) {
     mapPlot = std::make_shared<RichMapPlot>();
     storage = std::make_shared<MarkStorage>();
-
-    std::string tileDir = (std::filesystem::current_path() / "tiles" / "map").string();
-    tileGrabber = std::make_shared<TileGrabber>(
-        std::make_shared<TileSourceUrlOsm>(URL_REQUEST_LIMIT, MAP_PRELOAD),
-        std::make_shared<TileSaverSubDir>(tileDir)
-    );
-
     urlConnectionTest = std::make_shared<TileSourceUrlOsm>(URL_REQUEST_LIMIT, MAP_PRELOAD);
+
+    const int TILE_REQUEST_LIMIT = 100;
+    std::string tileDir = (std::filesystem::current_path() / "tiles" / "map").string();
+    tileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlOsm>(TILE_REQUEST_LIMIT, MAP_PRELOAD),
+                                                std::make_shared<TileSaverSubDir>(tileDir));
 
     storage->addMark({46.14665264871996, -70.66861153239353}, "Tapis Venture");
     mapPlot->addItem(std::reinterpret_pointer_cast<IRichItem>(storage->markItems().back().ptr));

@@ -17,6 +17,8 @@ public:
             const double maxLon, const int minZ, const int maxZ);
 
   void stop();
+  bool isStopping();
+  bool done();
 
   inline int tileCounter() const { return _tileCounter.load(); }
 
@@ -32,4 +34,5 @@ private:
   std::future<FutureData> _future;
   std::atomic_int _tileCounter{0};
   std::atomic_bool _stop{false};
+  std::atomic_bool _isDone{true};
 };
