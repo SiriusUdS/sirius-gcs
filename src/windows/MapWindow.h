@@ -14,7 +14,6 @@ enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };
 void render();
 void loadState(const mINI::INIStructure& ini);
 void saveState(mINI::INIStructure& ini);
-void checkTileSourceConnection();
 
 extern int mapView;
 extern int prevMapView;

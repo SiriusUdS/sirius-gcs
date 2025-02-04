@@ -37,33 +37,27 @@ void MapWindow::render() {
     ImGui::SameLine();
     ImGui::RadioButton("Satellite", &mapView, SATELLITE_VIEW);
 
-    //auto now = std::chrono::steady_clock::now();
-    //bool autoSourceSwitchDelayElapsed = now - lastAutoSourceSwitchTime > autoSourceSwitchDelay;
-    //bool shouldSwitchSource = mapPlot->failedToFetchTiles() && autoSourceSwitchDelayElapsed;
-    //if (shouldSwitchSource) {
-    //    sourceIsFs = !sourceIsFs;
-    //    lastAutoSourceSwitchTime = now;
-    //    GCS_LOG_WARN("Failed to fetch tiles, switching sources: {}", sourceIsFs);
-    //}
+    bool hasSwitchedSource = mapView != prevMapView;
 
-    bool hasSwitchedSource = false;
+    auto now = std::chrono::steady_clock::now();
+    bool autoSourceSwitchDelayElapsed = now - lastAutoSourceSwitchTime > autoSourceSwitchDelay;
 
-    if (mapPlot->failedToFetchTiles() && !sourceIsFs) {
+    if (mapPlot->failedToFetchTiles() && autoSourceSwitchDelayElapsed && !sourceIsFs) {
         sourceIsFs = true;
+        lastAutoSourceSwitchTime = now;
         hasSwitchedSource = true;
         GCS_LOG_DEBUG("Lost connection to tile provider.");
-    }
-
-    if (sourceIsFs) {
-        if (urlConnectionTest->canFetch()) {
+    } else if (sourceIsFs) {
+        if (urlConnectionTest->canFetch() && autoSourceSwitchDelayElapsed) {
             sourceIsFs = false;
+            lastAutoSourceSwitchTime = now;
             hasSwitchedSource = true;
             GCS_LOG_DEBUG("Regained connection to tile provider.");
         }
         urlConnectionTest->testFetch();
     }
 
-    if (mapView != prevMapView) {
+    if (hasSwitchedSource) {
         if (sourceIsFs) {
             std::string mapViewFolder;
             if (mapView == MAP_VIEW) {
@@ -112,8 +106,4 @@ void MapWindow::loadState(const mINI::INIStructure& ini) {
 void MapWindow::saveState(mINI::INIStructure& ini) {
     mapPlot->saveState(ini);
     ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_MAP_WINDOW_MAP_VIEW, std::to_string(mapView));
-}
-
-void MapWindow::checkTileSourceConnection() {
-    
 }
