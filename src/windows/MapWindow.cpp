@@ -25,9 +25,18 @@ void MapWindow::render() {
         ImGui::Text("Min Lat %.6f, Min Lon %.6f", mapPlot->minLat(), mapPlot->minLon());
         ImGui::Text("Max Lat %.6f, Max Lon %.6f", mapPlot->maxLat(), mapPlot->maxLon());
         ImGui::Text("Zoom %d", mapPlot->zoom());
+        ImGui::BeginDisabled(sourceIsFs);
         if (ImGui::Button("Download")) {
             tileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), mapPlot->zoom(), mapPlot->zoom());
         }
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+            if (sourceIsFs) {
+                ImGui::SetTooltip("Map tiles cannot be downloaded because the tile provider cannot be accessed (likely because of no Internet access).");
+            } else {
+                ImGui::SetTooltip("Download map tiles that are currently on screen so they can be accessed without having to fetch them online.");
+            }
+        }
+        ImGui::EndDisabled();
         ImGui::Unindent(20.0f);
     }
 
