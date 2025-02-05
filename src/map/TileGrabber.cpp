@@ -32,11 +32,16 @@ TileGrabber::FutureData
 TileGrabber::onLaunchGrab(const double minLat, const double maxLat,
                           const double minLon, const double maxLon,
                           const int minZ, const int maxZ) {
+  FutureData data;
+
+  if (!_isDone) {
+    return data;
+  }
+
   _isDone = false;
   _tileCounter = 0;
   std::vector<std::shared_ptr<ITile>> tiles;
   tiles.reserve(_source->requestLimit());
-  FutureData data;
 
   for (auto z{minZ}; z != maxZ + 1; ++z) {
     const auto tx{minmax_tx(minLon, maxLon, z)};

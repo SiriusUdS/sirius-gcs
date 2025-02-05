@@ -28,7 +28,8 @@ extern std::chrono::seconds autoSourceSwitchDelay;
 extern std::chrono::steady_clock::time_point lastAutoSourceSwitchTime;
 extern std::shared_ptr<RichMapPlot> mapPlot;
 extern std::shared_ptr<MarkStorage> storage;
-extern std::shared_ptr<TileGrabber> tileGrabber;
+extern std::shared_ptr<TileGrabber> mapTileGrabber;
+extern std::shared_ptr<TileGrabber> satelliteTileGrabber;
 extern std::shared_ptr<TileSourceUrl> urlConnectionTest;
 } // namespace MapWindow
 

@@ -20,7 +20,8 @@ std::chrono::seconds autoSourceSwitchDelay{3};
 std::chrono::steady_clock::time_point lastAutoSourceSwitchTime{std::chrono::steady_clock::now()};
 std::shared_ptr<RichMapPlot> mapPlot;
 std::shared_ptr<MarkStorage> storage;
-std::shared_ptr<TileGrabber> tileGrabber;
+std::shared_ptr<TileGrabber> mapTileGrabber;
+std::shared_ptr<TileGrabber> satelliteTileGrabber;
 std::shared_ptr<TileSourceUrl> urlConnectionTest;
 } // namespace MapWindow
 
@@ -38,12 +39,13 @@ void MapWindow::render() {
         ImGui::InputInt("Max Z", &downloadMaxZ);
         downloadMaxZ = std::clamp(downloadMaxZ, 0, MAX_ZOOM);
         ImGui::SameLine();
-        ImGui::Text("Tiles Count: %lu", countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ));
+        ImGui::Text("Tiles Count: %lu", 2 * countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ));
 
-        ImGui::BeginDisabled(sourceIsFs);
+        ImGui::BeginDisabled(sourceIsFs || !mapTileGrabber->done() || !satelliteTileGrabber->done());
         if (ImGui::Button("Download")) {
-            downloadTileTotal = countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
-            tileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
+            downloadTileTotal = 2 * countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
+            mapTileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
+            satelliteTileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
             if (sourceIsFs) {
@@ -55,13 +57,15 @@ void MapWindow::render() {
         ImGui::EndDisabled();
         ImGui::SameLine();
 
-        ImGui::BeginDisabled(tileGrabber->done() || tileGrabber->isStopping());
+        ImGui::BeginDisabled((mapTileGrabber->done() || mapTileGrabber->isStopping())
+                             && (satelliteTileGrabber->done() || satelliteTileGrabber->isStopping()));
         if (ImGui::Button("Stop")) {
-            tileGrabber->stop();
+            mapTileGrabber->stop();
+            satelliteTileGrabber->stop();
         }
         ImGui::EndDisabled();
 
-        downloadTileCount = tileGrabber->tileCounter();
+        downloadTileCount = mapTileGrabber->tileCounter() + satelliteTileGrabber->tileCounter();
         downloadProgress = float(downloadTileCount) / float(downloadTileTotal);
         downloadProgress = std::isnan(downloadProgress) ? 0.f : downloadProgress;
         ImGui::SameLine();
@@ -126,10 +130,13 @@ void MapWindow::loadState(const mINI::INIStructure& ini) {
     storage = std::make_shared<MarkStorage>();
     urlConnectionTest = std::make_shared<TileSourceUrlOsm>(URL_REQUEST_LIMIT, MAP_PRELOAD);
 
-    const int TILE_REQUEST_LIMIT = 100;
-    std::string tileDir = (std::filesystem::current_path() / "tiles" / "map").string();
-    tileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlOsm>(TILE_REQUEST_LIMIT, MAP_PRELOAD),
-                                                std::make_shared<TileSaverSubDir>(tileDir));
+    const int TILE_REQUEST_LIMIT = 25;
+    std::string mapTileDir = (std::filesystem::current_path() / "tiles" / "map").string();
+    std::string satelliteTileDir = (std::filesystem::current_path() / "tiles" / "satellite").string();
+    mapTileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlOsm>(TILE_REQUEST_LIMIT, MAP_PRELOAD),
+                                                   std::make_shared<TileSaverSubDir>(mapTileDir));
+    satelliteTileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlArc>(TILE_REQUEST_LIMIT, MAP_PRELOAD),
+                                                         std::make_shared<TileSaverSubDir>(satelliteTileDir));
 
     storage->addMark({46.14665264871996, -70.66861153239353}, "Tapis Venture");
     mapPlot->addItem(std::reinterpret_pointer_cast<IRichItem>(storage->markItems().back().ptr));
