@@ -44,7 +44,8 @@ project "sirius-gcs"
 
 project "sirius-gcs-tests"
     includedirs {
-        "src/test"
+        "src/test",
+        "external/doctest"
     }
 
     files {
