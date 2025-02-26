@@ -28,7 +28,7 @@ constexpr const char* HELLO_IMGUI_WINDOW_TITLE = "Sirius GCS";
 constexpr const char* HELLO_IMGUI_MENU_APP_TITLE = "Sirius GCS";
 
 // Font related params
-constexpr const char* IMGUI_MAIN_FONT_FILENAME = "assets/fonts/Comic Sans MS.ttf";
+constexpr const char* IMGUI_MAIN_FONT_FILENAME = "assets/fonts/Nunito-Regular.ttf";
 constexpr float IMGUI_MAIN_FONT_SIZE = 28.0f;
 } // namespace Constants
 
