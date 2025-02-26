@@ -7,6 +7,7 @@ constexpr const char* GCS_LED_WINDOW_ID = "LED";
 constexpr const char* GCS_LOGGING_WINDOW_ID = "Logs";
 constexpr const char* GCS_MAP_WINDOW_ID = "Map";
 constexpr const char* GCS_PLOT_WINDOW_ID = "Plot";
+constexpr const char* GCS_CONTROLS_WINDOW_ID = "Controls";
 
 // Dock space names
 constexpr const char* GCS_LED_DOCKSPACE = "MainDockSpace";

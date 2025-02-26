@@ -2,6 +2,7 @@
 
 #include "Altimeter/AltimeterData.h"
 #include "Constants.h"
+#include "ControlsWindow.h"
 #include "LedWindow.h"
 #include "Logging.h"
 #include "LoggingWindow.h"
@@ -79,6 +80,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { MapWindow::render(); });
     HelloImGui::DockableWindow plotDockWin(Constants::GCS_PLOT_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindow::render(); });
+    HelloImGui::DockableWindow controlsDockWin(Constants::GCS_CONTROLS_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { ControlsWindow::render(); });
 
-    return {ledDockWin, loggingDockWin, mapDockWin, plotDockWin};
+    return {ledDockWin, loggingDockWin, mapDockWin, plotDockWin, controlsDockWin};
 }
