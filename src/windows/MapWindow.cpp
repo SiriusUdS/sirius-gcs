@@ -13,8 +13,8 @@ bool sourceIsFs{};
 bool canFetchTilesFromUrl{false};
 int downloadMinZ{0};
 int downloadMaxZ{18};
-int downloadTileCount{0};
-int downloadTileTotal{};
+size_t downloadTileCount{0};
+size_t downloadTileTotal{};
 float downloadProgress{0};
 std::chrono::seconds autoSourceSwitchDelay{3};
 std::chrono::steady_clock::time_point lastAutoSourceSwitchTime{std::chrono::steady_clock::now()};
@@ -28,28 +28,47 @@ std::shared_ptr<TileSourceUrl> urlConnectionTest;
 void MapWindow::render() {
     if (ImGui::CollapsingHeader("Download Tiles")) {
         ImGui::Indent(20.0f);
+
+        size_t tilesSelectedTotal =
+          2 * countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
+        bool maxTilesDownloadExceeded = tilesSelectedTotal > Constants::GCS_MAP_MAX_TILES_DOWNLOAD;
+
+        // Latitude and longitude
         ImGui::Text("Min Lat %.6f, Min Lon %.6f", mapPlot->minLat(), mapPlot->minLon());
         ImGui::Text("Max Lat %.6f, Max Lon %.6f", mapPlot->maxLat(), mapPlot->maxLon());
 
-        ImGui::SetNextItemWidth(150);
+        // Input to set which zoom levels we want to download the tiles from + tile counter
+        ImGui::SetNextItemWidth(200);
         ImGui::InputInt("Min Z", &downloadMinZ);
         downloadMinZ = std::clamp(downloadMinZ, 0, MAX_ZOOM);
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(150);
+        ImGui::SetNextItemWidth(200);
         ImGui::InputInt("Max Z", &downloadMaxZ);
         downloadMaxZ = std::clamp(downloadMaxZ, 0, MAX_ZOOM);
         ImGui::SameLine();
-        ImGui::Text("Tiles Count: %lu", 2 * countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ));
+        if (maxTilesDownloadExceeded) {
+            ImGui::Text("Tiles Count:");
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+            ImGui::Text(">%lu (Too many tiles, can't download)", Constants::GCS_MAP_MAX_TILES_DOWNLOAD);
+            ImGui::PopStyleColor();
+        } else {
+            ImGui::Text("Tiles Count: %lu", tilesSelectedTotal);
+        }
 
-        ImGui::BeginDisabled(sourceIsFs || !mapTileGrabber->done() || !satelliteTileGrabber->done());
+        // Download button
+        ImGui::BeginDisabled(sourceIsFs || maxTilesDownloadExceeded || !mapTileGrabber->done() || !satelliteTileGrabber->done());
         if (ImGui::Button("Download")) {
-            downloadTileTotal = 2 * countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
+            downloadTileTotal = tilesSelectedTotal;
             mapTileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
             satelliteTileGrabber->grab(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
             if (sourceIsFs) {
-                ImGui::SetTooltip("Map tiles cannot be downloaded because the tile provider cannot be accessed (likely because of no Internet access).");
+                ImGui::SetTooltip(
+                  "Map tiles cannot be downloaded because the tile provider cannot be accessed (likely because of no Internet access).");
+            } else if (maxTilesDownloadExceeded) {
+                ImGui::SetTooltip("Downloads exceeding %lu tiles are not permitted.", Constants::GCS_MAP_MAX_TILES_DOWNLOAD);
             } else {
                 ImGui::SetTooltip("Download map tiles that are currently on screen so they can be accessed without having to fetch them online.");
             }
@@ -57,6 +76,7 @@ void MapWindow::render() {
         ImGui::EndDisabled();
         ImGui::SameLine();
 
+        // Stop download button
         ImGui::BeginDisabled((mapTileGrabber->done() || mapTileGrabber->isStopping())
                              && (satelliteTileGrabber->done() || satelliteTileGrabber->isStopping()));
         if (ImGui::Button("Stop")) {
@@ -65,6 +85,7 @@ void MapWindow::render() {
         }
         ImGui::EndDisabled();
 
+        // Download progress bar
         downloadTileCount = mapTileGrabber->tileCounter() + satelliteTileGrabber->tileCounter();
         downloadProgress = float(downloadTileCount) / float(downloadTileTotal);
         downloadProgress = std::isnan(downloadProgress) ? 0.f : downloadProgress;
@@ -87,6 +108,8 @@ void MapWindow::render() {
     auto now = std::chrono::steady_clock::now();
     bool autoSourceSwitchDelayElapsed = now - lastAutoSourceSwitchTime > autoSourceSwitchDelay;
 
+    // Check if we can fetch tiles from online provider
+    // If we can't, fetch the downloaded tiles locally
     if (mapPlot->failedToFetchTiles() && autoSourceSwitchDelayElapsed && !sourceIsFs) {
         sourceIsFs = true;
         lastAutoSourceSwitchTime = now;

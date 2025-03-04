@@ -9,6 +9,9 @@ constexpr const char* GCS_MAP_WINDOW_ID = "Map";
 constexpr const char* GCS_PLOT_WINDOW_ID = "Plot";
 constexpr const char* GCS_CONTROLS_WINDOW_ID = "Controls";
 
+// ImGui components params
+constexpr const size_t GCS_MAP_MAX_TILES_DOWNLOAD = 100'000;
+
 // Dock space names
 constexpr const char* GCS_LED_DOCKSPACE = "MainDockSpace";
 constexpr const char* GCS_LOGGING_DOCKSPACE = "LogSpace";
