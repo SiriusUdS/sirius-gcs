@@ -29,7 +29,7 @@ bool TileSourceAsync::canRequest() {
 }
 
 bool TileSourceAsync::hasFailedManyRequests() {
-    return _failedFetches == _failedFetchesThreshold;
+    return _failedFetches >= _failedFetchesThreshold;
 }
 
 bool TileSourceAsync::request(int z, int x, int y) {

@@ -15,3 +15,5 @@ FILE_PATTERNS          = *.h \
 RECURSIVE              = YES
 
 USE_MDFILE_AS_MAINPAGE = README.md
+
+USE_PDFLATEX = NO

@@ -85,73 +85,162 @@ struct OsmCoords;
 struct GeoCoords;
 struct LocalCoords;
 
+/**
+ * @struct LocalCoords
+ * @brief Local x and y coordinates
+ */
 struct LocalCoords {
-    double x{};
-    double y{};
+    double x{}; ///< X position
+    double y{}; ///< Y position
 };
 
+/**
+ * @struct OsmCoords
+ * @brief Osm x and y coordinates
+ */
 struct OsmCoords {
-    double x{};
-    double y{};
+    double x{}; ///< X position
+    double y{}; ///< Y position
 
+    /**
+     * @brief Converts OsmCoords to an ImPlot plot point
+     * @return ImPlotPoint
+     */
     inline ImPlotPoint toPlotPoint() const {
         return {x, y};
     }
+
+    /**
+     * @brief Converts OsmCoords to GeoCoords
+     * @return GeoCoords
+     */
     inline GeoCoords toGeoCoords() const;
 };
 
+/**
+ * @struct GeoCoords
+ * @brief Geographical coordinates representation in latitude and longitude
+ */
 struct GeoCoords {
     GeoCoords() = default;
+
+    /**
+     * @brief Constructs GeoCoords from 2 doubles
+     */
     GeoCoords(double lat_, double lon_) : lat{lat_}, lon{lon_} {
     }
+
+    /**
+     * @brief Constructs GeoCoords from array of 2 doubles
+     */
     GeoCoords(const std::array<double, 2>& arr) : lat{arr.front()}, lon{arr.back()} {
     }
+
+    /**
+     * @brief Constructs GeoCoords from array of 2 floats
+     */
     GeoCoords(const std::array<float, 2>& arr) : lat{arr.front()}, lon{arr.back()} {
     }
 
-    double lat{};
-    double lon{};
+    double lat{}; ///< Latitude
+    double lon{}; ///< Longitude
 
+    /**
+     * @brief Converts latitude and longitude to an ImPlot plot point
+     * @return ImPlotPoint
+     */
     inline ImPlotPoint toPlotPoint() const {
         return {lon2x(lon), lat2y(lat)};
     }
+
+    /**
+     * @brief Converts latitude and longitude to an OsmCoords point
+     * @return OsmCoords
+     */
     inline OsmCoords toOsmCoords() const {
         return {lon2x(lon), lat2y(lat)};
     }
+
+    /**
+     * @brief Converts longitude to OsmCoords x
+     * @return double
+     */
     inline double toOsmX() const {
         return lon2x(lon);
     };
+
+    /**
+     * @brief Converts latitude to OsmCoords y
+     * @return double
+     */
     inline double toOsmY() const {
         return lat2y(lat);
     };
+
+    /**
+     * @brief Converts latitude and longitude to cartesian coordinates
+     * @param o Point of reference for the cartesian coordinates
+     * @return double
+     */
     inline LocalCoords toLocalCoords(const GeoCoords& o) const {
         LocalCoords c;
         LatLon::cartesian(c.x, c.y, lat, lon, o.lat, o.lon);
         return c;
     }
+
+    /**
+     * @brief Computes destination latitude and longitude given a movement described by distance and bearing
+     * @param d Distance in meters
+     * @param b Bearing in degrees
+     * @return GeoCoords
+     */
     inline GeoCoords destination(const double d, const double b) const {
         GeoCoords c;
         LatLon::destination(c.lat, c.lon, lat, lon, d, b);
         return c;
     }
 
+    /**
+     * @brief Computes distance between current GeoCoords and another in meters
+     * @param other The other GeoCoords
+     * @return double
+     */
     inline double distance(const GeoCoords& other) const {
         return LatLon::distance(lat, lon, other.lat, other.lon);
     }
 
+    /**
+     * @brief Computes bearing between current GeoCoords and another in degrees
+     * @param other The other GeoCoords
+     * @return double
+     */
     inline double bearing(const GeoCoords& other) const {
         return LatLon::bearing(lat, lon, other.lat, other.lon);
     }
 
+    /**
+     * @brief Computes midpoint between current GeoCoords and another
+     * @param other The other GeoCoords
+     * @return GeoCoords
+     */
     inline GeoCoords midpoint(const GeoCoords& other) {
         double lat_{}, lon_{};
         LatLon::midpoint(lat_, lon_, lat, lon, other.lat, other.lon);
         return {lat_, lon_};
     }
 
+    /**
+     * @brief Casts latitude and longitude to array of 2 doubles
+     * @return std::array<double, 2>
+     */
     inline operator std::array<double, 2>() const {
         return {lat, lon};
     }
+
+    /**
+     * @brief Casts latitude and longitude to array of 2 floats
+     * @return std::array<float, 2>
+     */
     inline operator std::array<float, 2>() const {
         return {float(lat), float(lon)};
     }

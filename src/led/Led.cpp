@@ -16,6 +16,11 @@ const ImU32 LED_GREEN = IM_COL32(0, 255, 0, 255);
 const ImU32 LED_BLUE = IM_COL32(0, 0, 255, 255);
 const ImU32 LED_PURPLE = IM_COL32(160, 32, 240, 255);
 
+/**
+ * @brief Loads the shading texture for the LED component
+ * @param filePath File path of the LED shading image file
+ * @return ImTextureID
+ */
 ImTextureID LoadLedTexture(const char* filePath) {
     int height, width, channels;
 
@@ -43,6 +48,13 @@ ImTextureID LoadLedTexture(const char* filePath) {
     return (ImTextureID) (intptr_t) texture;
 }
 
+/**
+ * @brief Displays an LED
+ * @param open Whether the LED is shown as turned on/off
+ * @param size Size of the LED
+ * @param color Color of the LED
+ * @return void
+ */
 void Led(bool open, const ImVec2& size, ImU32 color) {
     static ImTextureID openTexture = LoadLedTexture("assets/images/open_led.png");
     static ImTextureID closedTexture = LoadLedTexture("assets/images/closed_led.png");
