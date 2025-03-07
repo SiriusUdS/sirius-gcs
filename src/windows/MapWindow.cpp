@@ -45,7 +45,8 @@ void MapWindow::render() {
         ImGui::SetNextItemWidth(200);
         ImGui::InputInt("Max Z", &downloadMaxZ);
         downloadMaxZ = std::clamp(downloadMaxZ, 0, MAX_ZOOM);
-        ImGui::SameLine();
+
+        // Tile count and zoom level
         if (maxTilesDownloadExceeded) {
             ImGui::Text("Tiles Count:");
             ImGui::SameLine();
@@ -55,6 +56,8 @@ void MapWindow::render() {
         } else {
             ImGui::Text("Tiles Count: %lu", tilesSelectedTotal);
         }
+        ImGui::SameLine();
+        ImGui::Text("Current Zoom Level: %d", mapPlot->zoom());
 
         // Download button
         ImGui::BeginDisabled(sourceIsFs || maxTilesDownloadExceeded || !mapTileGrabber->done() || !satelliteTileGrabber->done());
@@ -114,13 +117,13 @@ void MapWindow::render() {
         sourceIsFs = true;
         lastAutoSourceSwitchTime = now;
         hasSwitchedSource = true;
-        GCS_LOG_DEBUG("Lost connection to tile provider.");
+        GCS_LOG_DEBUG("MapWindow: Lost connection to tile provider.");
     } else if (sourceIsFs) {
         if (urlConnectionTest->canFetch() && autoSourceSwitchDelayElapsed) {
             sourceIsFs = false;
             lastAutoSourceSwitchTime = now;
             hasSwitchedSource = true;
-            GCS_LOG_DEBUG("Regained connection to tile provider.");
+            GCS_LOG_DEBUG("MapWindow: Regained connection to tile provider.");
         }
         urlConnectionTest->testFetch();
     }
