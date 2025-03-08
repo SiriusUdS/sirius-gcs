@@ -46,8 +46,8 @@ private:
     int _requestLimit{10};
     bool _preload{true};
     std::atomic_bool _interrupt;
-    int _failedFetches{};
-    int _failedFetchesThreshold{10};
+    int _failedFetchesInARow{};
+    int _failedFetchesInARowThreshold{10};
 };
 
 #endif // TILESOURCEASYNC_H

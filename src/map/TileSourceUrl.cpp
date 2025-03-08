@@ -14,10 +14,6 @@ TileSourceUrl::TileSourceUrl(int requestLimit, bool preload, const std::string& 
 TileSourceUrl::~TileSourceUrl() {
 }
 
-void TileSourceUrl::testFetch() {
-    std::async(std::launch::async, &TileSourceUrl::fetchTest, this);
-}
-
 bool TileSourceUrl::receiveTile(int z, int x, int y, TileData& tileData) {
     CURL* curl{curl_easy_init()};
     curl_easy_setopt(curl, CURLOPT_URL, makeUrl(z, x, y).c_str());
@@ -41,8 +37,12 @@ bool TileSourceUrl::receiveTile(int z, int x, int y, TileData& tileData) {
     return ok;
 }
 
-void TileSourceUrl::fetchTest() {
-    if (fetchTestMutex.try_lock()) {
+void TileSourceUrl::startConnectivityTest() {
+    connectivityTestFuture = std::async(std::launch::async, &TileSourceUrl::performConnectivityTest, this);
+}
+
+void TileSourceUrl::performConnectivityTest() {
+    if (connectivityTestMutex.try_lock()) {
         CURL* curl = {curl_easy_init()};
         curl_easy_setopt(curl, CURLOPT_URL, makeUrl(0, 0, 0).c_str());
         curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
@@ -50,8 +50,8 @@ void TileSourceUrl::fetchTest() {
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
         lastFetchSuccessful.store(curl_easy_perform(curl) == CURLE_OK);
         curl_easy_cleanup(curl);
-    
-        fetchTestMutex.unlock();
+
+        connectivityTestMutex.unlock();
     }
 }
 

@@ -29,7 +29,7 @@ bool TileSourceAsync::canRequest() {
 }
 
 bool TileSourceAsync::hasFailedManyRequests() {
-    return _failedFetches >= _failedFetchesThreshold;
+    return _failedFetchesInARow >= _failedFetchesInARowThreshold;
 }
 
 bool TileSourceAsync::request(int z, int x, int y) {
@@ -83,10 +83,10 @@ TileAsync::FutureData TileSourceAsync::onHandleRequest(int z, int x, int y) {
     TileAsync::FutureData futureData;
     if (receiveTile(z, x, y, tileData)) {
         futureData.tile = std::make_shared<Tile>(z, x, y, tileData.blob, _preload);
-        _failedFetches = 0;
+        _failedFetchesInARow = 0;
     } else {
         futureData.tile = std::make_shared<TileDummy>(z, x, y);
-        _failedFetches = std::min(_failedFetches + 1, _failedFetchesThreshold);
+        _failedFetchesInARow++;
     }
     return futureData;
 }

@@ -125,7 +125,7 @@ void MapWindow::render() {
             hasSwitchedSource = true;
             GCS_LOG_DEBUG("MapWindow: Regained connection to tile provider.");
         }
-        urlConnectionTest->testFetch();
+        urlConnectionTest->startConnectivityTest();
     }
 
     if (hasSwitchedSource) {
