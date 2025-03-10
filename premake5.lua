@@ -22,7 +22,9 @@ project "sirius-gcs"
         "src/logging",
         "src/map",
         "src/plot",
+        "src/serial",
         "src/windows",
+        "external/ceSerial",
         "external/mINI",
         "external/sirius-headers-common"
     }
@@ -30,6 +32,7 @@ project "sirius-gcs"
     files {
         "src/**.h",
         "src/**.cpp",
+        "external/ceSerial/ceserial.h",
         "external/mINI/ini.h",
         "external/sirius-headers-common/**.h"
     }
