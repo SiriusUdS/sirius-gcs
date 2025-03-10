@@ -5,6 +5,9 @@
 
 class TileDummy : public ITile {
 public:
+    /**
+     * @brief Constructor for a dummy tile
+     */
     TileDummy(int z, int x, int y) : _z{z}, _x{x}, _y{y} {
     }
     virtual ~TileDummy() override = default;

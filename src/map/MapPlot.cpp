@@ -6,27 +6,39 @@
 #include <algorithm>
 #include <implot.h>
 
+/**
+ * @struct MapPlot::Impl
+ * @brief Contains specific data to the implementation of the map plot ImGui component
+ */
 struct MapPlot::Impl {
-    constexpr static const ImPlotFlags plotFlags{ImPlotFlags_Equal | ImPlotFlags_NoLegend | ImPlotFlags_NoMouseText | ImPlotFlags_NoMenus};
+    constexpr static const ImPlotFlags plotFlags{ImPlotFlags_Equal | ImPlotFlags_NoLegend | ImPlotFlags_NoMouseText
+                                                 | ImPlotFlags_NoMenus}; ///< ImGui plot flags
 
     constexpr static const ImPlotAxisFlags xFlags{ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks
                                                   | ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoInitialFit | ImPlotAxisFlags_NoMenus
-                                                  | ImPlotAxisFlags_NoMenus | ImPlotAxisFlags_NoHighlight};
+                                                  | ImPlotAxisFlags_NoMenus | ImPlotAxisFlags_NoHighlight}; ///< ImGui plot x axis flags
 
-    constexpr static const ImPlotAxisFlags yFlags{xFlags | ImPlotAxisFlags_Invert};
+    constexpr static const ImPlotAxisFlags yFlags{xFlags | ImPlotAxisFlags_Invert}; ///< ImGui plot y axis flags
 
-    constexpr static const ImVec2 uv0{0, 1}, uv1{1, 0};
-    constexpr static const ImVec4 tint{1, 1, 1, 1};
+    constexpr static const ImVec2 uv0{0, 1},        ///< Texture coordinates (top-left corner)
+      uv1{1, 0};                                    ///< Texture coordinates (bottom-right corner)
+    constexpr static const ImVec4 tint{1, 1, 1, 1}; ///< Texture tint
 
-    ImPlotPoint mousePos{};
-    ImPlotRect plotLims{};
-    ImVec2 plotSize{};
-    ImVec2 plotPos{};
+    ImPlotPoint mousePos{}; ///< The mouse cursor position.
+    ImPlotRect plotLims{};  ///< The current plot axis range.
+    ImVec2 plotSize{};      ///< The current plot size.
+    ImVec2 plotPos{};       ///< The current plot position.
 };
 
+/**
+ * @brief Constructs a map plot with a default tile loader.
+ */
 MapPlot::MapPlot() : _impl{std::make_unique<Impl>()}, _loader{std::make_shared<TileLoaderOsmMap>()} {
 }
 
+/**
+ * @brief Constructs a map plot with the tile loader passed as a parameter.
+ */
 MapPlot::MapPlot(std::shared_ptr<ITileLoader>& loader)
     : _impl{std::make_unique<Impl>()}, _loader{loader}, _minLat{(float) MIN_LAT}, _minLon{(float) MIN_LON}, _maxLat{(float) MAX_LAT},
       _maxLon{(float) MAX_LON} {
@@ -35,6 +47,9 @@ MapPlot::MapPlot(std::shared_ptr<ITileLoader>& loader)
 
 MapPlot::~MapPlot() = default;
 
+/**
+ * @brief Displays the map.
+ */
 void MapPlot::paint() {
     if (ImPlot::BeginPlot("##ImOsmMapPlot", {-1, -1}, _impl->plotFlags)) {
         ImPlot::SetupAxis(ImAxis_X1, nullptr, _impl->xFlags);
@@ -117,6 +132,9 @@ void MapPlot::paint() {
     }
 }
 
+/**
+ * @brief Reset the latitude/longitude map bounds to display the entire world map.
+ */
 void MapPlot::resetBounds() {
     _minLat = (float) MIN_LAT;
     _maxLat = (float) MAX_LAT;
@@ -125,6 +143,9 @@ void MapPlot::resetBounds() {
     _setBounds = SetBounds::Geo;
 }
 
+/**
+ * @brief Set specific latitude/longitude map bounds.
+ */
 void MapPlot::setBoundsGeo(float minLat, float maxLat, float minLon, float maxLon) {
     _minLat = minLat;
     _maxLat = maxLat;
@@ -133,6 +154,9 @@ void MapPlot::setBoundsGeo(float minLat, float maxLat, float minLon, float maxLo
     _setBounds = SetBounds::Geo;
 }
 
+/**
+ * @brief Get the latitude/longitude map bounds.
+ */
 void MapPlot::getBoundsGeo(float& minLat, float& maxLat, float& minLon, float& maxLon) const {
     minLat = _minLat;
     maxLat = _maxLat;
@@ -140,6 +164,9 @@ void MapPlot::getBoundsGeo(float& minLat, float& maxLat, float& minLon, float& m
     maxLon = _maxLon;
 }
 
+/**
+ * @brief Get the tile map bounds.
+ */
 void MapPlot::getBoundsTile(int& minTX, int& maxTX, int& minTY, int& maxTY) const {
     minTX = _minTX;
     maxTX = _maxTX;
@@ -147,6 +174,9 @@ void MapPlot::getBoundsTile(int& minTX, int& maxTX, int& minTY, int& maxTY) cons
     maxTY = _maxTY;
 }
 
+/**
+ * @brief Set the local map bounds.
+ */
 void MapPlot::setBoundsLocal(float minX, float maxX, float minY, float maxY) {
     _minX = minX;
     _maxX = maxX;
@@ -155,6 +185,9 @@ void MapPlot::setBoundsLocal(float minX, float maxX, float minY, float maxY) {
     _setBounds = SetBounds::Local;
 }
 
+/**
+ * @brief Get the local map bounds.
+ */
 void MapPlot::getBoundsLocal(float& minX, float& maxX, float& minY, float& maxY) const {
     minX = _minX;
     maxX = _maxX;
@@ -162,11 +195,17 @@ void MapPlot::getBoundsLocal(float& minX, float& maxX, float& minY, float& maxY)
     maxY = _maxY;
 }
 
+/**
+ * @brief Return true if the mouse is on the plot.
+ */
 bool MapPlot::mouseOnPlot() const {
     return _impl->mousePos.x > _impl->plotLims.X.Min && _impl->mousePos.x < _impl->plotLims.X.Max && _impl->mousePos.y > _impl->plotLims.Y.Min
            && _impl->mousePos.y < _impl->plotLims.Y.Max;
 }
 
+/**
+ * @brief Return true if the map plot has recently failed to fetch multiple tiles.
+ */
 bool MapPlot::failedToFetchTiles() const {
     return _loader->failedLoad();
 }

@@ -6,6 +6,9 @@ MarkItem::MarkItem() {
     _ry.resize(int(360.0 / _dphi) + 1);
 }
 
+/**
+ * @brief Construct mark item from geographic coordinates and text.
+ */
 MarkItem::MarkItem(const GeoCoords& coords, const std::string& text) : _geoCoords{coords}, _text{text} {
     _osmCoords = _geoCoords.toOsmCoords();
     _rx.resize(int(360.0 / _dphi) + 1);

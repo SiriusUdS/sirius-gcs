@@ -6,6 +6,10 @@
 #include <stdint.h>
 #include <vector>
 
+/**
+ * @class Tile
+ * @brief Contains image data for a single map tile
+ */
 class Tile : public TileDummy {
 public:
     Tile(int z, int x, int y, const std::vector<std::byte>& rawBlob, bool preload = true);

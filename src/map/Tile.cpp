@@ -8,6 +8,9 @@
 
 #include <stb_image.h>
 
+/**
+ * @brief Constructor for a tile
+ */
 Tile::Tile(int z, int x, int y, const std::vector<std::byte>& rawBlob, bool preload) : TileDummy(z, x, y), _rawBlob{rawBlob} {
     if (preload) {
         stbLoad();

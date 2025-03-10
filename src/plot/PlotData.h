@@ -4,6 +4,10 @@
 #include <imgui.h>
 #include <vector>
 
+/**
+ * @class PlotData
+ * @brief Represents data of a single plot line to be shown on an ImPlot ImGui component
+ */
 class PlotData {
 public:
     PlotData();
