@@ -92,8 +92,8 @@ void render() {
             serialTest.init();
         }
 
-        if (ImGui::Button("Perform Serial Test")) {
-            serialTest.performTest();
+        if (ImGui::Button("Write Test")) {
+            serialTest.performWriteTest();
         }
 
         if (ImGui::Button("Close Serial Port")) {

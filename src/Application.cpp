@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "Altimeter/AltimeterData.h"
 #include "Constants.h"
 #include "ControlsWindow.h"
 #include "LedWindow.h"
@@ -41,9 +40,6 @@ void Application::init() {
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
     PlotWindow::loadState(iniStructure);
-
-    AltimeterData data = {1, 2, 3};
-    GCS_LOG_INFO("The following is AltimeterData - Altitude: {}, Value: {}, Timestamp: {}", data.altitude, data.status.value, data.timeStamp_ms);
 }
 
 void Application::shutdown() {

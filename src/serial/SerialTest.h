@@ -9,47 +9,62 @@ class SerialTest {
 public:
     void init() {
         if (com.IsOpened()) {
-            GCS_LOG_WARN("Serial Port Already Open");
+            GCS_LOG_WARN("Serial port already open");
             return;
         }
 
         com.SetPortName("\\\\.\\COM3");
         if (com.Open() != 0) {
-            GCS_LOG_WARN("Unsuccessful Serial Port Init");
+            GCS_LOG_WARN("Unsuccessful serial port init");
         } else {
-            GCS_LOG_INFO("Successful Serial Port Init");
+            GCS_LOG_INFO("Successful serial port init");
         }
     }
 
-    void performTest() {
+    void readChar() {
+        bool successFlag;
+        char c = com.ReadChar(successFlag);
+        if (successFlag && msgReadBufIdx < 1000) {
+            msgReadBuf[msgReadBufIdx++] = c;
+        }
+    }
+
+    bool readMessageReady() {
+        return msgReadReady;
+    }
+
+    std::string consumeReadMessage() {
+        if (!msgReadReady) {
+            return "";
+        }
+        std::string msg = msgReadBuf;
+        msgReadBuf[0] = 0;
+        msgReadBufIdx = 0;
+        msgReadReady = false;
+    }
+
+    void performWriteTest() {
         if (!com.IsOpened()) {
-            GCS_LOG_WARN("Couldn't perform test, serial port not open");
+            GCS_LOG_WARN("Couldn't perform write test, serial port not open");
             return;
         }
 
-        bool successFlag = false;
-        int unsuccessfulReadCount = 0;
-        char c = '\0';
-        std::string message;
-        while (c != ' ' && unsuccessfulReadCount <= 100) {
-            if (successFlag) {
-                message += c;
-            } else {
-                unsuccessfulReadCount++;
-            }
-            c = com.ReadChar(successFlag);
-        }
+        char s[] = "Bonjour ceci est un test!\n";
+        bool successFlag = com.Write(s);
 
-        GCS_LOG_INFO("Read the following message from COM: {}", message);
+        GCS_LOG_INFO("Write to COM state: {}", successFlag);
     }
 
     void shutdown() {
         com.Close();
-        GCS_LOG_INFO("Closed Serial Port");
+        GCS_LOG_INFO("Closed serial port");
     }
 
 private:
     ceSerial com;
+    char msgReadBuf[1000]{};
+    int msgReadBufIdx{};
+    bool msgReadReady{};
 };
 
 #endif // SERIALTEST_H
