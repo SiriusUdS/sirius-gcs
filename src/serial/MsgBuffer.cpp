@@ -2,17 +2,27 @@
 
 #include "Telecommunication/TelecommunicationHeader.h"
 
-bool MsgBuffer::read(char* rcv, size_t size) {
-    if (!canRead(size)) {
-        return false;
+size_t MsgBuffer::readPacket(char* rcv) {
+    if (nbPacketsReady == 0) {
+        return 0;
     }
 
-    for (size_t rcvIdx = 0; rcvIdx < size; rcvIdx++) {
-        readIdx = (readIdx + 1) % bufSize;
-        rcv[rcvIdx] = buf[readIdx];
+    for (int idx = 0; idx < HEADER_SIZE_BYTE; idx++) {
+        rcv[idx] = buf[readIdx];
+        advanceIndex(readIdx);
     }
 
-    return true;
+    size_t msgSize = 4;
+
+    for (int idx = HEADER_SIZE_BYTE; idx != writeIdx && !searchAnyHeader(readIdx) && msgSize < Constants::MSG_BUF_SIZE; idx++) {
+        rcv[idx] = buf[readIdx];
+        advanceIndex(readIdx);
+        msgSize++;
+    }
+
+    nbPacketsReady--;
+
+    return msgSize;
 }
 
 bool MsgBuffer::write(char* msg, size_t size) {
@@ -23,7 +33,7 @@ bool MsgBuffer::write(char* msg, size_t size) {
     size_t oldWriteIdx = writeIdx;
 
     for (size_t charIdx = 0; charIdx < size; charIdx++) {
-        writeIdx = (writeIdx + 1) % bufSize;
+        writeIdx = nextIndex(writeIdx);
         buf[writeIdx] = msg[charIdx];
     }
 
@@ -33,21 +43,82 @@ bool MsgBuffer::write(char* msg, size_t size) {
     // to check if the current packet has been fully received.
     size_t headerStartReadIdx = oldWriteIdx - (HEADER_SIZE_BYTE - 1);
     if (headerStartReadIdx < 0) {
-        headerStartReadIdx += bufSize;
+        headerStartReadIdx += Constants::MSG_BUF_SIZE;
     }
     if (readCapacityFromIdx(oldWriteIdx) < readCapacityFromIdx(headerStartReadIdx)) {
         headerStartReadIdx = readIdx;
+    }
+    if (searchAnyHeader(headerStartReadIdx, writeIdx)) {
+        nbPacketsReady++;
     }
 
     return true;
 }
 
 bool MsgBuffer::canRead(size_t size) {
-    return readCapacity() >= size;
+    return nbPacketsReady > 0;
 }
 
 bool MsgBuffer::canWrite(size_t size) {
     return writeCapacity() >= size;
+}
+
+std::optional<std::pair<int, size_t>> MsgBuffer::searchAnyHeader(size_t idx) {
+    return searchAnyHeader(idx, nextIndex(idx));
+}
+
+std::optional<std::pair<int, size_t>> MsgBuffer::searchAnyHeader(size_t startIdx, size_t endIdx) {
+    // clang-format off
+    static const int HEADER_CODES[9] = {
+        ACCELEROMETER_DATA_HEADER_CODE,
+        GYROSCOPE_DATA_HEADER_CODE,
+        ALTIMETER_DATA_HEADER_CODE,
+        GPS_DATA_HEADER_CODE,
+        MAGNETOMETER_DATA_HEADER_CODE,
+        PRESSURE_SENSOR_DATA_HEADER_CODE,
+        ROCKET_DATA_HEADER_CODE,
+        TEMPERATURE_SENSOR_DATA_HEADER_CODE,
+        VALVE_DATA_HEADER_CODE
+    };
+    // clang-format on
+
+    for (size_t idx = startIdx; startIdx != endIdx; startIdx = nextIndex(startIdx)) {
+        for (const int headerCode : HEADER_CODES) {
+            const std::optional<size_t> optionalIdx = searchHeader(ACCELEROMETER_DATA_HEADER_CODE, startIdx, endIdx);
+            if (optionalIdx.has_value()) {
+                return std::pair<int, size_t>{headerCode, optionalIdx.value()};
+            }
+        }
+    }
+
+    return {};
+}
+
+std::optional<size_t> MsgBuffer::searchHeader(int headerCode, size_t startIdx, size_t endIdx) {
+    // clang-format off
+    char headerStr[4] = {
+        (char) (headerCode >> 24),
+        (char) ((headerCode >> 16) & ((1 << 16) - 1)),
+        (char) ((headerCode >> 8) & ((1 << 16) - 1)),
+        (char) ((headerCode) & ((1 << 16) - 1))
+    };
+    
+    endIdx -= HEADER_SIZE_BYTE;
+    if (endIdx < 0) {
+        endIdx += Constants::MSG_BUF_SIZE;
+    }
+    for (size_t idx = startIdx; idx != endIdx; advanceIndex(idx)) {
+        if (headerStr[0] == buf[idx] &&
+            headerStr[1] == buf[nextIndex(idx)] &&
+            headerStr[2] == buf[nextIndex(idx, 2)] &&
+            headerStr[3] == buf[nextIndex(idx, 3)]
+        ) {
+            return idx;
+        }
+    }
+
+    return {};
+    // clang-format on
 }
 
 size_t MsgBuffer::readCapacity() {
@@ -58,64 +129,32 @@ size_t MsgBuffer::writeCapacity() {
     return writeCapacityFromIdx(writeIdx);
 }
 
-std::optional<size_t> MsgBuffer::searchAnyHeader(size_t startIdx, size_t endIdx) {
-    // TODO - Finish optional chaining
-    searchHeader(ACCELEROMETER_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(GYROSCOPE_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(ALTIMETER_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(GPS_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(MAGNETOMETER_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(PRESSURE_SENSOR_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(ROCKET_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(TEMPERATURE_SENSOR_DATA_HEADER_CODE, startIdx, endIdx);
-    searchHeader(VALVE_DATA_HEADER_CODE, startIdx, endIdx);
-}
-
-std::optional<size_t> MsgBuffer::searchHeader(int headerCode, size_t startIdx, size_t endIdx) {
-    // clang-format off
-    char headerStr[4] = {
-        (char) (headerCode >> 48),
-        (char) ((headerCode >> 32) & ((1 << 16) - 1)),
-        (char) ((headerCode >> 16) & ((1 << 16) - 1)),
-        (char) ((headerCode) & ((1 << 16) - 1))
-    };
-    
-    endIdx -= HEADER_SIZE_BYTE;
-    if (endIdx < 0) {
-        endIdx += bufSize;
-    }
-    for (size_t idx = startIdx; idx != endIdx; ++idx % bufSize) {
-        if (headerStr[0] == buf[idx] &&
-            headerStr[1] == buf[idx + 1] &&
-            headerStr[2] == buf[idx + 2] &&
-            headerStr[3] == buf[idx + 3]
-        ) {
-            return idx;
-        }
-    }
-
-    return {};
-    // clang-format on
-}
-
 size_t MsgBuffer::readCapacityFromIdx(size_t idx) {
     if (idx < writeIdx) {
         return (writeIdx - idx);
     } else if (idx > writeIdx) {
-        return (writeIdx + bufSize - idx);
+        return (writeIdx + Constants::MSG_BUF_SIZE - idx);
     } else if (bufFull) {
-        return bufSize;
+        return Constants::MSG_BUF_SIZE;
     }
     return 0;
 }
 
 size_t MsgBuffer::writeCapacityFromIdx(size_t idx) {
     if (idx > readIdx) {
-        return (readIdx + bufSize - idx);
+        return (readIdx + Constants::MSG_BUF_SIZE - idx);
     } else if (idx < readIdx) {
         return readIdx - idx;
     } else if (bufFull) {
         return 0;
     }
     return bufFull;
+}
+
+size_t MsgBuffer::nextIndex(size_t idx, size_t increment) {
+    return (idx + increment) % Constants::MSG_BUF_SIZE;
+}
+
+void MsgBuffer::advanceIndex(size_t& idx, size_t increment) {
+    idx = nextIndex(idx, increment);
 }

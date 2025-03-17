@@ -47,13 +47,17 @@ project "sirius-gcs"
 
 project "sirius-gcs-tests"
     includedirs {
-        "src/test",
-        "external/doctest"
+        "src",
+        "src/serial",
+        "external/doctest",
+        "external/sirius-headers-common"
     }
 
     files {
         "tests/**.h",
-        "tests/**.cpp"
+        "tests/**.cpp",
+        "src/Constants.h",
+        "src/serial/MsgBuffer.h",
+        "src/serial/MsgBuffer.cpp",
+        "external/sirius-headers-common/**.h"
     }
-
-

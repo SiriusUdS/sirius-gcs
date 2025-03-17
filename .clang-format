@@ -20,6 +20,7 @@ BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: 'true'
 BreakStringLiterals: 'true'
+BreakTemplateDeclarations: Yes
 ColumnLimit: '150'
 ContinuationIndentWidth: '2'
 DerivePointerAlignment: 'false'
