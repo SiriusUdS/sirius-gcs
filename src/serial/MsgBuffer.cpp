@@ -3,54 +3,61 @@
 #include "Telecommunication/TelecommunicationHeader.h"
 
 size_t MsgBuffer::readPacket(char* rcv) {
-    if (nbPacketsReady == 0) {
+    if (!canReadPacket()) {
         return 0;
     }
 
-    for (int idx = 0; idx < currPacketSize; idx++) {
+    PacketInfo& packetInfo = availablePacketInfoQueue.back();
+
+    for (int idx = 0; idx < packetInfo.size; idx++) {
         rcv[idx] = buf[readIdx];
-        advanceIndex(readIdx);
+        readIdx = nextIndex(readIdx);
     }
 
-    nbPacketsReady--;
-    size_t packetSize = currPacketSize;
-    currPacketSize = 0;
-
+    size_t packetSize = packetInfo.size;
+    availablePacketInfoQueue.pop();
     return packetSize;
 }
 
 bool MsgBuffer::writeChar(char c) {
-    if (!canWrite(1)) {
+    if (!canWriteChar()) {
         return false;
     }
 
     buf[writeIdx] = c;
     writeIdx = nextIndex(writeIdx);
+    currPacket.size++;
+    bufFull = (writeIdx == readIdx);
+
     if (readCapacity() >= HEADER_SIZE_BYTE) {
-        std::optional<std::pair<int, size_t>> optionalHeader = searchAnyHeader(prevIndex(writeIdx, 4));
-        if (optionalHeader.has_value()) {
-            nbPacketsReady++;
+        std::optional<int> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, 4));
+        if (optionalHeaderCode.has_value()) {
+            if (!writingValidPacket) {
+                writingValidPacket = true;
+            } else {
+                availablePacketInfoQueue.push(currPacket);
+                currPacket.headerCode = optionalHeaderCode.value();
+                currPacket.size = 0;
+            }
         }
     }
-
-    bufFull = (writeIdx == readIdx);
 
     return true;
 }
 
-bool MsgBuffer::canRead(size_t size) {
-    return nbPacketsReady > 0;
+bool MsgBuffer::canReadPacket() {
+    return availablePacketInfoQueue.size() > 0;
 }
 
-bool MsgBuffer::canWrite(size_t size) {
-    return writeCapacity() >= size;
+bool MsgBuffer::canWriteChar() {
+    return writeCapacity() >= 1;
 }
 
 int MsgBuffer::availablePackets() {
-    return nbPacketsReady;
+    return availablePacketInfoQueue.size();
 }
 
-std::optional<std::pair<int, size_t>> MsgBuffer::searchAnyHeader(size_t idx) {
+std::optional<int> MsgBuffer::searchAnyHeader(size_t idx) {
     // clang-format off
     static const int HEADER_CODES[9] = {
         ACCELEROMETER_DATA_HEADER_CODE,
@@ -66,16 +73,15 @@ std::optional<std::pair<int, size_t>> MsgBuffer::searchAnyHeader(size_t idx) {
     // clang-format on
 
     for (const int headerCode : HEADER_CODES) {
-        const std::optional<size_t> optionalIdx = searchHeader(headerCode, idx);
-        if (optionalIdx.has_value()) {
-            return std::pair<int, size_t>{headerCode, optionalIdx.value()};
+        if (searchSpecificHeader(headerCode, idx)) {
+            return headerCode;
         }
     }
 
     return {};
 }
 
-std::optional<size_t> MsgBuffer::searchHeader(int headerCode, size_t idx) {
+bool MsgBuffer::searchSpecificHeader(int headerCode, size_t idx) {
     // clang-format off
     char headerStr[4] = {
         (char) (headerCode >> 24),
@@ -89,37 +95,29 @@ std::optional<size_t> MsgBuffer::searchHeader(int headerCode, size_t idx) {
         headerStr[2] == buf[nextIndex(idx, 2)] &&
         headerStr[3] == buf[nextIndex(idx, 3)]
     ) {
-        return idx;
+        return true;
     }
 
-    return {};
+    return false;
     // clang-format on
 }
 
 size_t MsgBuffer::readCapacity() {
-    return readCapacityFromIdx(readIdx);
-}
-
-size_t MsgBuffer::writeCapacity() {
-    return writeCapacityFromIdx(writeIdx);
-}
-
-size_t MsgBuffer::readCapacityFromIdx(size_t idx) {
-    if (idx < writeIdx) {
-        return (writeIdx - idx);
-    } else if (idx > writeIdx) {
-        return (writeIdx + Constants::MSG_BUF_SIZE - idx);
+    if (readIdx < writeIdx) {
+        return (writeIdx - readIdx);
+    } else if (readIdx > writeIdx) {
+        return (writeIdx + Constants::MSG_BUF_SIZE - readIdx);
     } else if (bufFull) {
         return Constants::MSG_BUF_SIZE;
     }
     return 0;
 }
 
-size_t MsgBuffer::writeCapacityFromIdx(size_t idx) {
-    if (idx > readIdx) {
-        return (readIdx + Constants::MSG_BUF_SIZE - idx);
-    } else if (idx < readIdx) {
-        return readIdx - idx;
+size_t MsgBuffer::writeCapacity() {
+    if (writeIdx > readIdx) {
+        return (readIdx + Constants::MSG_BUF_SIZE - writeIdx);
+    } else if (writeIdx < readIdx) {
+        return readIdx - writeIdx;
     } else if (bufFull) {
         return 0;
     }
@@ -136,8 +134,4 @@ size_t MsgBuffer::prevIndex(size_t idx, size_t decrement) {
         idx += Constants::MSG_BUF_SIZE;
     }
     return idx;
-}
-
-void MsgBuffer::advanceIndex(size_t& idx, size_t increment) {
-    idx = nextIndex(idx, increment);
 }

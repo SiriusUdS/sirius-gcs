@@ -4,39 +4,38 @@
 #include "Constants.h"
 
 #include <optional>
+#include <queue>
 
 class MsgBuffer {
 public:
     size_t readPacket(char* rcv);
     bool writeChar(char c);
-    bool canRead(size_t size);
-    bool canWrite(size_t size);
+    bool canReadPacket();
+    bool canWriteChar();
     int availablePackets();
 
 private:
-    struct Packet {
+    struct PacketInfo {
         int headerCode;
         size_t size;
     };
 
-    std::optional<std::pair<int, size_t>> searchAnyHeader(size_t idx);
-    std::optional<size_t> searchHeader(int headerCode, size_t idx);
+    std::optional<int> searchAnyHeader(size_t idx);
+    bool searchSpecificHeader(int headerCode, size_t idx);
 
     size_t readCapacity();
     size_t writeCapacity();
-    size_t readCapacityFromIdx(size_t idx);
-    size_t writeCapacityFromIdx(size_t idx);
 
     size_t nextIndex(size_t idx, size_t increment = 1);
     size_t prevIndex(size_t idx, size_t decrement = 1);
-    void advanceIndex(size_t& idx, size_t increment = 1);
 
     size_t readIdx{};
     size_t writeIdx{};
     char buf[Constants::MSG_BUF_SIZE]{};
     bool bufFull{};
-    int nbPacketsReady{};
-    size_t currPacketSize{};
+    bool writingValidPacket{};
+    PacketInfo currPacket;
+    std::queue<PacketInfo> availablePacketInfoQueue{};
 };
 
 #endif // MSGBUFFER_H
