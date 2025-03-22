@@ -3,7 +3,9 @@
 #include <doctest.h>
 #include <string>
 
-bool writeToMsgBuffer(MsgBuffer& msgBuf, const char* str, size_t size) {
+static const size_t TEST_MSGBUFFER_SIZE = 100;
+
+bool writeToMsgBuffer(MsgBuffer<TEST_MSGBUFFER_SIZE>& msgBuf, const char* str, size_t size) {
     for (size_t i = 0; i < size; i++) {
         if (!msgBuf.writeChar(str[i])) {
             return false;
@@ -13,7 +15,7 @@ bool writeToMsgBuffer(MsgBuffer& msgBuf, const char* str, size_t size) {
 }
 
 TEST_CASE("Should detect correct amount of packets during writes") {
-    MsgBuffer msgBuf;
+    MsgBuffer<TEST_MSGBUFFER_SIZE> msgBuf;
 
     SUBCASE("Correct header codes") {
         writeToMsgBuffer(msgBuf, "ACC\0a1234acc test", 17);
