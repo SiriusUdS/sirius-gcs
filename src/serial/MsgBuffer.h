@@ -11,8 +11,14 @@ public:
     bool write(char* msg, size_t size);
     bool canRead(size_t size);
     bool canWrite(size_t size);
+    int availablePackets();
 
 private:
+    struct Packet {
+        int headerCode;
+        size_t size;
+    };
+
     std::optional<std::pair<int, size_t>> searchAnyHeader(size_t idx);
     std::optional<std::pair<int, size_t>> searchAnyHeader(size_t startIdx, size_t endIdx);
     std::optional<size_t> searchHeader(int headerCode, size_t startIdx, size_t endIdx);
@@ -23,6 +29,7 @@ private:
     size_t writeCapacityFromIdx(size_t idx);
 
     size_t nextIndex(size_t idx, size_t increment = 1);
+    size_t prevIndex(size_t idx, size_t decrement = 1);
     void advanceIndex(size_t& idx, size_t increment = 1);
 
     size_t readIdx{};
@@ -30,6 +37,7 @@ private:
     char buf[Constants::MSG_BUF_SIZE]{};
     bool bufFull{};
     int nbPacketsReady{};
+    size_t currPacketSize{};
 };
 
 #endif // MSGBUFFER_H

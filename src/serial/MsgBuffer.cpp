@@ -7,22 +7,16 @@ size_t MsgBuffer::readPacket(char* rcv) {
         return 0;
     }
 
-    for (int idx = 0; idx < HEADER_SIZE_BYTE; idx++) {
+    for (int idx = 0; idx < currPacketSize; idx++) {
         rcv[idx] = buf[readIdx];
         advanceIndex(readIdx);
-    }
-
-    size_t msgSize = 4;
-
-    for (int idx = HEADER_SIZE_BYTE; idx != writeIdx && !searchAnyHeader(readIdx) && msgSize < Constants::MSG_BUF_SIZE; idx++) {
-        rcv[idx] = buf[readIdx];
-        advanceIndex(readIdx);
-        msgSize++;
     }
 
     nbPacketsReady--;
+    size_t packetSize = currPacketSize;
+    currPacketSize = 0;
 
-    return msgSize;
+    return packetSize;
 }
 
 bool MsgBuffer::write(char* msg, size_t size) {
@@ -35,6 +29,12 @@ bool MsgBuffer::write(char* msg, size_t size) {
     for (size_t charIdx = 0; charIdx < size; charIdx++) {
         writeIdx = nextIndex(writeIdx);
         buf[writeIdx] = msg[charIdx];
+        if (readCapacity() > HEADER_SIZE_BYTE) {
+            std::optional<std::pair<int, size_t>> optionalHeader = searchAnyHeader(prevIndex(writeIdx, HEADER_SIZE_BYTE), writeIdx);
+            if (optionalHeader.has_value()) {
+                nbPacketsReady++;
+            }
+        }
     }
 
     bufFull = (writeIdx == readIdx);
@@ -48,9 +48,6 @@ bool MsgBuffer::write(char* msg, size_t size) {
     if (readCapacityFromIdx(oldWriteIdx) < readCapacityFromIdx(headerStartReadIdx)) {
         headerStartReadIdx = readIdx;
     }
-    if (searchAnyHeader(headerStartReadIdx, writeIdx)) {
-        nbPacketsReady++;
-    }
 
     return true;
 }
@@ -61,6 +58,10 @@ bool MsgBuffer::canRead(size_t size) {
 
 bool MsgBuffer::canWrite(size_t size) {
     return writeCapacity() >= size;
+}
+
+int MsgBuffer::availablePackets() {
+    return nbPacketsReady;
 }
 
 std::optional<std::pair<int, size_t>> MsgBuffer::searchAnyHeader(size_t idx) {
@@ -153,6 +154,14 @@ size_t MsgBuffer::writeCapacityFromIdx(size_t idx) {
 
 size_t MsgBuffer::nextIndex(size_t idx, size_t increment) {
     return (idx + increment) % Constants::MSG_BUF_SIZE;
+}
+
+size_t MsgBuffer::prevIndex(size_t idx, size_t decrement) {
+    idx -= decrement;
+    while (idx < 0) {
+        idx += Constants::MSG_BUF_SIZE;
+    }
+    return idx;
 }
 
 void MsgBuffer::advanceIndex(size_t& idx, size_t increment) {
