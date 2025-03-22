@@ -8,7 +8,7 @@
 class MsgBuffer {
 public:
     size_t readPacket(char* rcv);
-    bool write(char* msg, size_t size);
+    bool writeChar(char c);
     bool canRead(size_t size);
     bool canWrite(size_t size);
     int availablePackets();
@@ -20,8 +20,7 @@ private:
     };
 
     std::optional<std::pair<int, size_t>> searchAnyHeader(size_t idx);
-    std::optional<std::pair<int, size_t>> searchAnyHeader(size_t startIdx, size_t endIdx);
-    std::optional<size_t> searchHeader(int headerCode, size_t startIdx, size_t endIdx);
+    std::optional<size_t> searchHeader(int headerCode, size_t idx);
 
     size_t readCapacity();
     size_t writeCapacity();
