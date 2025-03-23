@@ -14,6 +14,15 @@ bool writeToMsgBuffer(MsgBuffer<TEST_MSGBUFFER_SIZE>& msgBuf, const char* str, s
     return true;
 }
 
+bool fillMsgBuffer(MsgBuffer<TEST_MSGBUFFER_SIZE>& msgBuf, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        if (!msgBuf.writeChar(' ')) {
+            return false;
+        }
+    }
+    return true;
+}
+
 TEST_CASE("Should detect correct amount of packets during writes") {
     MsgBuffer<TEST_MSGBUFFER_SIZE> msgBuf;
 
@@ -60,5 +69,33 @@ TEST_CASE("Should detect correct amount of packets during writes") {
 
         writeToMsgBuffer(msgBuf, "PRS\0", 4);
         CHECK(msgBuf.availablePackets() == 3);
+    }
+
+    SUBCASE("Header codes split between beginning and end of circular buffer") {
+        char rcv[TEST_MSGBUFFER_SIZE] = {0};
+
+        SUBCASE("Split after 1st header code character") {
+            writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
+            fillMsgBuffer(msgBuf, 91);
+            msgBuf.readPacket(rcv);
+            writeToMsgBuffer(msgBuf, "ACC\0", 4);
+            CHECK(msgBuf.availablePackets() == 1);
+        }
+
+        SUBCASE("Split after 2st header code character") {
+            writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
+            fillMsgBuffer(msgBuf, 90);
+            msgBuf.readPacket(rcv);
+            writeToMsgBuffer(msgBuf, "ACC\0", 4);
+            CHECK(msgBuf.availablePackets() == 1);
+        }
+
+        SUBCASE("Split after 3st header code character") {
+            writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
+            fillMsgBuffer(msgBuf, 89);
+            msgBuf.readPacket(rcv);
+            writeToMsgBuffer(msgBuf, "ACC\0", 4);
+            CHECK(msgBuf.availablePackets() == 1);
+        }
     }
 }

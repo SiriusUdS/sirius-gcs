@@ -35,7 +35,7 @@ private:
     char buf[BUFSIZE]{};
     bool bufFull{};
     bool writingValidPacket{};
-    PacketInfo currPacket;
+    PacketInfo currPacket{};
     std::queue<PacketInfo> availablePacketInfoQueue{};
 };
 
@@ -177,11 +177,11 @@ size_t MsgBuffer<BUFSIZE>::nextIndex(size_t idx, size_t increment) {
 
 template <size_t BUFSIZE>
 size_t MsgBuffer<BUFSIZE>::prevIndex(size_t idx, size_t decrement) {
-    idx -= decrement;
-    while (idx < 0) {
+    decrement %= BUFSIZE;
+    if (decrement > idx) {
         idx += BUFSIZE;
     }
-    return idx;
+    return idx - decrement;
 }
 
 #endif // MSGBUFFER_H
