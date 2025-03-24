@@ -9,7 +9,7 @@
 template <size_t BUFSIZE>
 class MsgBuffer {
 public:
-    size_t readPacket(char* rcv);
+    size_t readPacket(int* headerCode, char* rcv);
     bool writeChar(char c);
     bool canReadPacket();
     bool canWriteChar();
@@ -40,21 +40,24 @@ private:
 };
 
 template <size_t BUFSIZE>
-size_t MsgBuffer<BUFSIZE>::readPacket(char* rcv) {
+size_t MsgBuffer<BUFSIZE>::readPacket(int* headerCode, char* rcv) {
     if (!canReadPacket()) {
         return 0;
     }
 
     PacketInfo& packetInfo = availablePacketInfoQueue.back();
+    size_t dataSize = packetInfo.size - HEADER_SIZE_BYTE;
 
-    for (int idx = 0; idx < packetInfo.size; idx++) {
+    *headerCode = packetInfo.headerCode;
+
+    readIdx = nextIndex(readIdx, HEADER_SIZE_BYTE);
+    for (int idx = 0; idx < dataSize; idx++) {
         rcv[idx] = buf[readIdx];
         readIdx = nextIndex(readIdx);
     }
 
-    size_t packetSize = packetInfo.size;
     availablePacketInfoQueue.pop();
-    return packetSize;
+    return dataSize;
 }
 
 template <size_t BUFSIZE>
@@ -75,9 +78,9 @@ bool MsgBuffer<BUFSIZE>::writeChar(char c) {
                 writingValidPacket = true;
             } else {
                 availablePacketInfoQueue.push(currPacket);
-                currPacket.headerCode = optionalHeaderCode.value();
-                currPacket.size = 0;
             }
+            currPacket.headerCode = optionalHeaderCode.value();
+            currPacket.size = 0;
         }
     }
 
@@ -126,24 +129,8 @@ std::optional<int> MsgBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
 
 template <size_t BUFSIZE>
 bool MsgBuffer<BUFSIZE>::searchSpecificHeader(int headerCode, size_t idx) {
-    // clang-format off
-    char headerStr[4] = {
-        (char) (headerCode >> 24),
-        (char) ((headerCode >> 16) & ((1 << 16) - 1)),
-        (char) ((headerCode >> 8) & ((1 << 16) - 1)),
-        (char) ((headerCode) & ((1 << 16) - 1))
-    };
-    
-    if (headerStr[0] == buf[idx] &&
-        headerStr[1] == buf[nextIndex(idx)] &&
-        headerStr[2] == buf[nextIndex(idx, 2)] &&
-        headerStr[3] == buf[nextIndex(idx, 3)]
-    ) {
-        return true;
-    }
-
-    return false;
-    // clang-format on
+    int headerCodeAtIdx = (buf[idx] << 24) | (buf[nextIndex(idx)] << 16) | (buf[nextIndex(idx, 2)] << 8) | buf[nextIndex(idx, 3)];
+    return headerCode == headerCodeAtIdx;
 }
 
 template <size_t BUFSIZE>

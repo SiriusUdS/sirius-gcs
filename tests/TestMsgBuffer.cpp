@@ -23,6 +23,15 @@ bool fillMsgBuffer(MsgBuffer<TEST_MSGBUFFER_SIZE>& msgBuf, size_t size) {
     return true;
 }
 
+bool msgEqual(char* rcv, const char* expected, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        if (rcv[i] != expected[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 TEST_CASE("Should detect correct amount of packets during writes") {
     MsgBuffer<TEST_MSGBUFFER_SIZE> msgBuf;
 
@@ -73,11 +82,12 @@ TEST_CASE("Should detect correct amount of packets during writes") {
 
     SUBCASE("Header codes split between beginning and end of circular buffer") {
         char rcv[TEST_MSGBUFFER_SIZE] = {0};
+        int headerCode;
 
         SUBCASE("Split after 1st header code character") {
             writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
             fillMsgBuffer(msgBuf, 91);
-            msgBuf.readPacket(rcv);
+            msgBuf.readPacket(&headerCode, rcv);
             writeToMsgBuffer(msgBuf, "ACC\0", 4);
             CHECK(msgBuf.availablePackets() == 1);
         }
@@ -85,7 +95,7 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         SUBCASE("Split after 2st header code character") {
             writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
             fillMsgBuffer(msgBuf, 90);
-            msgBuf.readPacket(rcv);
+            msgBuf.readPacket(&headerCode, rcv);
             writeToMsgBuffer(msgBuf, "ACC\0", 4);
             CHECK(msgBuf.availablePackets() == 1);
         }
@@ -93,9 +103,30 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         SUBCASE("Split after 3st header code character") {
             writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
             fillMsgBuffer(msgBuf, 89);
-            msgBuf.readPacket(rcv);
+            msgBuf.readPacket(&headerCode, rcv);
             writeToMsgBuffer(msgBuf, "ACC\0", 4);
             CHECK(msgBuf.availablePackets() == 1);
         }
+    }
+}
+
+TEST_CASE("Should read packets correctly") {
+    MsgBuffer<TEST_MSGBUFFER_SIZE> msgBuf;
+    int headerCode;
+    char rcv[TEST_MSGBUFFER_SIZE] = {0};
+
+    SUBCASE("Packet with no data") {
+        writeToMsgBuffer(msgBuf, "ACC\0ACC\0", 8);
+        size_t dataSize = msgBuf.readPacket(&headerCode, rcv);
+        CHECK(dataSize == 0);
+        CHECK(headerCode == ACCELEROMETER_DATA_HEADER_CODE);
+    }
+
+    SUBCASE("Packet with data") {
+        writeToMsgBuffer(msgBuf, "PRS\0abcd1234RKT\0", 16);
+        size_t dataSize = msgBuf.readPacket(&headerCode, rcv);
+        CHECK(dataSize == 8);
+        CHECK(headerCode == PRESSURE_SENSOR_DATA_HEADER_CODE);
+        CHECK(msgEqual(rcv, "abcd1234", dataSize));
     }
 }
