@@ -45,7 +45,7 @@ size_t MsgBuffer<BUFSIZE>::readPacket(int* headerCode, char* rcv) {
         return 0;
     }
 
-    PacketInfo& packetInfo = availablePacketInfoQueue.back();
+    PacketInfo& packetInfo = availablePacketInfoQueue.front();
     size_t dataSize = packetInfo.size - HEADER_SIZE_BYTE;
 
     *headerCode = packetInfo.headerCode;
