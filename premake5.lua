@@ -58,6 +58,5 @@ project "sirius-gcs-tests"
         "tests/**.cpp",
         "src/Constants.h",
         "src/serial/MsgBuffer.h",
-        "src/serial/MsgBuffer.cpp",
         "external/sirius-headers-common/**.h"
     }
