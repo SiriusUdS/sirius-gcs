@@ -14,6 +14,8 @@ public:
     bool canReadPacket();
     bool canWriteChar();
     size_t availablePackets();
+    bool isBufferFull();
+    void clear();
 
 private:
     struct PacketInfo {
@@ -57,6 +59,7 @@ size_t MsgBuffer<BUFSIZE>::readPacket(int* headerCode, char* rcv) {
     }
 
     availablePacketInfoQueue.pop();
+    bufFull = false;
     return dataSize;
 }
 
@@ -100,6 +103,24 @@ bool MsgBuffer<BUFSIZE>::canWriteChar() {
 template <size_t BUFSIZE>
 size_t MsgBuffer<BUFSIZE>::availablePackets() {
     return availablePacketInfoQueue.size();
+}
+
+template <size_t BUFSIZE>
+inline bool MsgBuffer<BUFSIZE>::isBufferFull() {
+    return bufFull;
+}
+
+template <size_t BUFSIZE>
+inline void MsgBuffer<BUFSIZE>::clear() {
+    readIdx = 0;
+    writeIdx = 0;
+    bufFull = false;
+    writingValidPacket = false;
+    currPacket.headerCode = 0;
+    currPacket.size = 0;
+    while (!availablePacketInfoQueue.empty()) {
+        availablePacketInfoQueue.pop();
+    }
 }
 
 template <size_t BUFSIZE>

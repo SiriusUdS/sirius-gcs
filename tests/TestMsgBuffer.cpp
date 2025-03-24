@@ -162,3 +162,34 @@ TEST_CASE("Should read packets correctly") {
         CHECK(msgEqual(rcv, "efgh5678", dataSize));
     }
 }
+
+TEST_CASE("Should detect when the buffer is full") {
+    MsgBuffer<TEST_MSGBUFFER_SIZE> msgBuf;
+    int headerCode;
+    char rcv[TEST_MSGBUFFER_SIZE];
+    size_t dataSize;
+
+    CHECK_FALSE(msgBuf.isBufferFull());
+    CHECK(writeToMsgBuffer(msgBuf, "ACC\0", 4));
+    CHECK(fillMsgBuffer(msgBuf, 46));
+    CHECK_FALSE(msgBuf.isBufferFull());
+    CHECK(writeToMsgBuffer(msgBuf, "ACC\0", 4));
+    CHECK(fillMsgBuffer(msgBuf, 46));
+    CHECK(msgBuf.isBufferFull());
+    dataSize = msgBuf.readPacket(&headerCode, rcv);
+    CHECK(dataSize == 46);
+    CHECK_FALSE(msgBuf.isBufferFull());
+    CHECK(fillMsgBuffer(msgBuf, 50));
+    CHECK(msgBuf.isBufferFull());
+}
+
+TEST_CASE("Should clear correctly") {
+    MsgBuffer<TEST_MSGBUFFER_SIZE> msgBuf;
+
+    CHECK(writeToMsgBuffer(msgBuf, "ACC\0abcdVLV\0aaaaaaaaGPS\0qwertyazertyTHM\0", 40));
+    msgBuf.clear();
+    CHECK(msgBuf.availablePackets() == 0);
+    CHECK(msgBuf.canWriteChar());
+    CHECK_FALSE(msgBuf.canReadPacket());
+    CHECK_FALSE(msgBuf.isBufferFull());
+}
