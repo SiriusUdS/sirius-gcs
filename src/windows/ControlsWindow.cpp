@@ -7,7 +7,7 @@ ValveState valveState1{ValveState::CLOSED};
 std::chrono::time_point<std::chrono::system_clock> valveTimer1{};
 ValveState valveState2{ValveState::CLOSED};
 std::chrono::time_point<std::chrono::system_clock> valveTimer2{};
-SerialTest serialTest{};
+SerialCom serialTest{};
 } // namespace ControlsWindow
 
 bool ValveButton(const char* id, ValveState state) {
@@ -92,8 +92,8 @@ void render() {
             serialTest.init();
         }
 
-        if (ImGui::Button("Write Test")) {
-            serialTest.performWriteTest();
+        if (ImGui::Button("Get Available Com Ports")) {
+            serialTest.getAvailableComPorts();
         }
 
         if (ImGui::Button("Close Serial Port")) {

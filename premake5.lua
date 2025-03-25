@@ -31,6 +31,7 @@ project "sirius-gcs"
 
     files {
         "src/**.h",
+        "src/**.hpp",
         "src/**.cpp",
         "external/ceSerial/ceserial.h",
         "external/mINI/ini.h",
@@ -57,6 +58,6 @@ project "sirius-gcs-tests"
         "tests/**.h",
         "tests/**.cpp",
         "src/Constants.h",
-        "src/serial/MsgBuffer.h",
+        "src/serial/RecvBuffer.hpp",
         "external/sirius-headers-common/**.h"
     }

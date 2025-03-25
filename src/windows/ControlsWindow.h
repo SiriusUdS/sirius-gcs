@@ -1,7 +1,7 @@
 #ifndef CONTROLSWINDOW_H
 #define CONTROLSWINDOW_H
 
-#include "SerialTest.h"
+#include "SerialCom.h"
 
 #include <chrono>
 
@@ -14,7 +14,7 @@ extern ValveState valveState1;
 extern std::chrono::time_point<std::chrono::system_clock> valveTimer1;
 extern ValveState valveState2;
 extern std::chrono::time_point<std::chrono::system_clock> valveTimer2;
-extern SerialTest serialTest;
+extern SerialCom serialCom;
 } // namespace ControlsWindow
 
 #endif // CONTROLSWINDOW_H
