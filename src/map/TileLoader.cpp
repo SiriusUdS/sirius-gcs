@@ -5,12 +5,13 @@
 
 #include <algorithm>
 
-TileLoader::TileLoader(std::shared_ptr<ITileSource> source) : _source{source} {
+TileLoader::TileLoader(std::shared_ptr<ITileSource> source, bool dummiesAreFinal) : _source{source}, _dummiesAreFinal{dummiesAreFinal} {
 }
 
 void TileLoader::beginLoad(int z, int xmin, int xmax, int ymin, int ymax) {
-    const auto cond{
-      [z, xmin, xmax, ymin, ymax](const std::shared_ptr<ITile>& tile) { return !tile->inBounds(z, xmin, xmax, ymin, ymax) || tile->isDummy(); }};
+    const auto cond{[this, z, xmin, xmax, ymin, ymax](const std::shared_ptr<ITile>& tile) {
+        return !tile->inBounds(z, xmin, xmax, ymin, ymax) || (tile->isDummy() && !_dummiesAreFinal);
+    }};
     _tiles.erase(std::remove_if(_tiles.begin(), _tiles.end(), cond), _tiles.end());
     _source->takeReady(_tiles);
 }
@@ -20,7 +21,7 @@ ImTextureID TileLoader::tileAt(int z, int x, int y) {
     const auto it{std::find_if(_tiles.begin(), _tiles.end(), cond)};
 
     if (it != _tiles.end()) {
-        if (!(*it)->isDummy()) {
+        if (!(*it)->isDummy() || _dummiesAreFinal) {
             return (*it)->texture();
         }
     }

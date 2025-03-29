@@ -33,7 +33,7 @@ public:
 class TileLoaderFsMap : public TileLoader {
 public:
     TileLoaderFsMap(const std::string& dirname, const int requestLimit = URL_REQUEST_LIMIT)
-        : TileLoader{std::make_shared<TileSourceFsSubDir>(requestLimit, MAP_PRELOAD, dirname)} {
+        : TileLoader{std::make_shared<TileSourceFsSubDir>(requestLimit, MAP_PRELOAD, dirname), true} {
     }
 };
 
