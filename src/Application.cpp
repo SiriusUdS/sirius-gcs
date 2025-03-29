@@ -37,6 +37,8 @@ void Application::init() {
 
     iniFile.read(iniStructure);
 
+    MapWindow::init();
+
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
     PlotWindow::loadState(iniStructure);

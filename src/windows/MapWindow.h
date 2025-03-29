@@ -11,9 +11,12 @@
 namespace MapWindow {
 enum MapView { MAP_VIEW = 0, SATELLITE_VIEW = 1 };
 
-void render();
+void init();
 void loadState(const mINI::INIStructure& ini);
 void saveState(mINI::INIStructure& ini);
+void render();
+void addMark(const GeoCoords& coords, const std::string& name);
+std::string getFsPathFromMapView(int mapView);
 
 extern int mapView;
 extern int prevMapView;
