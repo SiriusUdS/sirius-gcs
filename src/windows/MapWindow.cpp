@@ -6,6 +6,8 @@
 #include "TileSaver.h"
 #include "TileSourceUrlImpl.h"
 
+#include <sstream>
+
 namespace MapWindow {
 int mapView{};
 int prevMapView{};
@@ -16,19 +18,19 @@ int downloadMaxZ{18};
 size_t downloadTileCount{0};
 size_t downloadTileTotal{};
 float downloadProgress{0};
-std::chrono::seconds autoSourceSwitchDelay{3};
+std::chrono::seconds autoSourceSwitchDelay{1};
 std::chrono::steady_clock::time_point lastAutoSourceSwitchTime{std::chrono::steady_clock::now()};
 std::shared_ptr<RichMapPlot> mapPlot;
 std::shared_ptr<MarkStorage> storage;
 std::shared_ptr<TileGrabber> mapTileGrabber;
 std::shared_ptr<TileGrabber> satelliteTileGrabber;
-std::shared_ptr<TileSourceUrl> urlConnectionTest;
+std::shared_ptr<TileSourceUrlConnTest> urlConnectionTest;
 } // namespace MapWindow
 
 void MapWindow::init() {
     mapPlot = std::make_shared<RichMapPlot>();
     storage = std::make_shared<MarkStorage>();
-    urlConnectionTest = std::make_shared<TileSourceUrlOsm>(URL_REQUEST_LIMIT, MAP_PRELOAD);
+    urlConnectionTest = std::make_shared<TileSourceUrlConnTest>();
 
     std::string mapTileDir = getFsPathFromMapView(MAP_VIEW);
     std::string satelliteTileDir = getFsPathFromMapView(SATELLITE_VIEW);
@@ -147,13 +149,13 @@ void MapWindow::render() {
         hasSwitchedSource = true;
         GCS_LOG_DEBUG("MapWindow: Lost connection to tile provider.");
     } else if (sourceIsFs) {
-        if (urlConnectionTest->canFetch() && autoSourceSwitchDelayElapsed) {
+        startTileProviderConnectivityTest();
+        if (urlConnectionTest->successful() && autoSourceSwitchDelayElapsed) {
             sourceIsFs = false;
             lastAutoSourceSwitchTime = now;
             hasSwitchedSource = true;
             GCS_LOG_DEBUG("MapWindow: Regained connection to tile provider.");
         }
-        urlConnectionTest->startConnectivityTest();
     }
 
     if (hasSwitchedSource) {
@@ -185,4 +187,14 @@ std::string MapWindow::getFsPathFromMapView(int mapView) {
         mapViewFolder = "satellite";
     }
     return (std::filesystem::current_path() / "tiles" / mapViewFolder).string();
+}
+
+void MapWindow::startTileProviderConnectivityTest() {
+    std::ostringstream urlmaker;
+    if (mapView == MAP_VIEW) {
+        urlmaker << TileSourceUrlOsm::makeSourceUrl(0, 0, 0);
+    } else if (mapView == SATELLITE_VIEW) {
+        urlmaker << TileSourceUrlArcImagery::makeSourceUrl(0, 0, 0);
+    }
+    urlConnectionTest->startConnectivityTest(urlmaker.str());
 }

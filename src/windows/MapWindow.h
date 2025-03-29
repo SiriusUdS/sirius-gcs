@@ -4,7 +4,8 @@
 #include "RichMapPlot.h"
 #include "RichMarkStorage.h"
 #include "TileGrabber.h"
-#include "TileSourceUrl.h"
+#include "TileSourceUrlConnTest.h"
+#include "TileSourceUrlImpl.h"
 
 #include <chrono>
 
@@ -17,6 +18,7 @@ void saveState(mINI::INIStructure& ini);
 void render();
 void addMark(const GeoCoords& coords, const std::string& name);
 std::string getFsPathFromMapView(int mapView);
+void startTileProviderConnectivityTest();
 
 extern int mapView;
 extern int prevMapView;
@@ -33,7 +35,7 @@ extern std::shared_ptr<RichMapPlot> mapPlot;
 extern std::shared_ptr<MarkStorage> storage;
 extern std::shared_ptr<TileGrabber> mapTileGrabber;
 extern std::shared_ptr<TileGrabber> satelliteTileGrabber;
-extern std::shared_ptr<TileSourceUrl> urlConnectionTest;
+extern std::shared_ptr<TileSourceUrlConnTest> urlConnectionTest;
 } // namespace MapWindow
 
 #endif // MAPWINDOW_H

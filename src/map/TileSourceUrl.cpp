@@ -37,24 +37,6 @@ bool TileSourceUrl::receiveTile(int z, int x, int y, TileData& tileData) {
     return ok;
 }
 
-void TileSourceUrl::startConnectivityTest() {
-    connectivityTestFuture = std::async(std::launch::async, &TileSourceUrl::performConnectivityTest, this);
-}
-
-void TileSourceUrl::performConnectivityTest() {
-    if (connectivityTestMutex.try_lock()) {
-        CURL* curl = {curl_easy_init()};
-        curl_easy_setopt(curl, CURLOPT_URL, makeUrl(0, 0, 0).c_str());
-        curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 1);
-        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5);
-        lastFetchSuccessful.store(curl_easy_perform(curl) == CURLE_OK);
-        curl_easy_cleanup(curl);
-
-        connectivityTestMutex.unlock();
-    }
-}
-
 size_t onWrite(void* data, size_t size, size_t nmemb, void* userp) {
     auto& tileData{*static_cast<TileSourceAsync::TileData*>(userp)};
     auto& blob{tileData.blob};

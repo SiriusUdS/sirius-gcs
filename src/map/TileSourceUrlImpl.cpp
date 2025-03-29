@@ -29,17 +29,26 @@ TileSourceUrlOsm::TileSourceUrlOsm(int request_limit, bool preload) : TileSource
 }
 
 std::string TileSourceUrlOsm::makeUrl(int z, int x, int y) {
+    return TileSourceUrlOsm::makeSourceUrl(z, x, y);
+}
+
+std::string TileSourceUrlOsm::makeSourceUrl(int z, int x, int y) {
     std::ostringstream urlmaker;
     urlmaker << "https://a.tile.openstreetmap.org";
     urlmaker << '/' << z << '/' << x << '/' << y << ".png";
     return urlmaker.str();
 }
+
 // -----------------------------------------------------------------------------
 
 TileSourceUrlArcImagery::TileSourceUrlArcImagery(int request_limit, bool preload) : TileSourceUrl{request_limit, preload} {
 }
 
 std::string TileSourceUrlArcImagery::makeUrl(int z, int x, int y) {
+    return TileSourceUrlArcImagery::makeSourceUrl(z, x, y);
+}
+
+std::string TileSourceUrlArcImagery::makeSourceUrl(int z, int x, int y) {
     std::ostringstream urlmaker;
     urlmaker << "https://server.arcgisonline.com/ArcGIS/rest/"
                 "services/World_Imagery/MapServer/tile";

@@ -28,6 +28,8 @@ protected:
 
 public:
     inline static const char URL_TPL[]{"https://a.tile.openstreetmap.org/$Z$/$X$/$Y$.png"};
+
+    static std::string makeSourceUrl(int z, int x, int y);
 };
 
 // -----------------------------------------------------------------------------
@@ -42,6 +44,8 @@ protected:
 public:
     inline static const char URL_TPL[]{"https://server.arcgisonline.com/ArcGIS/rest/services/"
                                        "World_Imagery/MapServer/tile/$Z$/$Y$/$X$"};
+
+    static std::string makeSourceUrl(int z, int x, int y);
 };
 using TileSourceUrlArc = TileSourceUrlArcImagery;
 
