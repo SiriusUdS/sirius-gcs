@@ -51,21 +51,21 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         CHECK(writeTorecvBuffer(recvBuf, "ACC\0a1234acc test", 17));
         CHECK(recvBuf.availablePackets() == 0);
 
-        CHECK(writeTorecvBuffer(recvBuf, "asdfGYR\0qwerty", 14));
+        CHECK(writeTorecvBuffer(recvBuf, "asdfGYR\x002qwerty", 14));
         CHECK(recvBuf.availablePackets() == 1);
 
-        CHECK(writeTorecvBuffer(recvBuf, "zxcvbnmVLV\0", 11));
+        CHECK(writeTorecvBuffer(recvBuf, "zxcvbnmVLV\x010", 11));
         CHECK(recvBuf.availablePackets() == 2);
 
-        CHECK(writeTorecvBuffer(recvBuf, "ALT\0GPS\0MAG\0abcdefgPRS\0", 23));
+        CHECK(writeTorecvBuffer(recvBuf, "ALT\0GPS\x044MAG\0abcdefgPRS\0", 23));
         CHECK(recvBuf.availablePackets() == 6);
     }
 
     SUBCASE("Wrong header codes") {
-        CHECK(writeTorecvBuffer(recvBuf, "ACC -----------", 15));
+        CHECK(writeTorecvBuffer(recvBuf, "ACA -----------", 15));
         CHECK(recvBuf.availablePackets() == 0);
 
-        CHECK(writeTorecvBuffer(recvBuf, "MAGPR\0SRKT0", 11));
+        CHECK(writeTorecvBuffer(recvBuf, "MXGXR\0SRXT0", 11));
         CHECK(recvBuf.availablePackets() == 0);
 
         CHECK(writeTorecvBuffer(recvBuf, "asdfasdfasdfasdfasdfasdf123412341234123412341234", 48));
@@ -85,7 +85,7 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         CHECK(recvBuf.availablePackets() == 1);
 
         CHECK(writeTorecvBuffer(recvBuf, "9012 VLV", 8));
-        CHECK(writeTorecvBuffer(recvBuf, "\0ijkl", 5));
+        CHECK(writeTorecvBuffer(recvBuf, "\x001ijkl", 5));
         CHECK(recvBuf.availablePackets() == 2);
 
         CHECK(writeTorecvBuffer(recvBuf, "PRS\0", 4));
@@ -131,7 +131,7 @@ TEST_CASE("Should read packets correctly") {
     size_t dataSize;
 
     SUBCASE("Packet with no data") {
-        CHECK(writeTorecvBuffer(recvBuf, "ACC\0ACC\0", 8));
+        CHECK(writeTorecvBuffer(recvBuf, "ACC\0ACC\x001", 8));
         dataSize = recvBuf.readPacket(rcv);
         CHECK(dataSize == 4);
     }
@@ -180,7 +180,7 @@ TEST_CASE("Should detect when the buffer is full") {
 TEST_CASE("Should clear correctly") {
     RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
 
-    CHECK(writeTorecvBuffer(recvBuf, "ACC\0abcdVLV\0aaaaaaaaGPS\0qwertyazertyTHM\0", 40));
+    CHECK(writeTorecvBuffer(recvBuf, "ACC\0abcdVLV\x00AzaaaaaaaGPS\0qwertyazertyTHM\0", 40));
     recvBuf.clear();
     CHECK(recvBuf.availablePackets() == 0);
     CHECK_FALSE(recvBuf.isBufferFull());

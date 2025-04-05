@@ -128,7 +128,7 @@ std::optional<int> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
 
 template <size_t BUFSIZE>
 bool RecvBuffer<BUFSIZE>::searchSpecificHeader(int headerCode, size_t idx) {
-    int headerCodeAtIdx = (buf[idx] << 24) | (buf[nextIndex(idx)] << 16) | (buf[nextIndex(idx, 2)] << 8) | buf[nextIndex(idx, 3)];
+    int headerCodeAtIdx = (buf[idx] << 24) | (buf[nextIndex(idx)] << 16) | (buf[nextIndex(idx, 2)] << 8);
     return headerCode == headerCodeAtIdx;
 }
 
