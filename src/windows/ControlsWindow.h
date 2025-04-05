@@ -8,7 +8,9 @@
 enum class ValveState { OPEN, CLOSED, OPENING, CLOSING };
 
 namespace ControlsWindow {
+void init();
 void render();
+void shutdown();
 
 extern ValveState valveState1;
 extern std::chrono::time_point<std::chrono::system_clock> valveTimer1;

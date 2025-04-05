@@ -37,6 +37,7 @@ void Application::init() {
 
     iniFile.read(iniStructure);
 
+    ControlsWindow::init();
     MapWindow::init();
 
     LoggingWindow::loadState(iniStructure);
@@ -48,6 +49,8 @@ void Application::shutdown() {
     LoggingWindow::saveState(iniStructure);
     MapWindow::saveState(iniStructure);
     PlotWindow::saveState(iniStructure);
+
+    ControlsWindow::shutdown();
 
     iniFile.write(iniStructure);
 

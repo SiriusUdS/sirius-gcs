@@ -74,6 +74,10 @@ void updateValveState(ValveState& state, std::chrono::time_point<std::chrono::sy
 }
 
 namespace ControlsWindow {
+void init() {
+    serialTest.start();
+}
+
 void render() {
     if (ImGui::CollapsingHeader("Valves")) {
         ImGui::TextUnformatted("Valve 1");
@@ -87,18 +91,52 @@ void render() {
         updateValveState(valveState2, valveTimer2, valveButton2Pressed);
     }
 
+    static char sendPacket[13] = "bonjour hi! ";
+    static char recvPacket[512] = {0};
+
     if (ImGui::CollapsingHeader("Serial")) {
-        if (ImGui::Button("Initialize Serial Port")) {
-            serialTest.init();
+        ImGui::Text("COM Opened: ");
+        ImGui::SameLine();
+        ImGui::Text(serialTest.comOpened() ? "Yes" : "No");
+
+        if (ImGui::Button("Open COM")) {
+            serialTest.start();
+            if (serialTest.comOpened()) {
+                GCS_LOG_INFO("ControlsWindow: COM opened.");
+            } else {
+                GCS_LOG_WARN("ControlsWindow: Couldn't open COM port.");
+            }
         }
 
-        if (ImGui::Button("Get Available Com Ports")) {
-            serialTest.getAvailableComPorts();
+        if (ImGui::Button("Send test packet")) {
+            bool success = serialTest.write(sendPacket, 12);
+            if (success) {
+                GCS_LOG_INFO("ControlsWindow: Sent following packet: {}", sendPacket);
+            } else {
+                GCS_LOG_WARN("ControlsWindow: Couldn't send packet.");
+            }
         }
 
-        if (ImGui::Button("Close Serial Port")) {
-            serialTest.shutdown();
+        if (ImGui::Button("Read incoming packet")) {
+            size_t size = serialTest.getPacket(recvPacket);
+            if (size > 0) {
+                for (int i = 0; i < size; i++) {
+                    if (recvPacket[i] == '\0') {
+                        recvPacket[i] = '_';
+                    }
+                }
+                recvPacket[size] = '\0';
+                GCS_LOG_INFO("ControlsWindow: Received packet of size {}, contents are: {}", size, recvPacket);
+            } else {
+                GCS_LOG_WARN("ControlsWindow: Can't receive packet, no packets are available.");
+            }
         }
     }
+
+    serialTest.readChar();
+}
+
+void shutdown() {
+    serialTest.shutdown();
 }
 } // namespace ControlsWindow

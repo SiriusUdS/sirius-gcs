@@ -1,30 +1,25 @@
 #include "SerialCom.h"
 
-void SerialCom::init() {
+#include "ComDiscovery.h"
+
+void SerialCom::start() {
     if (com.IsOpened()) {
+        com.Close();
+    }
+
+    std::vector<std::string> availableComPorts;
+    getAvailableComPorts(availableComPorts);
+    if (availableComPorts.empty()) {
         return;
     }
 
-    com.SetPortName("\\\\.\\COM3");
+    std::string comPath = std::string("\\\\.\\") + availableComPorts[0];
+    com.SetPortName(comPath);
     com.Open();
 }
 
-void SerialCom::getAvailableComPorts() {
-    availableComPorts.clear();
-    HKEY hKey;
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT("HARDWARE\\DEVICEMAP\\SERIALCOMM"), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-        WCHAR valueName[256], comPort[256];
-        DWORD valueNameSize, comPortSize, index = 0, type;
-        while (true) {
-            valueNameSize = sizeof(valueName) / sizeof(WCHAR);
-            comPortSize = sizeof(comPort);
-            if (RegEnumValue(hKey, index++, valueName, &valueNameSize, nullptr, &type, (LPBYTE) comPort, &comPortSize) != ERROR_SUCCESS) {
-                break;
-            }
-            availableComPorts.emplace_back(&comPort[0], &comPort[255]);
-        }
-        RegCloseKey(hKey);
-    }
+bool SerialCom::comOpened() {
+    return com.IsOpened();
 }
 
 void SerialCom::readChar() {
