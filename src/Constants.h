@@ -35,8 +35,9 @@ constexpr const char* HELLO_IMGUI_MENU_APP_TITLE = "Sirius GCS";
 constexpr const char* IMGUI_MAIN_FONT_FILENAME = "assets/fonts/Nunito-Regular.ttf";
 constexpr float IMGUI_MAIN_FONT_SIZE = 28.0f;
 
-// Message buffer
-constexpr size_t MSG_BUF_SIZE = 1000;
+// Serial COM
+constexpr size_t RECV_BUF_SIZE = 10000;
+constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
 } // namespace Constants
 
 #endif // CONSTANTS_H

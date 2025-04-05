@@ -1,6 +1,7 @@
 #ifndef SERIALCOM_H
 #define SERIALCOM_H
 
+#include "Constants.h"
 #include "Logging.h"
 #include "RecvBuffer.hpp"
 
@@ -18,7 +19,7 @@ public:
 
 private:
     ceSerial com;
-    RecvBuffer<10000> recvBuf;
+    RecvBuffer<Constants::RECV_BUF_SIZE> recvBuf;
 };
 
 #endif // SERIALCOM_H
