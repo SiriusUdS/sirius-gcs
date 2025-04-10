@@ -12,7 +12,7 @@ public:
     size_t readPacket(char* recv);
     bool writeChar(char c);
     size_t availablePackets();
-    bool isBufferFull();
+    bool isFull();
     void clear();
 
 private:
@@ -85,7 +85,7 @@ size_t RecvBuffer<BUFSIZE>::availablePackets() {
 }
 
 template <size_t BUFSIZE>
-inline bool RecvBuffer<BUFSIZE>::isBufferFull() {
+inline bool RecvBuffer<BUFSIZE>::isFull() {
     return bufFull;
 }
 
