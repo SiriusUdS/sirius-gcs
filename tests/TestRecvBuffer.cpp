@@ -163,18 +163,18 @@ TEST_CASE("Should detect when the buffer is full") {
     char rcv[TEST_RECVBUFFER_SIZE];
     size_t dataSize;
 
-    CHECK_FALSE(recvBuf.isBufferFull());
+    CHECK_FALSE(recvBuf.isFull());
     CHECK(writeTorecvBuffer(recvBuf, "ACC\0", 4));
     CHECK(fillrecvBuffer(recvBuf, 46));
-    CHECK_FALSE(recvBuf.isBufferFull());
+    CHECK_FALSE(recvBuf.isFull());
     CHECK(writeTorecvBuffer(recvBuf, "ACC\0", 4));
     CHECK(fillrecvBuffer(recvBuf, 46));
-    CHECK(recvBuf.isBufferFull());
+    CHECK(recvBuf.isFull());
     dataSize = recvBuf.readPacket(rcv);
     CHECK(dataSize == 50);
-    CHECK_FALSE(recvBuf.isBufferFull());
+    CHECK_FALSE(recvBuf.isFull());
     CHECK(fillrecvBuffer(recvBuf, 50));
-    CHECK(recvBuf.isBufferFull());
+    CHECK(recvBuf.isFull());
 }
 
 TEST_CASE("Should clear correctly") {
@@ -183,5 +183,5 @@ TEST_CASE("Should clear correctly") {
     CHECK(writeTorecvBuffer(recvBuf, "ACC\0abcdVLV\x00AzaaaaaaaGPS\0qwertyazertyTHM\0", 40));
     recvBuf.clear();
     CHECK(recvBuf.availablePackets() == 0);
-    CHECK_FALSE(recvBuf.isBufferFull());
+    CHECK_FALSE(recvBuf.isFull());
 }
