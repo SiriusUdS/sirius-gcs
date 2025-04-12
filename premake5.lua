@@ -55,9 +55,10 @@ project "sirius-gcs-tests"
     }
 
     files {
-        "tests/**.h",
         "tests/**.cpp",
         "src/Constants.h",
         "src/serial/RecvBuffer.hpp",
+        "src/serial/WordFormatter.h",
+        "src/serial/WordFormatter.cpp",
         "external/sirius-headers-common/**.h"
     }

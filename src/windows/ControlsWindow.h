@@ -15,7 +15,6 @@ void shutdown();
 
 extern ValveState valveState1;
 extern ValveState valveState2;
-extern SerialCom serialCom;
 } // namespace ControlsWindow
 
 #endif // CONTROLSWINDOW_H

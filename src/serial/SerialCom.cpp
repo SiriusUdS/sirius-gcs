@@ -49,7 +49,7 @@ void SerialCom::read() {
  * @param recv The char buffer to receive the bytes into
  * @returns If a packet is found, the size of the packet is returned, otherwise 0 is returned
  */
-size_t SerialCom::getPacket(char* recv) {
+size_t SerialCom::getPacket(uint8_t* recv) {
     return recvBuf.readPacket(recv);
 }
 
@@ -59,12 +59,12 @@ size_t SerialCom::getPacket(char* recv) {
  * @param size The size of the data to send
  * @returns True if the data was successfully sent, else false
  */
-bool SerialCom::write(char* msg, size_t size) {
+bool SerialCom::write(uint8_t* msg, size_t size) {
     if (!com.IsOpened()) {
         return false;
     }
 
-    return com.Write(msg, (long) size);
+    return com.Write((char*) msg, (long) size);
 }
 
 /**

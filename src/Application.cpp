@@ -7,6 +7,7 @@
 #include "LoggingWindow.h"
 #include "MapWindow.h"
 #include "PlotWindow.h"
+#include "SerialComImpl.h"
 
 #include <WinSock2.h>
 #include <imgui.h>
