@@ -9,6 +9,10 @@
 
 class IRichItem;
 
+/**
+ * @class RichMapPlot
+ * @brief The ImGui map plot component with additional features
+ */
 class RichMapPlot : public MapPlot {
 public:
     RichMapPlot();

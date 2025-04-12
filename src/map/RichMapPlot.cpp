@@ -19,6 +19,10 @@ void RichMapPlot::paintOverMap() {
     });
 }
 
+/**
+ * @brief Loads the state of the rich map plot from an ini struct
+ * @param ini The ini struct to load the state from
+ */
 void RichMapPlot::loadState(const mINI::INIStructure& ini) {
     if (ini.has("map_plot")) {
         if (ini.get("map_plot").has("min_lat") && ini.get("map_plot").has("max_lat") && ini.get("map_plot").has("min_lon")
@@ -29,6 +33,10 @@ void RichMapPlot::loadState(const mINI::INIStructure& ini) {
     }
 }
 
+/**
+ * @brief Saves the state of the rich map plot to an ini struct
+ * @param ini The ini struct to save the state to
+ */
 void RichMapPlot::saveState(mINI::INIStructure& ini) const {
     float minLat{}, maxLat{}, minLon{}, maxLon{};
     getBoundsGeo(minLat, maxLat, minLon, maxLon);
@@ -38,6 +46,10 @@ void RichMapPlot::saveState(mINI::INIStructure& ini) const {
     ini["map_plot"].set("max_lon", std::to_string(maxLon));
 }
 
+/**
+ * @brief Add a rich item to the rich map plot
+ * @param item The item to add
+ */
 void RichMapPlot::addItem(std::weak_ptr<IRichItem> item) {
     _items.push_back(item);
 }

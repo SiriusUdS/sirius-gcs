@@ -10,9 +10,11 @@
 class IRichItem;
 class MarkItem;
 
+/**
+ * @class MarkStorage
+ * @brief Storage for marks on the map plot
+ */
 class MarkStorage {
-    friend class MarkEditorWidget;
-
 public:
     MarkStorage();
     ~MarkStorage();
@@ -23,38 +25,35 @@ public:
     void loadState(const mINI::INIStructure& ini);
     void saveState(mINI::INIStructure& ini) const;
 
-    inline void setPickCoords(const GeoCoords& coords) {
-        _pickCoords = coords;
-        _pickState = true;
-    }
-
     void addMark(const GeoCoords& coords, const std::string& name);
     void rmMarks();
 
     struct ItemNode;
+
+    /**
+     * @brief Returns the mark items in the storage
+     * @returns Vector containing the mark items
+     */
     inline std::vector<ItemNode>& markItems() {
         return _markItems;
     }
+
+    /**
+     * @brief Returns the mark items in the storage (const)
+     * @returns Vector containing the mark items
+     */
     inline const std::vector<ItemNode>& markItems() const {
         return _markItems;
     }
 
-private:
-    bool handlePickState();
-    bool handleLoadState();
-
-private:
-    // Load State
-    bool _loadState{false};
-
-    // Pick State
-    GeoCoords _pickCoords{};
-    bool _pickState{false};
-
 public:
+    /**
+     * @struct ItemNode
+     * @brief Represents a mark item in storage
+     */
     struct ItemNode {
-        std::shared_ptr<MarkItem> ptr;
-        mutable bool rmFlag{false};
+        std::shared_ptr<MarkItem> ptr; ///< Shared pointer to mark item
+        mutable bool rmFlag{false};    ///< Flag that dictates whether the mark item can be deleted
     };
 
 private:

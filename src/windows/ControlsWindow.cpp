@@ -66,7 +66,7 @@ void render() {
         }
     }
 
-    serialTest.readChar();
+    serialTest.read();
 }
 
 void renderValveState(const char* id, ValveState state) {

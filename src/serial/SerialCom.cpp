@@ -2,6 +2,9 @@
 
 #include "ComDiscovery.h"
 
+/**
+ * @brief Initializes communication on the first COM port found
+ */
 void SerialCom::start() {
     if (com.IsOpened()) {
         com.Close();
@@ -18,11 +21,18 @@ void SerialCom::start() {
     com.Open();
 }
 
+/**
+ * @brief Checks if a COM port is opened
+ * @returns True if a COM port is opened, else false
+ */
 bool SerialCom::comOpened() {
     return com.IsOpened();
 }
 
-void SerialCom::readChar() {
+/**
+ * @brief Reads a single byte from the COM port into an internal buffer
+ */
+void SerialCom::read() {
     if (!com.IsOpened()) {
         return;
     }
@@ -34,10 +44,21 @@ void SerialCom::readChar() {
     }
 }
 
+/**
+ * @brief Fetches a packet from the internal buffer if one is available
+ * @param recv The char buffer to receive the bytes into
+ * @returns If a packet is found, the size of the packet is returned, otherwise 0 is returned
+ */
 size_t SerialCom::getPacket(char* recv) {
     return recvBuf.readPacket(recv);
 }
 
+/**
+ * @brief Send data through the opened COM port
+ * @param msg The char buffer that contains the data to send
+ * @param size The size of the data to send
+ * @returns True if the data was successfully sent, else false
+ */
 bool SerialCom::write(char* msg, size_t size) {
     if (!com.IsOpened()) {
         return false;
@@ -46,6 +67,9 @@ bool SerialCom::write(char* msg, size_t size) {
     return com.Write(msg, (long) size);
 }
 
+/**
+ * @brief Shuts down communication with the currently opened serial COM port
+ */
 void SerialCom::shutdown() {
     com.Close();
 }

@@ -8,11 +8,15 @@
 #include <ceserial.h>
 #include <optional>
 
+/**
+ * @class SerialCom
+ * @brief Handles serial communication to receive packets
+ */
 class SerialCom {
 public:
     void start();
     bool comOpened();
-    void readChar();
+    void read();
     size_t getPacket(char* recv);
     bool write(char* msg, size_t size);
     void shutdown();

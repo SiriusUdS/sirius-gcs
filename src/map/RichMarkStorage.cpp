@@ -6,6 +6,11 @@ MarkStorage::MarkStorage() = default;
 
 MarkStorage::~MarkStorage() = default;
 
+/**
+ * @brief Finds a marker by name in the storage
+ * @param name Name of the marker to find
+ * @return If mark found, the shared_ptr of the mark item, otherwise nullptr
+ */
 std::shared_ptr<MarkItem> MarkStorage::findMark(const std::string& name) const {
     const auto it{std::find_if(_markItems.begin(), _markItems.end(), [name](const ItemNode& node) { return node.ptr->text() == name; })};
     if (it != _markItems.end()) {
@@ -14,6 +19,12 @@ std::shared_ptr<MarkItem> MarkStorage::findMark(const std::string& name) const {
     return nullptr;
 }
 
+/**
+ * @brief Finds a mark by name in the storage and returns its longitude and latitude
+ * @param name The name of the mark item to get the GeoCoords from
+ * @param ok Set to true if the mark item was found, otherwise set to false
+ * @returns The GeoCoords of the mark item if one was found, else empty GeoCoords are returned (all values set to 0)
+ */
 GeoCoords MarkStorage::findMark(const std::string& name, bool& ok) const {
     const auto ptr{findMark(name)};
     if (ptr) {
@@ -24,6 +35,10 @@ GeoCoords MarkStorage::findMark(const std::string& name, bool& ok) const {
     return {};
 }
 
+/**
+ * @brief Load the state of the mark item storage from an ini struct
+ * @param ini The ini struct to load the state from
+ */
 void MarkStorage::loadState(const mINI::INIStructure& ini) {
     for (auto it{ini.begin()}; it != ini.end(); ++it) {
         if (it->first.starts_with("mark_")) {
@@ -67,9 +82,12 @@ void MarkStorage::loadState(const mINI::INIStructure& ini) {
             _markItems.push_back({ptr});
         }
     }
-    _loadState = true;
 }
 
+/**
+ * @brief Save the state of the mark item storage to an ini struct
+ * @param ini The ini struct to save the mark item storage state to
+ */
 void MarkStorage::saveState(mINI::INIStructure& ini) const {
     static const auto key_base{"mark_"};
     unsigned index{};
@@ -93,22 +111,18 @@ void MarkStorage::saveState(mINI::INIStructure& ini) const {
     }
 }
 
+/**
+ * @brief Add a new mark item to the mark item storage
+ * @param coords The longitude and latitude of the new mark item to add
+ * @param name The name of the new mark item to add
+ */
 void MarkStorage::addMark(const GeoCoords& coords, const std::string& name) {
     _markItems.push_back({std::make_shared<MarkItem>(coords, name)});
 }
 
+/**
+ * @brief Remove mark items if their rmFlag is set to true
+ */
 void MarkStorage::rmMarks() {
     _markItems.erase(std::remove_if(_markItems.begin(), _markItems.end(), [](auto& item) { return item.rmFlag; }), _markItems.end());
-}
-
-bool MarkStorage::handleLoadState() {
-    const bool loadState{_loadState};
-    _loadState = false;
-    return loadState;
-}
-
-bool MarkStorage::handlePickState() {
-    const bool pickState{_pickState};
-    _pickState = false;
-    return pickState;
 }

@@ -3,6 +3,10 @@
 
 #include "ITile.h"
 
+/**
+ * @class TileDummy
+ * @brief A tile with no loaded image data
+ */
 class TileDummy : public ITile {
 public:
     /**
