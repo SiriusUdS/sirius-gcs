@@ -13,7 +13,6 @@ void saveState(mINI::INIStructure& ini);
 
 extern ImPlotFlags flags;
 extern bool autofit;
-extern std::vector<PlotData> data;
 } // namespace PlotWindow
 
 #endif // PLOTWINDOW_H

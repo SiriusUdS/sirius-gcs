@@ -125,6 +125,50 @@ TEST_CASE("Should detect correct amount of packets during writes") {
     }
 }
 
+TEST_CASE("Should correctly detect next packet header and size") {
+    RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
+
+    CHECK(writeToRecvBuffer(recvBuf, "\0CCAa1234acc test", 17));
+    CHECK(recvBuf.nextPacketHeaderCode() == 0);
+    CHECK(recvBuf.nextPacketSize() == 0);
+
+    CHECK(writeToRecvBuffer(recvBuf, "asdf\x002RYGqwerty", 14));
+    CHECK(recvBuf.nextPacketHeaderCode() == ACCELEROMETER_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 21);
+
+    CHECK(writeToRecvBuffer(recvBuf, "zxcvbnm\x010VLV", 11));
+    CHECK(recvBuf.nextPacketHeaderCode() == ACCELEROMETER_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 21);
+
+    CHECK(recvBuf.dumpNextPacket());
+    CHECK(recvBuf.nextPacketHeaderCode() == GYROSCOPE_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 17);
+}
+
+TEST_CASE("Should be able to dump packets correctly") {
+    RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
+
+    CHECK(writeToRecvBuffer(recvBuf, "\0CCA1234\0VLV567876\0TLA90\0SPG3456\0CCA7890", 42));
+    CHECK(recvBuf.nextPacketHeaderCode() == ACCELEROMETER_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 8);
+
+    CHECK(recvBuf.dumpNextPacket());
+    CHECK(recvBuf.nextPacketHeaderCode() == VALVE_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 10);
+
+    CHECK(recvBuf.dumpNextPacket());
+    CHECK(recvBuf.nextPacketHeaderCode() == ALTIMETER_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 6);
+
+    CHECK(recvBuf.dumpNextPacket());
+    CHECK(recvBuf.nextPacketHeaderCode() == GPS_DATA_HEADER_CODE);
+    CHECK(recvBuf.nextPacketSize() == 8);
+
+    CHECK(recvBuf.dumpNextPacket());
+    CHECK(recvBuf.nextPacketHeaderCode() == 0);
+    CHECK(recvBuf.nextPacketSize() == 0);
+}
+
 TEST_CASE("Should read packets correctly") {
     RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
     uint8_t rcv[TEST_RECVBUFFER_SIZE] = {0};

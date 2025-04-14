@@ -2,15 +2,15 @@
 
 #include "Constants.h"
 #include "Logging.h"
+#include "PacketProcessing.h"
 #include "PlotColors.h"
-#include "SerialComImpl.h"
+#include "PlotDataCenter.h"
 
 #include <imgui.h>
 #include <implot.h>
 #include <ini.h>
 
 namespace PlotWindow {
-std::vector<PlotData> data;
 ImPlotFlags flags{};
 bool autofit{};
 } // namespace PlotWindow
@@ -24,38 +24,15 @@ void PlotWindow::render() {
         flags = ImPlotFlags_None;
     }
 
-    // static float x = 5.0f;
-    // static float y = 2.5f;
-    // ImGui::SameLine();
-    // if (ImGui::Button("Add test data")) {
-    //     for (auto& d : data) {
-    //         d.addData(x, y++);
-    //     }
-    //     x++;
-    // }
-
     if (ImPlot::BeginPlot("Line Plot", "Time (ms)", "Degrees (C)", ImGui::GetContentRegionAvail(), flags)) {
-        for (const auto& plotData : data) {
-            plotData.plot();
-        }
+        PlotDataCenter::TemperatureSensorPlotData.plot();
         ImPlot::EndPlot();
     }
 
-    SerialComImpl::addTempDataToPlot(data[0]);
+    PacketProcessing::processPacket();
 }
 
 void PlotWindow::loadState(const mINI::INIStructure& ini) {
-    PlotData d1;
-    // d1.addData(0.0f, 0.0f);
-    // d1.addData(1.0f, 10.0f);
-    // d1.addData(2.0f, 7.5f);
-    // d1.addData(3.0f, 12.5f);
-    // d1.addData(4.0f, 15.0f);
-    d1.setName("Temperature");
-    d1.setColor(PlotColors::YELLOW);
-
-    data.push_back(d1);
-
     if (ini.has(Constants::GCS_INI_SECTION)) {
         if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT)) {
             autofit = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT));

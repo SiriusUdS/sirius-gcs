@@ -13,12 +13,16 @@ public:
     size_t readPacket(uint8_t* recv);
     bool writeChar(uint8_t c);
     size_t availablePackets();
+    uint32_t nextPacketHeaderCode();
+    size_t nextPacketSize();
+    bool dumpNextPacket();
     bool isFull();
     void clear();
 
 private:
     std::optional<uint32_t> searchAnyHeader(size_t idx);
     bool searchSpecificHeader(uint32_t headerCode, size_t idx);
+    uint32_t getHeaderAtIdx(size_t idx);
 
     size_t nextIndex(size_t idx, size_t increment = 1);
     size_t prevIndex(size_t idx, size_t decrement = 1);
@@ -86,6 +90,32 @@ size_t RecvBuffer<BUFSIZE>::availablePackets() {
 }
 
 template <size_t BUFSIZE>
+inline uint32_t RecvBuffer<BUFSIZE>::nextPacketHeaderCode() {
+    if (availablePacketSizeQueue.empty()) {
+        return 0;
+    }
+    return getHeaderAtIdx(readIdx);
+}
+
+template <size_t BUFSIZE>
+inline size_t RecvBuffer<BUFSIZE>::nextPacketSize() {
+    if (availablePacketSizeQueue.empty()) {
+        return 0;
+    }
+    return availablePacketSizeQueue.front();
+}
+
+template <size_t BUFSIZE>
+inline bool RecvBuffer<BUFSIZE>::dumpNextPacket() {
+    if (!availablePacketSizeQueue.empty()) {
+        readIdx = nextIndex(readIdx, availablePacketSizeQueue.front());
+        availablePacketSizeQueue.pop();
+        return true;
+    }
+    return false;
+}
+
+template <size_t BUFSIZE>
 inline bool RecvBuffer<BUFSIZE>::isFull() {
     return bufFull;
 }
@@ -129,9 +159,13 @@ std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
 
 template <size_t BUFSIZE>
 bool RecvBuffer<BUFSIZE>::searchSpecificHeader(uint32_t headerCode, size_t idx) {
-    // The header code is received in reversed (little endian), so it needs to be flipped (Ex. Received as \0MHT, convert to THM\0)
-    uint32_t headerCodeAtIdx = (buf[nextIndex(idx, 1)] << 8) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 3)] << 24);
-    return headerCode == headerCodeAtIdx;
+    return headerCode == getHeaderAtIdx(idx);
+}
+
+template <size_t BUFSIZE>
+inline uint32_t RecvBuffer<BUFSIZE>::getHeaderAtIdx(size_t idx) {
+    // The header code is received in reverse order (little endian), so it needs to be flipped (Ex. Received as \0MHT, converted to THM\0)
+    return (buf[nextIndex(idx, 1)] << 8) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 3)] << 24);
 }
 
 template <size_t BUFSIZE>

@@ -53,6 +53,14 @@ size_t SerialCom::getPacket(uint8_t* recv) {
     return recvBuf.readPacket(recv);
 }
 
+uint32_t SerialCom::nextPacketHeaderCode() {
+    return recvBuf.nextPacketHeaderCode();
+}
+
+size_t SerialCom::nextPacketSize() {
+    return recvBuf.nextPacketSize();
+}
+
 /**
  * @brief Send data through the opened COM port
  * @param msg The char buffer that contains the data to send
