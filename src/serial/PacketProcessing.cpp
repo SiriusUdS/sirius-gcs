@@ -1,7 +1,8 @@
 #include "PacketProcessing.h"
 
-#include "Accelerometer/AccelerometerPacket.h"
+// #include "Accelerometer/AccelerometerPacket.h"
 #include "Altimeter/AltimeterPacket.h"
+#include "Application.h"
 #include "GPS/GpsPacket.h"
 #include "Gyroscope/GyroscopePacket.h"
 #include "Magnetometer/MagnetometerPacket.h"
@@ -10,14 +11,9 @@
 #include "Rocket/RocketPacket.h"
 #include "TemperatureSensor/TemperatureSensorPacket.h"
 #include "Valve/ValvePacket.h"
-#include "WordFormatter.h"
 
-namespace PacketProcessing {
-SerialCom serialCom;
-} // namespace PacketProcessing
-
-bool PacketProcessing::processPacket() {
-    uint32_t headerCode = serialCom.nextPacketHeaderCode();
+bool PacketProcessing::processIncomingPacket() {
+    uint32_t headerCode = Application::serialCom.nextPacketHeaderCode();
 
     switch (headerCode) {
     case 0:
@@ -47,9 +43,9 @@ bool PacketProcessing::processPacket() {
 }
 
 bool PacketProcessing::processAccelerometerPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(AccelerometerPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processAccelerometerPacket() called, but there's no packet to process.");
             return false;
         }
@@ -58,7 +54,7 @@ bool PacketProcessing::processAccelerometerPacket() {
     }
 
     AccelerometerPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     // TODO - Change altitude with accelerometer when sirius-headers-common fixed
     float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
     float rawAltitude = packet.fields.rawData[0].members.data.rawAltitude;
@@ -67,9 +63,9 @@ bool PacketProcessing::processAccelerometerPacket() {
 }
 
 bool PacketProcessing::processGyroscopePacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(GyroscopePacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processGyroscopePacket() called, but there's no packet to process.");
             return false;
         }
@@ -78,7 +74,7 @@ bool PacketProcessing::processGyroscopePacket() {
     }
 
     GyroscopePacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
     float rawX = packet.fields.rawData[0].members.data.rawX;
     float rawY = packet.fields.rawData[0].members.data.rawY;
@@ -90,9 +86,9 @@ bool PacketProcessing::processGyroscopePacket() {
 }
 
 bool PacketProcessing::processAltimeterPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(AccelerometerPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processAltimeterPacket() called, but there's no packet to process.");
             return false;
         }
@@ -101,7 +97,7 @@ bool PacketProcessing::processAltimeterPacket() {
     }
 
     AccelerometerPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
     float rawAltitude = packet.fields.rawData[0].members.data.rawAltitude;
     PlotDataCenter::AltimeterPlotData.addData(timeStamp, rawAltitude);
@@ -109,9 +105,9 @@ bool PacketProcessing::processAltimeterPacket() {
 }
 
 bool PacketProcessing::processGpsPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(GpsPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processGpsPacket() called, but there's no packet to process.");
             return false;
         }
@@ -120,7 +116,7 @@ bool PacketProcessing::processGpsPacket() {
     }
 
     GpsPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawLongitude = packet.fields.rawData.members.data.rawLongitude;
     float rawLatitude = packet.fields.rawData.members.data.rawLatitude;
@@ -130,9 +126,9 @@ bool PacketProcessing::processGpsPacket() {
 }
 
 bool PacketProcessing::processMagnetometerPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(MagnetometerPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processMagnetometerPacket() called, but there's no packet to process.");
             return false;
         }
@@ -141,7 +137,7 @@ bool PacketProcessing::processMagnetometerPacket() {
     }
 
     MagnetometerPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     // TODO - float timeStamp quand fix
     float rawX = packet.fields.rawData[0].rawX;
     float rawY = packet.fields.rawData[0].rawY;
@@ -151,9 +147,9 @@ bool PacketProcessing::processMagnetometerPacket() {
 }
 
 bool PacketProcessing::processPressureSensorPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(PressureSensorPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processPressureSensorPacket() called, but there's no packet to process.");
             return false;
         }
@@ -162,7 +158,7 @@ bool PacketProcessing::processPressureSensorPacket() {
     }
 
     PressureSensorPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
     float rawPressure = packet.fields.rawData[0].members.data.rawPressure;
     PlotDataCenter::PressureSensorPlotData.addData(timeStamp, rawPressure);
@@ -170,9 +166,9 @@ bool PacketProcessing::processPressureSensorPacket() {
 }
 
 bool PacketProcessing::processRocketPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(RocketPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processRocketPacket() called, but there's no packet to process.");
             return false;
         }
@@ -181,7 +177,7 @@ bool PacketProcessing::processRocketPacket() {
     }
 
     RocketPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.packet.rawData[0].members.timeStamp_ms; // TODO - PACKET.PACKET QUESSE CA BIG
     // TODO - NO DATA???.?
     PlotDataCenter::RocketPlotData.addData(timeStamp, 0);
@@ -189,9 +185,9 @@ bool PacketProcessing::processRocketPacket() {
 }
 
 bool PacketProcessing::processTemperatureSensorPacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(TemperatureSensorPacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processTemperatureSensorPacket() called, but there's no packet to process.");
             return false;
         }
@@ -200,7 +196,7 @@ bool PacketProcessing::processTemperatureSensorPacket() {
     }
 
     TemperatureSensorPacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
     PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, rawTemperature);
@@ -208,9 +204,9 @@ bool PacketProcessing::processTemperatureSensorPacket() {
 }
 
 bool PacketProcessing::processValvePacket() {
-    size_t packetSize = serialCom.nextPacketSize();
+    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != sizeof(ValvePacket)) {
-        if (!serialCom.dumpNextPacket()) {
+        if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processValvePacket() called, but there's no packet to process.");
             return false;
         }
@@ -219,7 +215,7 @@ bool PacketProcessing::processValvePacket() {
     }
 
     ValvePacket packet;
-    serialCom.getPacket(packet.data);
+    Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float dutyCycle = packet.fields.rawData.members.data.dutyCycle_CCR;
     float state = packet.fields.rawData.members.data.state;

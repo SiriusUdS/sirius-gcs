@@ -1,7 +1,7 @@
 #ifndef ITILELOADER_H
 #define ITILELOADER_H
 
-using ImTextureID = void*;
+#include <imgui.h>
 
 /**
  * @class ITileLoader

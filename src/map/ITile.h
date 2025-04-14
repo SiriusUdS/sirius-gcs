@@ -1,7 +1,7 @@
 #ifndef ITILE_H
 #define ITILE_H
 
-using ImTextureID = void*;
+#include <imgui.h>
 
 /**
  * @class ITile

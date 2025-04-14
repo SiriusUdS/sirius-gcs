@@ -18,6 +18,7 @@
 namespace Application {
 mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
 mINI::INIStructure iniStructure;
+SerialCom serialCom;
 } // namespace Application
 
 void Application::loadFonts() {
@@ -44,6 +45,10 @@ void Application::init() {
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
     PlotWindow::loadState(iniStructure);
+}
+
+void Application::preNewFrame() {
+    PacketProcessing::processIncomingPacket();
 }
 
 void Application::shutdown() {

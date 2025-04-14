@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 namespace PacketProcessing {
-bool processPacket();
+bool processIncomingPacket();
 
 bool processAccelerometerPacket();
 bool processGyroscopePacket();
@@ -18,8 +18,6 @@ bool processPressureSensorPacket();
 bool processRocketPacket();
 bool processTemperatureSensorPacket();
 bool processValvePacket();
-
-extern SerialCom serialCom;
 } // namespace PacketProcessing
 
 #endif // PACKETPROCESSING_H

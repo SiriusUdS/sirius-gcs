@@ -1,6 +1,6 @@
 #include "ControlsWindow.h"
 
-#include "SerialComImpl.h"
+#include "Application.h"
 
 #include <imgui.h>
 
@@ -31,11 +31,11 @@ void render() {
     if (ImGui::CollapsingHeader("Serial")) {
         ImGui::Text("COM Opened: ");
         ImGui::SameLine();
-        ImGui::Text(SerialComImpl::serialCom.comOpened() ? "Yes" : "No");
+        ImGui::Text(Application::serialCom.comOpened() ? "Yes" : "No");
 
         if (ImGui::Button("Open COM")) {
-            SerialComImpl::serialCom.start();
-            if (SerialComImpl::serialCom.comOpened()) {
+            Application::serialCom.start();
+            if (Application::serialCom.comOpened()) {
                 GCS_LOG_INFO("ControlsWindow: COM opened.");
             } else {
                 GCS_LOG_WARN("ControlsWindow: Couldn't open COM port.");
@@ -43,7 +43,7 @@ void render() {
         }
 
         if (ImGui::Button("Send test packet")) {
-            bool success = SerialComImpl::serialCom.write((uint8_t*) sendPacket, 12);
+            bool success = Application::serialCom.write((uint8_t*) sendPacket, 12);
             if (success) {
                 GCS_LOG_INFO("ControlsWindow: Sent following packet: {}", sendPacket);
             } else {
@@ -52,7 +52,7 @@ void render() {
         }
 
         if (ImGui::Button("Read incoming packet")) {
-            size_t size = SerialComImpl::serialCom.getPacket((uint8_t*) recvPacket);
+            size_t size = Application::serialCom.getPacket((uint8_t*) recvPacket);
             if (size > 0) {
                 for (int i = 0; i < size; i++) {
                     if (recvPacket[i] == '\0') {
@@ -67,7 +67,7 @@ void render() {
         }
     }
 
-    SerialComImpl::serialCom.read();
+    Application::serialCom.read();
 }
 
 void renderValveState(const char* id, ValveState state) {
@@ -97,6 +97,6 @@ void renderValveState(const char* id, ValveState state) {
 }
 
 void shutdown() {
-    SerialComImpl::serialCom.shutdown();
+    Application::serialCom.shutdown();
 }
 } // namespace ControlsWindow

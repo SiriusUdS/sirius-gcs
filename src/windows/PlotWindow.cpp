@@ -28,8 +28,6 @@ void PlotWindow::render() {
         PlotDataCenter::TemperatureSensorPlotData.plot();
         ImPlot::EndPlot();
     }
-
-    PacketProcessing::processPacket();
 }
 
 void PlotWindow::loadState(const mINI::INIStructure& ini) {
