@@ -20,6 +20,7 @@ public:
     size_t getPacket(uint8_t* recv);
     uint32_t nextPacketHeaderCode();
     size_t nextPacketSize();
+    bool dumpNextPacket();
     bool write(uint8_t* msg, size_t size);
     void shutdown();
 

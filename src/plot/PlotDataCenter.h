@@ -5,9 +5,12 @@
 
 namespace PlotDataCenter {
 extern PlotData AccelerometerPlotData;
-extern PlotData GyroscopePlotData;
+extern PlotData GyroscopeXPlotData;
+extern PlotData GyroscopeYPlotData;
+extern PlotData GyroscopeZPlotData;
 extern PlotData AltimeterPlotData;
-extern PlotData GpsPlotData;
+extern PlotData GpsLongitudePlotData;
+extern PlotData GpsLatitudePlotData;
 extern PlotData MagnetometerPlotData;
 extern PlotData PressureSensorPlotData;
 extern PlotData RocketPlotData;

@@ -61,6 +61,10 @@ size_t SerialCom::nextPacketSize() {
     return recvBuf.nextPacketSize();
 }
 
+bool SerialCom::dumpNextPacket() {
+    return recvBuf.dumpNextPacket();
+}
+
 /**
  * @brief Send data through the opened COM port
  * @param msg The char buffer that contains the data to send
