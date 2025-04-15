@@ -1,6 +1,6 @@
 #include "PacketProcessing.h"
 
-// #include "Accelerometer/AccelerometerPacket.h"
+#include "Accelerometer/AccelerometerPacket.h"
 #include "Altimeter/AltimeterPacket.h"
 #include "Application.h"
 #include "GPS/GpsPacket.h"
@@ -55,10 +55,13 @@ bool PacketProcessing::processAccelerometerPacket() {
 
     AccelerometerPacket packet;
     Application::serialCom.getPacket(packet.data);
-    // TODO - Change altitude with accelerometer when sirius-headers-common fixed
-    float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
-    float rawAltitude = packet.fields.rawData[0].members.data.rawAltitude;
-    PlotDataCenter::AccelerometerPlotData.addData(timeStamp, rawAltitude);
+    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
+    float rawX = packet.fields.rawData.members.data.rawX;
+    float rawY = packet.fields.rawData.members.data.rawY;
+    float rawZ = packet.fields.rawData.members.data.rawZ;
+    PlotDataCenter::AccelerometerXPlotData.addData(timeStamp, rawX);
+    PlotDataCenter::AccelerometerYPlotData.addData(timeStamp, rawY);
+    PlotDataCenter::AccelerometerZPlotData.addData(timeStamp, rawZ);
     return true;
 }
 
@@ -75,10 +78,10 @@ bool PacketProcessing::processGyroscopePacket() {
 
     GyroscopePacket packet;
     Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
-    float rawX = packet.fields.rawData[0].members.data.rawX;
-    float rawY = packet.fields.rawData[0].members.data.rawY;
-    float rawZ = packet.fields.rawData[0].members.data.rawZ;
+    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
+    float rawX = packet.fields.rawData.members.data.rawX;
+    float rawY = packet.fields.rawData.members.data.rawY;
+    float rawZ = packet.fields.rawData.members.data.rawZ;
     PlotDataCenter::GyroscopeXPlotData.addData(timeStamp, rawX);
     PlotDataCenter::GyroscopeYPlotData.addData(timeStamp, rawY);
     PlotDataCenter::GyroscopeZPlotData.addData(timeStamp, rawZ);
@@ -87,19 +90,19 @@ bool PacketProcessing::processGyroscopePacket() {
 
 bool PacketProcessing::processAltimeterPacket() {
     size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(AccelerometerPacket)) {
+    if (packetSize != sizeof(AltimeterPacket)) {
         if (!Application::serialCom.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: processAltimeterPacket() called, but there's no packet to process.");
             return false;
         }
-        GCS_LOG_WARN("PacketProcessing: Invalid AccelerometerPacket size, ignoring packet.");
+        GCS_LOG_WARN("PacketProcessing: Invalid AltimeterPacket size, ignoring packet.");
         return false;
     }
 
-    AccelerometerPacket packet;
+    AltimeterPacket packet;
     Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
-    float rawAltitude = packet.fields.rawData[0].members.data.rawAltitude;
+    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
+    float rawAltitude = packet.fields.rawData.members.data.rawAltitude;
     PlotDataCenter::AltimeterPlotData.addData(timeStamp, rawAltitude);
     return true;
 }
@@ -138,11 +141,13 @@ bool PacketProcessing::processMagnetometerPacket() {
 
     MagnetometerPacket packet;
     Application::serialCom.getPacket(packet.data);
-    // TODO - float timeStamp quand fix
-    float rawX = packet.fields.rawData[0].rawX;
-    float rawY = packet.fields.rawData[0].rawY;
-    float rawZ = packet.fields.rawData[0].rawZ;
-    PlotDataCenter::MagnetometerPlotData.addData(0, rawX);
+    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
+    float rawX = packet.fields.rawData.members.data.rawX;
+    float rawY = packet.fields.rawData.members.data.rawY;
+    float rawZ = packet.fields.rawData.members.data.rawZ;
+    PlotDataCenter::MagnetometerXPlotData.addData(timeStamp, rawX);
+    PlotDataCenter::MagnetometerYPlotData.addData(timeStamp, rawX);
+    PlotDataCenter::MagnetometerZPlotData.addData(timeStamp, rawX);
     return true;
 }
 
@@ -159,8 +164,8 @@ bool PacketProcessing::processPressureSensorPacket() {
 
     PressureSensorPacket packet;
     Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData[0].members.timeStamp_ms;
-    float rawPressure = packet.fields.rawData[0].members.data.rawPressure;
+    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
+    float rawPressure = packet.fields.rawData.members.data.rawPressure;
     PlotDataCenter::PressureSensorPlotData.addData(timeStamp, rawPressure);
     return true;
 }
@@ -178,8 +183,7 @@ bool PacketProcessing::processRocketPacket() {
 
     RocketPacket packet;
     Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.packet.rawData[0].members.timeStamp_ms; // TODO - PACKET.PACKET QUESSE CA BIG
-    // TODO - NO DATA???.?
+    float timeStamp = packet.packet.rawData[0].members.timeStamp_ms; // TODO - changer quand yaura plus struct packet dans rocket packet
     PlotDataCenter::RocketPlotData.addData(timeStamp, 0);
     return true;
 }
@@ -217,8 +221,7 @@ bool PacketProcessing::processValvePacket() {
     ValvePacket packet;
     Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float dutyCycle = packet.fields.rawData.members.data.dutyCycle_CCR;
-    float state = packet.fields.rawData.members.data.state;
-    PlotDataCenter::ValvePlotData.addData(timeStamp, dutyCycle);
+    float status = packet.fields.rawData.members.status.bits.state;
+    PlotDataCenter::ValvePlotData.addData(timeStamp, status);
     return true;
 }

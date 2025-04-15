@@ -1,14 +1,18 @@
 #include "PlotDataCenter.h"
 
 namespace PlotDataCenter {
-PlotData AccelerometerPlotData;
+PlotData AccelerometerXPlotData;
+PlotData AccelerometerYPlotData;
+PlotData AccelerometerZPlotData;
 PlotData GyroscopeXPlotData;
 PlotData GyroscopeYPlotData;
 PlotData GyroscopeZPlotData;
 PlotData AltimeterPlotData;
 PlotData GpsLongitudePlotData;
 PlotData GpsLatitudePlotData;
-PlotData MagnetometerPlotData;
+PlotData MagnetometerXPlotData;
+PlotData MagnetometerYPlotData;
+PlotData MagnetometerZPlotData;
 PlotData PressureSensorPlotData;
 PlotData RocketPlotData;
 PlotData TemperatureSensorPlotData;
