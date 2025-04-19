@@ -18,6 +18,8 @@ bool processPressureSensorPacket();
 bool processRocketPacket();
 bool processTemperatureSensorPacket();
 bool processValvePacket();
+
+bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
 } // namespace PacketProcessing
 
 #endif // PACKETPROCESSING_H

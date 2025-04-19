@@ -43,13 +43,7 @@ bool PacketProcessing::processIncomingPacket() {
 }
 
 bool PacketProcessing::processAccelerometerPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(AccelerometerPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processAccelerometerPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid AccelerometerPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(AccelerometerPacket), "AccelerometerPacket")) {
         return false;
     }
 
@@ -66,13 +60,7 @@ bool PacketProcessing::processAccelerometerPacket() {
 }
 
 bool PacketProcessing::processGyroscopePacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(GyroscopePacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processGyroscopePacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid GyroscopePacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(GyroscopePacket), "GyroscopePacket")) {
         return false;
     }
 
@@ -89,13 +77,7 @@ bool PacketProcessing::processGyroscopePacket() {
 }
 
 bool PacketProcessing::processAltimeterPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(AltimeterPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processAltimeterPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid AltimeterPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(AltimeterPacket), "AltimeterPacket")) {
         return false;
     }
 
@@ -108,13 +90,7 @@ bool PacketProcessing::processAltimeterPacket() {
 }
 
 bool PacketProcessing::processGpsPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(GpsPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processGpsPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid GpsPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(GpsPacket), "GpsPacket")) {
         return false;
     }
 
@@ -129,13 +105,7 @@ bool PacketProcessing::processGpsPacket() {
 }
 
 bool PacketProcessing::processMagnetometerPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(MagnetometerPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processMagnetometerPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid MagnetometerPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(MagnetometerPacket), "MagnetometerPacket")) {
         return false;
     }
 
@@ -152,13 +122,7 @@ bool PacketProcessing::processMagnetometerPacket() {
 }
 
 bool PacketProcessing::processPressureSensorPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(PressureSensorPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processPressureSensorPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid PressureSensorPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(PressureSensorPacket), "PressureSensorPacket")) {
         return false;
     }
 
@@ -171,13 +135,7 @@ bool PacketProcessing::processPressureSensorPacket() {
 }
 
 bool PacketProcessing::processRocketPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(RocketPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processRocketPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid RocketPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(RocketPacket), "RockerPacket")) {
         return false;
     }
 
@@ -189,13 +147,7 @@ bool PacketProcessing::processRocketPacket() {
 }
 
 bool PacketProcessing::processTemperatureSensorPacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(TemperatureSensorPacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processTemperatureSensorPacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid TemperatureSensorPacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(TemperatureSensorPacket), "TemperatureSensorPacket")) {
         return false;
     }
 
@@ -208,13 +160,7 @@ bool PacketProcessing::processTemperatureSensorPacket() {
 }
 
 bool PacketProcessing::processValvePacket() {
-    size_t packetSize = Application::serialCom.nextPacketSize();
-    if (packetSize != sizeof(ValvePacket)) {
-        if (!Application::serialCom.dumpNextPacket()) {
-            GCS_LOG_WARN("PacketProcessing: processValvePacket() called, but there's no packet to process.");
-            return false;
-        }
-        GCS_LOG_WARN("PacketProcessing: Invalid ValvePacket size, ignoring packet.");
+    if (!validateIncomingPacketSize(sizeof(ValvePacket), "ValvePacket")) {
         return false;
     }
 
@@ -223,5 +169,18 @@ bool PacketProcessing::processValvePacket() {
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float status = packet.fields.rawData.members.status.bits.state;
     PlotDataCenter::ValvePlotData.addData(timeStamp, status);
+    return true;
+}
+
+bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
+    size_t packetSize = Application::serialCom.nextPacketSize();
+    if (packetSize != targetPacketSize) {
+        if (!Application::serialCom.dumpNextPacket()) {
+            GCS_LOG_WARN("PacketProcessing: process{}() called, but there's no packet to process.", packetName);
+            return false;
+        }
+        GCS_LOG_WARN("PacketProcessing: Invalid {} size, ignoring packet.", packetName);
+        return false;
+    }
     return true;
 }
