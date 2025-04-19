@@ -20,6 +20,9 @@ bool processTemperatureSensorPacket();
 bool processValvePacket();
 
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
+
+static float voltageConverter_V(float adcValue);
+static float pressureConverter_NAME1_PSI(float ADCInput, uint8_t index);
 } // namespace PacketProcessing
 
 #endif // PACKETPROCESSING_H

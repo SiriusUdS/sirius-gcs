@@ -11,6 +11,7 @@
 #include "Rocket/RocketPacket.h"
 #include "TemperatureSensor/TemperatureSensorPacket.h"
 #include "Valve/ValvePacket.h"
+#include "PressureTransducer.h"
 
 bool PacketProcessing::processIncomingPacket() {
     uint32_t headerCode = Application::serialCom.nextPacketHeaderCode();
@@ -155,7 +156,9 @@ bool PacketProcessing::processTemperatureSensorPacket() {
     Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
-    PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, rawTemperature);
+    float convertVoltage = voltageConverter_V(rawTemperature);
+    float convertTemperature = pressureConverter_NAME1_PSI(convertVoltage, packet.fields.header.values[0] & 0x000000ff);
+    PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, convertTemperature);
     return true;
 }
 
@@ -183,4 +186,13 @@ bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const
         return false;
     }
     return true;
+}
+
+float PacketProcessing::voltageConverter_V(float adcValue) {
+    float VoltageInput = adcValue / ADCRange_bit * voltageRange_V;
+    return VoltageInput;
+}
+
+float PacketProcessing::pressureConverter_NAME1_PSI(float VoltageInput, uint8_t index) {
+    return (PRESSURE_SENSOR_ARRAY_SLOPE[index] * VoltageInput) + PRESSURE_SENSOR_ARRAY_CONST[index];
 }
