@@ -66,8 +66,6 @@ void render() {
             }
         }
     }
-
-    Application::serialCom.read();
 }
 
 void renderValveState(const char* id, ValveState state) {
