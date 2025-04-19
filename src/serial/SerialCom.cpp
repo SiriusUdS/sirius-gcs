@@ -41,6 +41,8 @@ void SerialCom::read() {
     char c = com.ReadChar(successFlag);
     if (successFlag) {
         recvBuf.writeChar(c);
+    } else {
+        GCS_LOG_TRACE("SerialCom: No available bytes in recv COM port.");
     }
 }
 

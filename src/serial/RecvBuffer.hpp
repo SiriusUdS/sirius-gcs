@@ -1,6 +1,7 @@
 #ifndef RECVBUFFER_H
 #define RECVBUFFER_H
 
+#include "Logging.h"
 #include "Telecommunication/TelecommunicationHeader.h"
 #include "WordFormatter.h"
 
@@ -65,10 +66,6 @@ bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
     currPacketSize++;
     bufFull = (writeIdx == readIdx);
 
-    if (currPacketSize < HEADER_SIZE_BYTE) {
-        return true;
-    }
-
     if (currPacketSize >= HEADER_SIZE_BYTE) {
         std::optional<uint32_t> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, HEADER_SIZE_BYTE));
         if (optionalHeaderCode.has_value()) {
@@ -79,6 +76,11 @@ bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
             }
             currPacketSize = 0;
         }
+    }
+
+    if (isFull() && availablePackets() == 0) {
+        GCS_LOG_WARN("RecvBuffer: Buffer full, but no packets detected. Clearing buffer.");
+        clear();
     }
 
     return true;

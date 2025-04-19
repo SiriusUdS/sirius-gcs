@@ -26,6 +26,9 @@ void PlotWindow::render() {
 
     if (ImPlot::BeginPlot("Line Plot", "Time (ms)", "Degrees (C)", ImGui::GetContentRegionAvail(), flags)) {
         PlotDataCenter::TemperatureSensorPlotData.plot();
+        PlotDataCenter::AccelerometerXPlotData.plot();
+        PlotDataCenter::AccelerometerYPlotData.plot();
+        PlotDataCenter::AccelerometerZPlotData.plot();
         ImPlot::EndPlot();
     }
 }
