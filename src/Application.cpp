@@ -53,9 +53,11 @@ void Application::preNewFrame() {
     std::chrono::duration<double> elapsed = now - lastSerialReadTime;
     lastSerialReadTime = now;
 
-    size_t bytesToRead = Constants::RECV_BYTES_PER_SECOND * elapsed.count();
+    size_t bytesToRead = Constants::RECV_BYTES_TO_READ_PER_SECOND * elapsed.count();
     while (0 < bytesToRead--) {
-        Application::serialCom.read();
+        if (!Application::serialCom.read()) {
+            break;
+        }
     }
 
     PacketProcessing::processIncomingPacket();

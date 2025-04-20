@@ -16,7 +16,7 @@ class SerialCom {
 public:
     void start();
     bool comOpened();
-    void read();
+    bool read();
     size_t getPacket(uint8_t* recv);
     uint32_t nextPacketHeaderCode();
     size_t nextPacketSize();

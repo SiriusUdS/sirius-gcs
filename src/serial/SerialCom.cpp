@@ -32,18 +32,17 @@ bool SerialCom::comOpened() {
 /**
  * @brief Reads a single byte from the COM port into an internal buffer
  */
-void SerialCom::read() {
+bool SerialCom::read() {
     if (!com.IsOpened()) {
-        return;
+        return false;
     }
 
     bool successFlag;
     char c = com.ReadChar(successFlag);
     if (successFlag) {
         recvBuf.writeChar(c);
-    } else {
-        GCS_LOG_TRACE("SerialCom: No available bytes in recv COM port.");
     }
+    return successFlag;
 }
 
 /**
