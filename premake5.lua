@@ -9,6 +9,28 @@ workspace "sirius-gcs"
     targetdir "out/bin/%{cfg.buildcfg}"
     objdir "out/obj"
 
+    includedirs {
+        "src",
+        "src/led",
+        "src/logging",
+        "src/map",
+        "src/plot",
+        "src/serial",
+        "src/windows",
+        "external/ceSerial",
+        "external/mINI",
+        "external/sirius-headers-common"
+    }
+
+    files {
+        "src/**.h",
+        "src/**.hpp",
+        "src/**.cpp",
+        "external/ceSerial/ceserial.h",
+        "external/mINI/ini.h",
+        "external/sirius-headers-common/**.h"
+    }
+
     filter "configurations:Debug"
         symbols "On"
 
@@ -24,52 +46,15 @@ workspace "sirius-gcs"
         }
 
 project "sirius-gcs"
-    includedirs {
-        "src",
-        "src/led",
-        "src/logging",
-        "src/map",
-        "src/plot",
-        "src/serial",
-        "src/windows",
-        "external/ceSerial",
-        "external/mINI",
-        "external/sirius-headers-common"
-    }
-
-    files {
-        "src/**.h",
-        "src/**.hpp",
-        "src/**.cpp",
-        "external/ceSerial/ceserial.h",
-        "external/mINI/ini.h",
-        "external/sirius-headers-common/**.h"
-    }
 
 project "sirius-gcs-tests"
     includedirs {
-        "src",
-        "src/led",
-        "src/logging",
-        "src/map",
-        "src/plot",
-        "src/serial",
-        "src/windows",
-        "external/ceSerial",
-        "external/doctest",
-        "external/mINI",
-        "external/sirius-headers-common"
+        "external/doctest"
     }
 
     files {
         "tests/**.cpp",
-        "src/**.h",
-        "src/**.hpp",
-        "src/**.cpp",
-        "external/ceSerial/ceserial.h",
-        "external/doctest/doctest.h",
-        "external/mINI/ini.h",
-        "external/sirius-headers-common/**.h"
+        "external/doctest/doctest.h"
     }
 
     removefiles {
