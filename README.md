@@ -12,10 +12,11 @@
 1. Create new file/folder in File Explorer.
 2. If a new folder was created:
     1. Open the **sirius-gcs/premake.lua** file in a text editor.
-    2. In the `includedirs` list under `workspace "sirius-gcs"`, add the relative path to your folder.
+    2. In the `includedirs` list under `workspace "sirius-gcs"`, add the relative path to your new folder.
     3. Save your changes to the **sirius-gcs/premake.lua** file.
 3. Execute the **sirius-gcs/setup/premake.bat** script to regenerate the Visual Studio solution.
-4. Either restart Visual Studio, or click the **Reload All** button in the window that popped-up in Visual Studio. *If no window pop-up appears, it means no changes were detected.*
+4. Either restart Visual Studio, or click the **Reload All** button in the window that popped-up in Visual Studio.
+    - *If you haven't restarted Visual Studio and no window pop-up appears, it means no changes were detected. Make sure you followed step 2 correctly.*
 5. The new files and/or folders should appear in the **Solution Explorer** window.
 
 ## Enable format on save (ClangFormat)
