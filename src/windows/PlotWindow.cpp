@@ -5,15 +5,17 @@
 #include "PacketProcessing.h"
 #include "PlotColors.h"
 #include "PlotDataCenter.h"
+#include "Utils.h"
 
 #include <imgui.h>
 #include <implot.h>
 #include <ini.h>
 
-namespace PlotWindow {
-ImPlotFlags flags{};
-bool autofit{};
-} // namespace PlotWindow
+PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<PlotData*> plotData)
+    : name(name), xLabel(xLabel), yLabel(yLabel), plotData(plotData) {
+    autofitIniId = std::string(name) + std::string(Constants::GCS_INI_BASE_PLOT_WINDOW_AUTO_FIT);
+    Utils::convertStringToIniId(autofitIniId);
+}
 
 void PlotWindow::render() {
     ImGui::Checkbox("Auto-fit", &autofit);
@@ -24,23 +26,26 @@ void PlotWindow::render() {
         flags = ImPlotFlags_None;
     }
 
-    if (ImPlot::BeginPlot("Line Plot", "Time (ms)", "Degrees (C)", ImGui::GetContentRegionAvail(), flags)) {
-        PlotDataCenter::TemperatureSensorPlotData.plot();
-        PlotDataCenter::AccelerometerXPlotData.plot();
-        PlotDataCenter::AccelerometerYPlotData.plot();
-        PlotDataCenter::AccelerometerZPlotData.plot();
+    if (ImPlot::BeginPlot(name.c_str(), xLabel.c_str(), yLabel.c_str(), ImGui::GetContentRegionAvail(), flags)) {
+        for (const PlotData* data : plotData) {
+            data->plot();
+        }
         ImPlot::EndPlot();
     }
 }
 
 void PlotWindow::loadState(const mINI::INIStructure& ini) {
     if (ini.has(Constants::GCS_INI_SECTION)) {
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT)) {
-            autofit = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT));
+        if (ini.get(Constants::GCS_INI_SECTION).has(autofitIniId)) {
+            autofit = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(autofitIniId));
         }
     }
 }
 
 void PlotWindow::saveState(mINI::INIStructure& ini) {
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_PLOT_WINDOW_AUTO_FIT, std::to_string(autofit));
+    ini[Constants::GCS_INI_SECTION].set(autofitIniId, std::to_string(autofit));
+}
+
+std::string PlotWindow::getWindowId() {
+    return std::string(Constants::GCS_BASE_PLOT_WINDOW_ID) + name;
 }
