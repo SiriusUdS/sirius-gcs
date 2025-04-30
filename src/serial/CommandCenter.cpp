@@ -8,11 +8,17 @@ bool CommandCenter::isValidId(size_t commandId) {
     return commandId < Constants::COMMAND_STORAGE_MAX_SIZE;
 }
 
+Command* CommandCenter::get(size_t commandId) {
+    if (!isValidId(commandId) || commands[commandId].state == CommandState::NOT_READY) {
+        return nullptr;
+    }
+    return &commands[commandId];
+}
+
 size_t CommandCenter::reserveSlot() {
     for (size_t i = 0; i < Constants::COMMAND_STORAGE_MAX_SIZE; i++) {
-        if (!commands[i].valid) {
-            commands[i].valid = true;
-            commands[i].sent = false;
+        if (commands[i].state == CommandState::NOT_READY) {
+            commands[i].state = CommandState::READY;
             return i;
         }
     }
@@ -23,14 +29,10 @@ bool CommandCenter::freeSlot(size_t commandId) {
     if (!isValidId(commandId)) {
         return false;
     }
-
-    commands[commandId].valid = false;
+    commands[commandId].state = CommandState::NOT_READY;
     return true;
 }
 
-Command* CommandCenter::get(size_t commandId) {
-    if (!isValidId(commandId)) {
-        return nullptr;
-    }
-    return &commands[commandId];
+bool CommandCenter::processAck() {
+    return false;
 }

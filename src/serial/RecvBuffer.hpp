@@ -3,7 +3,6 @@
 
 #include "Logging.h"
 #include "Telecommunication/TelecommunicationHeader.h"
-#include "WordFormatter.h"
 
 #include <optional>
 #include <queue>

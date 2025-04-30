@@ -5,9 +5,10 @@
 
 #include <stdint.h>
 
+enum CommandState { NOT_READY, READY, SENT };
+
 struct Command {
-    bool valid{};
-    bool sent{};
+    CommandState state;
     uint8_t data[Constants::COMMAND_MAX_SIZE];
 };
 
