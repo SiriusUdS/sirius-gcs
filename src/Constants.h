@@ -48,6 +48,8 @@ constexpr float IMGUI_MAIN_FONT_SIZE = 28.0f;
 constexpr size_t RECV_BUF_SIZE = 10000;
 constexpr size_t RECV_BYTES_TO_READ_PER_SECOND = 10000;
 constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
+constexpr size_t COMMAND_MAX_SIZE = 256;
+constexpr size_t COMMAND_STORAGE_MAX_SIZE = 10;
 } // namespace Constants
 
 #endif // CONSTANTS_H
