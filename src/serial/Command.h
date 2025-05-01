@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-enum CommandState { NOT_READY, READY, SENT };
+enum CommandState { NONE, READY, SENT };
 
 struct Command {
     CommandState state;
