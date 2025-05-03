@@ -35,6 +35,18 @@ constexpr const char* HELLO_IMGUI_MENU_APP_TITLE = "Sirius GCS";
 constexpr const char* IMGUI_MAIN_FONT_FILENAME = "assets/fonts/Nunito-Regular.ttf";
 constexpr float IMGUI_MAIN_FONT_SIZE = 28.0f;
 
+// Temperature sensor
+constexpr float ADC_MIN_TEMPERATURE = 10.0;
+constexpr float ADC_MAX_TEMPERATURE = 4090.0;
+typedef struct {
+    float temperature;
+    float resistance;
+} RT_Point;
+    // Resistor-Temperature values table
+constexpr RT_Point rtTable[] = {{-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990}, {20, 125250}, {25, 100000}, {30, 81000},
+                      {40, 53500},    {50, 35900},   {60, 25000},   {70, 17550}, {80, 12540},  {90, 9100},   {100, 6710}};
+constexpr int tableSize = sizeof(Constants::rtTable) / sizeof(Constants::rtTable[0]);
+
 // Serial COM
 constexpr size_t RECV_BUF_SIZE = 10000;
 constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;

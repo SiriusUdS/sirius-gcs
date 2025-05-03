@@ -146,17 +146,6 @@ bool PacketProcessing::processRocketPacket() {
     return true;
 }
 
-float PacketProcessing::interpolateTemperature(float measuredResistance, RT_Point* rtTable, int tableSize) {
-    for (int i = 0; i < tableSize - 1; i++) {
-        if (measuredResistance <= rtTable[i].resistance && measuredResistance >= rtTable[i + 1].resistance) {
-            float slope = (rtTable[i + 1].temperature - rtTable[i].temperature) / (rtTable[i + 1].resistance - rtTable[i].resistance);
-            float temp = rtTable[i].temperature + slope * (measuredResistance - rtTable[i].resistance);
-            return temp;
-        }
-    }
-    return -1;
-}
-
 bool PacketProcessing::processTemperatureSensorPacket() {
     if (!validateIncomingPacketSize(sizeof(TemperatureSensorPacket), "TemperatureSensorPacket")) {
         return false;
@@ -166,38 +155,9 @@ bool PacketProcessing::processTemperatureSensorPacket() {
     Application::serialCom.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
-    float temperature = 0;
+    
+    float temperature = TemperatureSensor::temperatureInfos(rawTemperature);
 
-    if (rawTemperature < 10) {
-        printf("ERREUR: Thermistance déconnectée !\n");
-    } else if (rawTemperature > 4090) {
-            // printf("ERREUR: Court-circuit détecté !\n");
-    } else {
-            // Calcul de la résistance de la thermistance
-        float measuredResistance = (10000.0 * rawTemperature) / (4096.0 - rawTemperature);
-
-        RT_Point rtTable[] = {{-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990}, {20, 125250}, {25, 100000}, {30, 81000},
-                              {40, 53500},    {50, 35900},   {60, 25000},   {70, 17550}, {80, 12540},  {90, 9100},   {100, 6710}};
-
-        int tableSize = sizeof(rtTable) / sizeof(rtTable[0]);
-        temperature = interpolateTemperature(measuredResistance, rtTable, tableSize);
-
-        if (temperature != -1) {
-            printf("La température est de %.2f°C\n", temperature);
-        } else {
-            printf("Résistance mesurée en dehors de la plage du tableau.\n");
-        }
-
-        if (temperature < 0.0) {
-            printf("ALERTE: Température trop basse: %.2f°C !\n", temperature);
-        } else if (temperature > 100.0) {
-            printf("ALERTE: Température trop élevée: %.2f°C !\n", temperature);
-        } else if (temperature != -1) {
-            printf("Température normale: %.2f°C\n", temperature);
-        }
-
-        //HAL_ADC_Stop(&hadc1);
-    }
     PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, temperature);
     return true;
 }

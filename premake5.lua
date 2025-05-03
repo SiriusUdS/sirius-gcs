@@ -14,6 +14,11 @@ workspace "sirius-gcs"
 
     filter "configurations:Release"
         optimize "On"
+	
+    includedirs {
+	"src/TemperatureSensor.h",
+	"src/TemperatureSensor.cpp"
+    }
 
 project "sirius-gcs"
     includedirs {

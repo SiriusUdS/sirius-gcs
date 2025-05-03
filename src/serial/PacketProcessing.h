@@ -3,13 +3,9 @@
 
 #include "PlotData.h"
 #include "SerialCom.h"
+#include "../TemperatureSensor.h"
 
 #include <stdint.h>
-
-typedef struct {
-    float temperature;
-    float resistance;
-} RT_Point;
 
 namespace PacketProcessing {
 bool processIncomingPacket();
@@ -21,7 +17,6 @@ bool processGpsPacket();
 bool processMagnetometerPacket();
 bool processPressureSensorPacket();
 bool processRocketPacket();
-float interpolateTemperature(float measuredResistance, RT_Point* rtTable, int tableSize);
 bool processTemperatureSensorPacket();
 bool processValvePacket();
 
