@@ -19,7 +19,6 @@ std::vector<HelloImGui::DockableWindow> createDockableWindows();
 extern mINI::INIFile iniFile;
 extern mINI::INIStructure iniStructure;
 extern SerialCom serialCom;
-extern std::chrono::time_point<std::chrono::steady_clock> lastSerialReadTime;
 } // namespace Application
 
 #endif // APPLICATION_H

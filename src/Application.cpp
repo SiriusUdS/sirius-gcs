@@ -8,6 +8,7 @@
 #include "MapWindow.h"
 #include "PacketProcessing.h"
 #include "PlotWindowCenter.h"
+#include "SerialControl.h"
 
 #include <WinSock2.h>
 #include <imgui.h>
@@ -19,7 +20,6 @@ namespace Application {
 mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
 mINI::INIStructure iniStructure;
 SerialCom serialCom;
-std::chrono::time_point<std::chrono::steady_clock> lastSerialReadTime = std::chrono::steady_clock::now();
 } // namespace Application
 
 void Application::loadFonts() {
@@ -49,17 +49,8 @@ void Application::init() {
 }
 
 void Application::preNewFrame() {
-    auto now = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed = now - lastSerialReadTime;
-    lastSerialReadTime = now;
-
-    size_t bytesToRead = Constants::RECV_BYTES_TO_READ_PER_SECOND * elapsed.count();
-    while (0 < bytesToRead--) {
-        if (!Application::serialCom.read()) {
-            break;
-        }
-    }
-
+    SerialControl::startComIfNeeded();
+    SerialControl::readIncomingBytesAtSetRate();
     PacketProcessing::processIncomingPacket();
 }
 
