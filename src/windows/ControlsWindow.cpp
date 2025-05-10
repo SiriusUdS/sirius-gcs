@@ -1,6 +1,6 @@
 #include "ControlsWindow.h"
 
-#include "Application.h"
+#include "SerialTask.h"
 
 #include <imgui.h>
 
@@ -30,12 +30,12 @@ void render() {
     if (ImGui::CollapsingHeader("Serial")) {
         ImGui::Text("COM Opened: ");
         ImGui::SameLine();
-        ImGui::Text(Application::serialCom.comOpened() ? "Yes" : "No");
+        ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
 
-        ImGui::Text("Packets read/s: %d", Application::serialCom.packetsReadPerSecond());
+        ImGui::Text("Packets read/s: %d", SerialTask::com.packetsReadPerSecond());
 
         if (ImGui::Button("Send test packet")) {
-            bool success = Application::serialCom.write((uint8_t*) sendPacket, 12);
+            bool success = SerialTask::com.write((uint8_t*) sendPacket, 12);
             if (success) {
                 GCS_LOG_INFO("ControlsWindow: Sent following packet: {}", sendPacket);
             } else {
@@ -72,6 +72,6 @@ void renderValveState(const char* id, ValveState state) {
 }
 
 void shutdown() {
-    Application::serialCom.shutdown();
+    SerialTask::com.shutdown();
 }
 } // namespace ControlsWindow

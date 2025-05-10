@@ -9,7 +9,7 @@
 
 ## Create C++ file/folder
 
-1. Create new file/folder in File Explorer.
+1. Create new file/folder in File Explorer at the desired location in the **src** folder.
 2. If a new folder was created:
     1. Open the **sirius-gcs/premake.lua** file in a text editor.
     2. In the `includedirs` list under `workspace "sirius-gcs"`, add the relative path to your new folder.

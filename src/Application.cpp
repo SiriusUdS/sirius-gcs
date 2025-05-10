@@ -10,6 +10,7 @@
 #include "PlotWindowCenter.h"
 #include "SerialControl.h"
 
+#include <SerialTask.h>
 #include <WinSock2.h>
 #include <imgui.h>
 #include <implot.h>
@@ -46,12 +47,13 @@ void Application::init() {
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
     PlotWindowCenter::loadState(iniStructure);
+
+    // TODO - Handle thread better than this, don't detach, keep track of thread state
+    std::thread serialTaskThread(SerialTask::performTask);
+    serialTaskThread.detach();
 }
 
 void Application::preNewFrame() {
-    SerialControl::startComIfNeeded();
-    SerialControl::readIncomingBytesAtSetRate();
-    PacketProcessing::processIncomingPacket();
 }
 
 void Application::shutdown() {

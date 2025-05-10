@@ -11,6 +11,7 @@ workspace "sirius-gcs"
 
     includedirs {
         "src",
+        "src/commands",
         "src/led",
         "src/logging",
         "src/map",

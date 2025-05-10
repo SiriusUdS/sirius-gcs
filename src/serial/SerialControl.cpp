@@ -1,7 +1,7 @@
 #include "SerialControl.h"
 
-#include "Application.h"
 #include "Constants.h"
+#include "SerialTask.h"
 
 namespace SerialControl {
 std::chrono::time_point<std::chrono::steady_clock> lastSerialConnectionAttempt = std::chrono::steady_clock::now();
@@ -9,7 +9,7 @@ std::chrono::time_point<std::chrono::steady_clock> lastSerialReadTime = std::chr
 } // namespace SerialControl
 
 void SerialControl::startComIfNeeded() {
-    if (Application::serialCom.comOpened() && Application::serialCom.comWorking()) {
+    if (SerialTask::com.comOpened() && SerialTask::com.comWorking()) {
         return;
     }
 
@@ -18,7 +18,7 @@ void SerialControl::startComIfNeeded() {
 
     if (elapsedSeconds.count() > Constants::SERIAL_CONNECTION_ATTEMPT_DELAY_IN_SECS) {
         lastSerialConnectionAttempt = now;
-        Application::serialCom.start();
+        SerialTask::com.start();
     }
 }
 
@@ -29,7 +29,7 @@ void SerialControl::readIncomingBytesAtSetRate() {
 
     size_t bytesToRead = Constants::RECV_BYTES_TO_READ_PER_SECOND * elapsedSeconds.count();
     while (0 < bytesToRead--) {
-        if (!Application::serialCom.read()) {
+        if (!SerialTask::com.read()) {
             break;
         }
     }
