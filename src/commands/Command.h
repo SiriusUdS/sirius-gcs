@@ -3,13 +3,15 @@
 
 #include "Constants.h"
 
+#include <chrono>
 #include <stdint.h>
 
-enum CommandState { NONE, READY, SENT };
+enum class CommandState { NONE, READY, SENT };
 
 struct Command {
     CommandState state;
     uint8_t data[Constants::COMMAND_MAX_SIZE];
+    std::chrono::steady_clock::time_point lastTimeSent;
 };
 
 #endif // COMMAND_H

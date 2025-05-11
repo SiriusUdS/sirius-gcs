@@ -6,12 +6,12 @@ namespace CommandCenter {
 Command commands[Constants::COMMAND_STORAGE_MAX_SIZE];
 }
 
-Command* CommandCenter::get(size_t commandId) {
-    if (!isValidId(commandId) || commands[commandId].state == CommandState::NONE) {
-        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandId);
+Command* CommandCenter::get(size_t commandSlotId) {
+    if (!isValidSlotId(commandSlotId) || commands[commandSlotId].state == CommandState::NONE) {
+        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandSlotId);
         return nullptr;
     }
-    return &commands[commandId];
+    return &commands[commandSlotId];
 }
 
 size_t CommandCenter::reserveSlot() {
@@ -24,31 +24,47 @@ size_t CommandCenter::reserveSlot() {
     return Constants::COMMAND_STORAGE_MAX_SIZE;
 }
 
-bool CommandCenter::freeSlot(size_t commandId) {
-    if (!isValidId(commandId)) {
-        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandId);
+bool CommandCenter::freeSlot(size_t commandSlotId) {
+    if (!isValidSlotId(commandSlotId)) {
+        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandSlotId);
         return false;
     }
-    commands[commandId].state = CommandState::NONE;
+    commands[commandSlotId].state = CommandState::NONE;
     return true;
 }
 
-bool CommandCenter::processAck(size_t commandId) {
-    if (!isValidId(commandId)) {
-        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandId);
+bool CommandCenter::processAck(size_t commandSlotId) {
+    if (!isValidSlotId(commandSlotId)) {
+        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandSlotId);
         return false;
-    }
-    if (commands[commandId].state == CommandState::NONE) {
+    } else if (commands[commandSlotId].state == CommandState::NONE) {
         GCS_LOG_WARN("CommandCenter: Tried to process ACK packet for command that doesn't exist.");
         return false;
-    } else if (commands[commandId].state == CommandState::READY) {
+    } else if (commands[commandSlotId].state == CommandState::READY) {
         GCS_LOG_WARN("CommandCenter: Tried to process ACK packet for command that hasn't been sent yet.");
         return false;
     }
-    commands[commandId].state = CommandState::NONE;
+    commands[commandSlotId].state = CommandState::NONE;
     return true;
 }
 
-bool CommandCenter::isValidId(size_t commandId) {
-    return commandId < Constants::COMMAND_STORAGE_MAX_SIZE;
+void CommandCenter::processCommands() {
+    for (size_t i = 0; i < Constants::COMMAND_STORAGE_MAX_SIZE; i++) {
+        if (commands[i].state == CommandState::READY) {
+            // TODO - Send command
+            commands[i].state = CommandState::SENT;
+            commands[i].lastTimeSent = std::chrono::steady_clock::now();
+        } else if (commands[i].state == CommandState::SENT) {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsedTimeLastSentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - commands[i].lastTimeSent);
+            if (elapsedTimeLastSentMs.count() >= Constants::COMMAND_TIME_BEFORE_RESENDING_MS) {
+                // TODO - Resend command
+                commands[i].lastTimeSent = std::chrono::steady_clock::now();
+            }
+        }
+    }
+}
+
+bool CommandCenter::isValidSlotId(size_t commandSlotId) {
+    return commandSlotId < Constants::COMMAND_STORAGE_MAX_SIZE;
 }

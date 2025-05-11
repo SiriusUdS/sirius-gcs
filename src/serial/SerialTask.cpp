@@ -1,5 +1,6 @@
 #include "SerialTask.h"
 
+#include "CommandCenter.h"
 #include "PacketProcessing.h"
 #include "SerialControl.h"
 
@@ -13,5 +14,6 @@ void SerialTask::performTask() {
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
         PacketProcessing::processIncomingPacket();
+        CommandCenter::processCommands();
     }
 }

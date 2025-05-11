@@ -51,8 +51,11 @@ constexpr size_t SERIAL_MAX_CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE = 100;
 constexpr size_t RECV_BUF_SIZE = 10000;
 constexpr size_t RECV_BYTES_TO_READ_PER_SECOND = 10000;
 constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
+
+// Commands
 constexpr size_t COMMAND_MAX_SIZE = 256;
 constexpr size_t COMMAND_STORAGE_MAX_SIZE = 10;
+constexpr size_t COMMAND_TIME_BEFORE_RESENDING_MS = 100;
 } // namespace Constants
 
 #endif // CONSTANTS_H
