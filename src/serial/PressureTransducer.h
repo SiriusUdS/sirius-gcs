@@ -1,11 +1,11 @@
 #pragma once
 #include <cstdint>
 
-#define voltageRange_V 3.3f
-#define ADCRange_bit 4095u
+#define VOLTAGERANGE_V 3.3f
+#define ADCRANGE_BIT 4095u
 
-#define VOLTAGE_VALUE_MIN_V 2000 // À CHANGER
-#define VOLTAGE_VALUE_MAX_V 2100 // À COMPLÉTER
+#define VOLTAGE_VALUE_MIN_V 2000
+#define VOLTAGE_VALUE_MAX_V 2100
 #define VOLTAGE_VALUE_OFF_V 70
 
 #define PRESSURE_SENSOR_29673136_SLOPE 1126.8605003120f
@@ -21,6 +21,5 @@ const float PRESSURE_SENSOR_ARRAY_SLOPE[4] = {PRESSURE_SENSOR_29673136_SLOPE, PR
 const float PRESSURE_SENSOR_ARRAY_CONST[4] = {PRESSURE_SENSOR_29673136_CONST, PRESSURE_SENSOR_29685373_CONST, PRESSURE_SENSOR_310989_CONST,
                                               PRESSURE_SENSOR_3109815_CONST};
 
-static float voltageConverter_V(float adcValue);
-static float pressureConverter_NAME1_PSI(float ADCInput, uint8_t index);
-#pragma once
+float voltageConverter_V(float adcValue);
+float pressureConverter_NAME1_PSI(float ADCInput, uint8_t index);
