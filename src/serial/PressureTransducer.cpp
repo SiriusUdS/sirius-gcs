@@ -1,7 +1,7 @@
 #include "PressureTransducer.h"
 
 float voltageConverter_V(float adcValue) {
-    float VoltageInput = adcValue / ADCRange_bit * voltageRange_V;
+    float VoltageInput = adcValue / PRESSURE_SENSOR_ADC_RANGE_BIT * PRESSURE_SENSOR_VOLTAGE_RANGE_V;
     return VoltageInput;
 }
 
