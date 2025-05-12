@@ -3,7 +3,6 @@
 
 #include "PlotData.h"
 #include "SerialCom.h"
-#include "../TemperatureSensor.h"
 
 #include <stdint.h>
 
