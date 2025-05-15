@@ -155,7 +155,10 @@ bool PacketProcessing::processTemperatureSensorPacket() {
     SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
-    PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, rawTemperature);
+    
+    float temperature = TemperatureSensor::temperatureInfos(rawTemperature);
+
+    PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, temperature);
     return true;
 }
 
