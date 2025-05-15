@@ -2,18 +2,18 @@
 
 #include "Accelerometer/AccelerometerPacket.h"
 #include "Altimeter/AltimeterPacket.h"
-#include "Application.h"
 #include "GPS/GpsPacket.h"
 #include "Gyroscope/GyroscopePacket.h"
 #include "Magnetometer/MagnetometerPacket.h"
 #include "PlotDataCenter.h"
 #include "PressureSensor/PressureSensorPacket.h"
 #include "Rocket/RocketPacket.h"
+#include "SerialTask.h"
 #include "TemperatureSensor/TemperatureSensorPacket.h"
 #include "Valve/ValvePacket.h"
 
 bool PacketProcessing::processIncomingPacket() {
-    uint32_t headerCode = Application::serialCom.nextPacketHeaderCode();
+    uint32_t headerCode = SerialTask::com.nextPacketHeaderCode();
 
     switch (headerCode) {
     case 0:
@@ -48,7 +48,7 @@ bool PacketProcessing::processAccelerometerPacket() {
     }
 
     AccelerometerPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawX = packet.fields.rawData.members.data.rawX;
     float rawY = packet.fields.rawData.members.data.rawY;
@@ -65,7 +65,7 @@ bool PacketProcessing::processGyroscopePacket() {
     }
 
     GyroscopePacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawX = packet.fields.rawData.members.data.rawX;
     float rawY = packet.fields.rawData.members.data.rawY;
@@ -82,7 +82,7 @@ bool PacketProcessing::processAltimeterPacket() {
     }
 
     AltimeterPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawAltitude = packet.fields.rawData.members.data.rawAltitude;
     PlotDataCenter::AltimeterPlotData.addData(timeStamp, rawAltitude);
@@ -95,7 +95,7 @@ bool PacketProcessing::processGpsPacket() {
     }
 
     GpsPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawLongitude = packet.fields.rawData.members.data.rawLongitude;
     float rawLatitude = packet.fields.rawData.members.data.rawLatitude;
@@ -110,7 +110,7 @@ bool PacketProcessing::processMagnetometerPacket() {
     }
 
     MagnetometerPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawX = packet.fields.rawData.members.data.rawX;
     float rawY = packet.fields.rawData.members.data.rawY;
@@ -127,7 +127,7 @@ bool PacketProcessing::processPressureSensorPacket() {
     }
 
     PressureSensorPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawPressure = packet.fields.rawData.members.data.rawPressure;
     PlotDataCenter::PressureSensorPlotData.addData(timeStamp, rawPressure);
@@ -140,7 +140,7 @@ bool PacketProcessing::processRocketPacket() {
     }
 
     RocketPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.packet.rawData[0].members.timeStamp_ms; // TODO - changer quand yaura plus struct packet dans rocket packet
     PlotDataCenter::RocketPlotData.addData(timeStamp, 0);
     return true;
@@ -152,7 +152,7 @@ bool PacketProcessing::processTemperatureSensorPacket() {
     }
 
     TemperatureSensorPacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
     
@@ -168,7 +168,7 @@ bool PacketProcessing::processValvePacket() {
     }
 
     ValvePacket packet;
-    Application::serialCom.getPacket(packet.data);
+    SerialTask::com.getPacket(packet.data);
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float status = packet.fields.rawData.members.status.bits.state;
     PlotDataCenter::ValvePlotData.addData(timeStamp, status);
@@ -176,9 +176,9 @@ bool PacketProcessing::processValvePacket() {
 }
 
 bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
-    size_t packetSize = Application::serialCom.nextPacketSize();
+    size_t packetSize = SerialTask::com.nextPacketSize();
     if (packetSize != targetPacketSize) {
-        if (!Application::serialCom.dumpNextPacket()) {
+        if (!SerialTask::com.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: process{}() called, but there's no packet to process.", packetName);
             return false;
         }

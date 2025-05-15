@@ -2,6 +2,7 @@
 #define PLOTDATA_H
 
 #include <imgui.h>
+#include <mutex>
 #include <vector>
 
 /**
@@ -24,6 +25,7 @@ private:
     const char* name;
     ImVec4 color;
     float weight;
+    mutable std::mutex mtx;
 };
 
 #endif // PLOTDATA_H

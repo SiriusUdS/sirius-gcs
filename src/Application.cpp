@@ -7,8 +7,10 @@
 #include "LoggingWindow.h"
 #include "MapWindow.h"
 #include "PacketProcessing.h"
-#include "PlotWindow.h"
+#include "PlotWindowCenter.h"
+#include "SerialControl.h"
 
+#include <SerialTask.h>
 #include <WinSock2.h>
 #include <imgui.h>
 #include <implot.h>
@@ -44,17 +46,20 @@ void Application::init() {
 
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
-    PlotWindow::loadState(iniStructure);
+    PlotWindowCenter::loadState(iniStructure);
+
+    // TODO - Handle thread better than this, don't detach, keep track of thread state
+    std::thread serialTaskThread(SerialTask::performTask);
+    serialTaskThread.detach();
 }
 
 void Application::preNewFrame() {
-    PacketProcessing::processIncomingPacket();
 }
 
 void Application::shutdown() {
     LoggingWindow::saveState(iniStructure);
     MapWindow::saveState(iniStructure);
-    PlotWindow::saveState(iniStructure);
+    PlotWindowCenter::saveState(iniStructure);
 
     ControlsWindow::shutdown();
 
@@ -86,8 +91,13 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow ledDockWin(Constants::GCS_LED_WINDOW_ID, Constants::GCS_LED_DOCKSPACE, []() { LedWindow::render(); });
     HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { MapWindow::render(); });
-    HelloImGui::DockableWindow plotDockWin(Constants::GCS_PLOT_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindow::render(); });
     HelloImGui::DockableWindow controlsDockWin(Constants::GCS_CONTROLS_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { ControlsWindow::render(); });
 
-    return {ledDockWin, loggingDockWin, mapDockWin, plotDockWin, controlsDockWin};
+    std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
+    dockableWindows.push_back(ledDockWin);
+    dockableWindows.push_back(loggingDockWin);
+    dockableWindows.push_back(mapDockWin);
+    dockableWindows.push_back(controlsDockWin);
+
+    return dockableWindows;
 }

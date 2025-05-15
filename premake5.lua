@@ -9,15 +9,9 @@ workspace "sirius-gcs"
     targetdir "out/bin/%{cfg.buildcfg}"
     objdir "out/obj"
 
-    filter "configurations:Debug"
-        symbols "On"
-
-    filter "configurations:Release"
-        optimize "On"
-	
-project "sirius-gcs"
     includedirs {
         "src",
+        "src/commands",
         "src/led",
         "src/logging",
         "src/map",
@@ -38,6 +32,12 @@ project "sirius-gcs"
         "external/sirius-headers-common/**.h"
     }
 
+    filter "configurations:Debug"
+        symbols "On"
+
+    filter "configurations:Release"
+        optimize "On"
+
     filter "system:windows"
         buildoptions {
             "/utf-8",
@@ -46,19 +46,18 @@ project "sirius-gcs"
             "/wd26800"
         }
 
+project "sirius-gcs"
+
 project "sirius-gcs-tests"
     includedirs {
-        "src",
-        "src/serial",
-        "external/doctest",
-        "external/sirius-headers-common"
+        "external/doctest"
     }
 
     files {
         "tests/**.cpp",
-        "src/Constants.h",
-        "src/serial/RecvBuffer.hpp",
-        "src/serial/WordFormatter.h",
-        "src/serial/WordFormatter.cpp",
-        "external/sirius-headers-common/**.h"
+        "external/doctest/doctest.h"
+    }
+
+    removefiles {
+        "src/EntryPoint.cpp"
     }
