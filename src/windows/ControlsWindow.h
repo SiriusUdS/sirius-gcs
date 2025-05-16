@@ -8,10 +8,8 @@
 namespace ControlsWindow {
 enum class ValveState { OPEN, CLOSED, OPENING, CLOSING };
 
-void init();
 void render();
 void renderValveState(const char* id, ValveState state);
-void shutdown();
 
 extern ValveState valveState1;
 extern ValveState valveState2;

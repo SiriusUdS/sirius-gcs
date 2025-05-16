@@ -10,10 +10,6 @@ ValveState valveState2{ValveState::CLOSED};
 } // namespace ControlsWindow
 
 namespace ControlsWindow {
-void init() {
-    // serialTest.start();
-}
-
 void render() {
     if (ImGui::CollapsingHeader("Valves")) {
         ImGui::TextUnformatted("Valve 1");
@@ -33,6 +29,11 @@ void render() {
         ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
 
         ImGui::Text("Packets read/s: %d", SerialTask::com.packetsReadPerSecond());
+
+        size_t secondsSinceLastUpdate = SerialTask::secondsSinceLastUpdate();
+        if (secondsSinceLastUpdate > 1) {
+            ImGui::Text("Seconds since last update from SerialTask: %zu", secondsSinceLastUpdate);
+        }
 
         if (ImGui::Button("Send test packet")) {
             bool success = SerialTask::com.write((uint8_t*) sendPacket, 12);
@@ -69,9 +70,5 @@ void renderValveState(const char* id, ValveState state) {
     ImGui::Button(buttonID.c_str(), ImVec2(200.0f, 0.0f));
     ImGui::EndDisabled();
     ImGui::PopStyleColor(1);
-}
-
-void shutdown() {
-    SerialTask::com.shutdown();
 }
 } // namespace ControlsWindow

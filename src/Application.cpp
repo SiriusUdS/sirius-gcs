@@ -20,7 +20,6 @@
 namespace Application {
 mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
 mINI::INIStructure iniStructure;
-SerialCom serialCom;
 } // namespace Application
 
 void Application::loadFonts() {
@@ -41,27 +40,24 @@ void Application::init() {
 
     iniFile.read(iniStructure);
 
-    ControlsWindow::init();
     MapWindow::init();
 
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
     PlotWindowCenter::loadState(iniStructure);
 
-    // TODO - Handle thread better than this, don't detach, keep track of thread state
-    std::thread serialTaskThread(SerialTask::performTask);
-    serialTaskThread.detach();
+    SerialTask::start();
 }
 
 void Application::preNewFrame() {
 }
 
 void Application::shutdown() {
+    SerialTask::stop();
+
     LoggingWindow::saveState(iniStructure);
     MapWindow::saveState(iniStructure);
     PlotWindowCenter::saveState(iniStructure);
-
-    ControlsWindow::shutdown();
 
     iniFile.write(iniStructure);
 

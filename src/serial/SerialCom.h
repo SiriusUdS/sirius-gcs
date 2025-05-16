@@ -34,6 +34,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> comStartTimePoint;
     ceSerial com;
     RecvBuffer<Constants::RECV_BUF_SIZE> recvBuf;
+    std::mutex mtx;
 };
 
 #endif // SERIALCOM_H
