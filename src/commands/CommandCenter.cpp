@@ -1,6 +1,7 @@
 #include "CommandCenter.h"
 
 #include "Logging.h"
+#include "SerialTask.h"
 
 namespace CommandCenter {
 Command commands[Constants::COMMAND_STORAGE_MAX_SIZE];
@@ -21,6 +22,7 @@ size_t CommandCenter::reserveSlot() {
             return i;
         }
     }
+    GCS_LOG_WARN("CommandCenter: Couldn't reserve command slot, no more space available.");
     return Constants::COMMAND_STORAGE_MAX_SIZE;
 }
 
@@ -51,15 +53,15 @@ bool CommandCenter::processAck(size_t commandSlotId) {
 void CommandCenter::processCommands() {
     for (size_t i = 0; i < Constants::COMMAND_STORAGE_MAX_SIZE; i++) {
         if (commands[i].state == CommandState::READY) {
-            // TODO - Send command
+            SerialTask::com.write(commands[i].data, commands[i].size);
             commands[i].state = CommandState::SENT;
             commands[i].lastTimeSent = std::chrono::steady_clock::now();
         } else if (commands[i].state == CommandState::SENT) {
             auto now = std::chrono::steady_clock::now();
             auto elapsedTimeLastSentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - commands[i].lastTimeSent);
             if (elapsedTimeLastSentMs.count() >= Constants::COMMAND_TIME_BEFORE_RESENDING_MS) {
-                // TODO - Resend command
-                commands[i].lastTimeSent = std::chrono::steady_clock::now();
+                SerialTask::com.write(commands[i].data, commands[i].size);
+                commands[i].lastTimeSent = now;
             }
         }
     }
