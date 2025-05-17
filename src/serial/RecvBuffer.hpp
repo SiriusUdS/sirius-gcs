@@ -2,7 +2,8 @@
 #define RECVBUFFER_H
 
 #include "Logging.h"
-#include "Telecommunication/TelecommunicationHeader.h"
+#include "Telecommunication/TelemetryHeader.h"
+#include "Telecommunication/TelemetryPacket.h"
 
 #include <optional>
 #include <queue>
@@ -65,8 +66,8 @@ bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
     currPacketSize++;
     bufFull = (writeIdx == readIdx);
 
-    if (currPacketSize >= HEADER_SIZE_BYTE) {
-        std::optional<uint32_t> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, HEADER_SIZE_BYTE));
+    if (currPacketSize >= sizeof(TelemetryHeader)) {
+        std::optional<uint32_t> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, sizeof(TelemetryHeader)));
         if (optionalHeaderCode.has_value()) {
             if (!writingValidPacket) {
                 writingValidPacket = true;
@@ -137,15 +138,8 @@ template <size_t BUFSIZE>
 std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
     // clang-format off
     static const uint32_t HEADER_CODES[9] = {
-        ACCELEROMETER_DATA_HEADER_CODE,
-        GYROSCOPE_DATA_HEADER_CODE,
-        ALTIMETER_DATA_HEADER_CODE,
-        GPS_DATA_HEADER_CODE,
-        MAGNETOMETER_DATA_HEADER_CODE,
-        PRESSURE_SENSOR_DATA_HEADER_CODE,
-        ROCKET_DATA_HEADER_CODE,
-        TEMPERATURE_SENSOR_DATA_HEADER_CODE,
-        VALVE_DATA_HEADER_CODE
+        TELEMETRY_HEADER_TYPE_TELEMETRY,
+        TELEMETRY_HEADER_TYPE_STATUS
     };
     // clang-format on
 
