@@ -50,6 +50,7 @@ constexpr size_t SERIAL_MAX_CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 100;
 constexpr size_t SERIAL_MAX_CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE = 100;
 constexpr size_t RECV_BUF_SIZE = 10000;
 constexpr size_t RECV_BYTES_TO_READ_PER_SECOND = 10000;
+constexpr size_t RECV_PACKET_MAX_SIZE = 64;
 constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
 
 // Commands

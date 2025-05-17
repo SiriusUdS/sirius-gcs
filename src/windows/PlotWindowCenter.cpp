@@ -20,6 +20,14 @@ PlotWindow pressureSensorPlot       (Constants::GCS_PRESSURE_SENSOR_PLOT_NAME, "
 PlotWindow temperatureSensorPlot    (Constants::GCS_TEMPERATURE_SENSOR_PLOT_NAME, "X", "Y",
                                      {&PlotDataCenter::TemperatureSensorPlotData});
 // clang-format on
+// PlotWindow adcSensorPlot("ADC Values", "ms", "Value",
+//                          {&PlotDataCenter::ADC1PlotData, &PlotDataCenter::ADC2PlotData, &PlotDataCenter::ADC3PlotData,
+//                          &PlotDataCenter::ADC4PlotData,
+//                           &PlotDataCenter::ADC5PlotData, &PlotDataCenter::ADC6PlotData, &PlotDataCenter::ADC7PlotData,
+//                           &PlotDataCenter::ADC8PlotData, &PlotDataCenter::ADC9PlotData, &PlotDataCenter::ADC10PlotData,
+//                           &PlotDataCenter::ADC11PlotData, &PlotDataCenter::ADC12PlotData, &PlotDataCenter::ADC13PlotData,
+//                           &PlotDataCenter::ADC14PlotData, &PlotDataCenter::ADC15PlotData, &PlotDataCenter::ADC16PlotData});
+PlotWindow adcSensorPlot("ADC Values", "ms", "Value", {&PlotDataCenter::ADC16PlotData});
 } // namespace PlotWindowCenter
 
 std::vector<HelloImGui::DockableWindow> PlotWindowCenter::createDockableWindows() {
@@ -31,10 +39,11 @@ std::vector<HelloImGui::DockableWindow> PlotWindowCenter::createDockableWindows(
     HelloImGui::DockableWindow magnetometerPlotDockWin      (magnetometerPlot.getWindowId(),      Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindowCenter::magnetometerPlot.render(); });
     HelloImGui::DockableWindow pressureSensorPlotDockWin    (pressureSensorPlot.getWindowId(),    Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindowCenter::pressureSensorPlot.render(); });
     HelloImGui::DockableWindow temperatureSensorPlotDockWin (temperatureSensorPlot.getWindowId(), Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindowCenter::temperatureSensorPlot.render(); });
+    HelloImGui::DockableWindow acdPlotDockWin               (adcSensorPlot.getWindowId(),         Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindowCenter::adcSensorPlot.render(); });
     // clang-format on
 
-    return {accelerometerPlotDockWin, gyroscopePlotDockWin,      altimeterPlotDockWin,        gpsPlotDockWin,
-            magnetometerPlotDockWin,  pressureSensorPlotDockWin, temperatureSensorPlotDockWin};
+    return {accelerometerPlotDockWin, gyroscopePlotDockWin,      altimeterPlotDockWin,         gpsPlotDockWin,
+            magnetometerPlotDockWin,  pressureSensorPlotDockWin, temperatureSensorPlotDockWin, acdPlotDockWin};
 }
 
 void PlotWindowCenter::loadState(const mINI::INIStructure& iniStructure) {
@@ -45,6 +54,7 @@ void PlotWindowCenter::loadState(const mINI::INIStructure& iniStructure) {
     magnetometerPlot.loadState(iniStructure);
     pressureSensorPlot.loadState(iniStructure);
     temperatureSensorPlot.loadState(iniStructure);
+    adcSensorPlot.loadState(iniStructure);
 }
 
 void PlotWindowCenter::saveState(mINI::INIStructure& iniStructure) {
@@ -55,4 +65,5 @@ void PlotWindowCenter::saveState(mINI::INIStructure& iniStructure) {
     magnetometerPlot.saveState(iniStructure);
     pressureSensorPlot.saveState(iniStructure);
     temperatureSensorPlot.saveState(iniStructure);
+    adcSensorPlot.saveState(iniStructure);
 }

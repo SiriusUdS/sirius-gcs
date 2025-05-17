@@ -14,7 +14,6 @@ public:
     size_t readPacket(uint8_t* recv);
     bool writeChar(uint8_t c);
     size_t availablePackets();
-    uint32_t nextPacketHeaderCode();
     size_t nextPacketSize();
     bool dumpNextPacket();
     bool isFull();
@@ -23,7 +22,6 @@ public:
 private:
     std::optional<uint32_t> searchAnyHeader(size_t idx);
     bool searchSpecificHeader(uint32_t headerCode, size_t idx);
-    uint32_t getHeaderAtIdx(size_t idx);
 
     size_t nextIndex(size_t idx, size_t increment = 1);
     size_t prevIndex(size_t idx, size_t decrement = 1);
@@ -92,14 +90,6 @@ size_t RecvBuffer<BUFSIZE>::availablePackets() {
 }
 
 template <size_t BUFSIZE>
-inline uint32_t RecvBuffer<BUFSIZE>::nextPacketHeaderCode() {
-    if (availablePacketSizeQueue.empty()) {
-        return 0;
-    }
-    return getHeaderAtIdx(readIdx);
-}
-
-template <size_t BUFSIZE>
 inline size_t RecvBuffer<BUFSIZE>::nextPacketSize() {
     if (availablePacketSizeQueue.empty()) {
         return 0;
@@ -137,7 +127,7 @@ inline void RecvBuffer<BUFSIZE>::clear() {
 template <size_t BUFSIZE>
 std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
     // clang-format off
-    static const uint32_t HEADER_CODES[9] = {
+    static const uint32_t HEADER_CODES[] = {
         TELEMETRY_HEADER_TYPE_TELEMETRY,
         TELEMETRY_HEADER_TYPE_STATUS
     };
@@ -148,19 +138,14 @@ std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
             return headerCode;
         }
     }
-
     return {};
 }
 
 template <size_t BUFSIZE>
 bool RecvBuffer<BUFSIZE>::searchSpecificHeader(uint32_t headerCode, size_t idx) {
-    return headerCode == getHeaderAtIdx(idx);
-}
-
-template <size_t BUFSIZE>
-inline uint32_t RecvBuffer<BUFSIZE>::getHeaderAtIdx(size_t idx) {
-    // The header code is received in reverse order (little endian), so it needs to be flipped (Ex. Received as \0MHT, converted to THM\0)
-    return (buf[nextIndex(idx, 1)] << 8) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 3)] << 24);
+    TelemetryHeader header;
+    header.value = (buf[nextIndex(idx, 3)] << 24) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 1)] << 8) | buf[idx];
+    return headerCode == header.bits.type;
 }
 
 template <size_t BUFSIZE>

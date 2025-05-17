@@ -96,15 +96,6 @@ size_t SerialCom::getPacket(uint8_t* recv) {
 }
 
 /**
- * @brief Returns the header code of the next available packet that can be read
- * @returns The next packet's header code if at least one packet is available, else 0
- */
-uint32_t SerialCom::nextPacketHeaderCode() {
-    std::lock_guard<std::mutex> lock(mtx);
-    return recvBuf.nextPacketHeaderCode();
-}
-
-/**
  * @brief Returns the size of the next available packet that can be read
  * @returns The next packet's size if at least one packet is available, else 0
  */

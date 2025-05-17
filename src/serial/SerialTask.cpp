@@ -24,6 +24,13 @@ void SerialTask::start() {
 
 void SerialTask::execute() {
     while (!shouldStop) {
+        // TODO: Make this more beautiful
+        auto now = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCompletedTaskLoopIteration);
+        if (duration.count() < 50) {
+            continue;
+        }
+
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
         PacketProcessing::processIncomingPacket();
@@ -51,6 +58,6 @@ void SerialTask::stop() {
 
 size_t SerialTask::secondsSinceLastUpdate() {
     auto now = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - lastCompletedTaskLoopIteration);
+    auto duration = std::chrono::duration<double>(now - lastCompletedTaskLoopIteration);
     return duration.count();
 }

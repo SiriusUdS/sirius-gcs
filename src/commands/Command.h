@@ -6,7 +6,7 @@
 #include <chrono>
 #include <stdint.h>
 
-enum class CommandState { NONE, READY, SENT };
+enum class CommandState { NONE, RESERVED, READY, SENT };
 
 struct Command {
     CommandState state = CommandState::NONE;
