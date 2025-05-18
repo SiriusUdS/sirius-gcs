@@ -4,6 +4,7 @@
 #include "Altimeter/AltimeterPacket.h"
 #include "GPS/GpsPacket.h"
 #include "Gyroscope/GyroscopePacket.h"
+#include "LoadCell.h"
 #include "Magnetometer/MagnetometerPacket.h"
 #include "PlotDataCenter.h"
 #include "PressureSensor/PressureSensorPacket.h"
@@ -16,18 +17,6 @@ namespace PacketProcessing {
 size_t packetSize{};
 uint8_t packetBuf[Constants::RECV_PACKET_MAX_SIZE];
 } // namespace PacketProcessing
-
-float TEMP_LOAD_CELL_CONVERSION(float adcValue) {
-    if (adcValue < 0 || adcValue > 4095.0) {
-        GCS_LOG_ERROR("Load cell ADC value out of range!");
-        return -1;
-    }
-
-    float force = 200 * ((adcValue * 3.3f / 4096.f) / 209.f) / 0.015; // / 209.f;
-
-    GCS_LOG_INFO("Load Cell Force: {} N", force);
-    return force;
-}
 
 bool PacketProcessing::processIncomingPacket() {
     packetSize = SerialTask::com.nextPacketSize();
@@ -85,11 +74,11 @@ bool PacketProcessing::processTelemetryPacket() {
     PlotDataCenter::ADC12PlotData.addData(timeStamp, (float) packet->fields.adcValues[11]);
     PlotDataCenter::ADC13PlotData.addData(timeStamp, (float) packet->fields.adcValues[12]);
     PlotDataCenter::ADC14PlotData.addData(timeStamp, (float) packet->fields.adcValues[13]);
-    PlotDataCenter::ADC15PlotData.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[14]));
-    PlotDataCenter::ADC16PlotData.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[15]));
+    PlotDataCenter::ADC15PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
+    PlotDataCenter::ADC16PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
 
-    PlotDataCenter::LoadCell1Data.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[14]));
-    PlotDataCenter::LoadCell2Data.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[15]));
+    PlotDataCenter::LoadCell1Data.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
+    PlotDataCenter::LoadCell2Data.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
     return true;
 }
 
@@ -99,7 +88,6 @@ bool PacketProcessing::processStatusPacket() {
     }
 
     EngineStatusPacket* packet = (EngineStatusPacket*) packetBuf;
-
     return true;
 }
 
