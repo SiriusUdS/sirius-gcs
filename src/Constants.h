@@ -3,7 +3,6 @@
 
 namespace Constants {
 // Window names
-constexpr const char* GCS_LED_WINDOW_ID = "LED";
 constexpr const char* GCS_LOGGING_WINDOW_ID = "Logs";
 constexpr const char* GCS_MAP_WINDOW_ID = "Map";
 constexpr const char* GCS_BASE_PLOT_WINDOW_ID = "Plot - ";
@@ -23,7 +22,6 @@ constexpr const size_t GCS_MAP_MAX_TILES_DOWNLOAD = 100'000;
 constexpr const size_t GCS_TILE_REQUEST_LIMIT = 25;
 
 // Dock space names
-constexpr const char* GCS_LED_DOCKSPACE = "MainDockSpace";
 constexpr const char* GCS_LOGGING_DOCKSPACE = "LogSpace";
 constexpr const char* GCS_MAP_DOCKSPACE = "MapSpace";
 constexpr const char* GCS_PLOT_DOCKSPACE = "MainDockSpace";

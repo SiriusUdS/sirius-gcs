@@ -2,7 +2,6 @@
 
 #include "Constants.h"
 #include "ControlsWindow.h"
-#include "LedWindow.h"
 #include "Logging.h"
 #include "LoggingWindow.h"
 #include "MapWindow.h"
@@ -84,13 +83,11 @@ std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
 }
 
 std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
-    HelloImGui::DockableWindow ledDockWin(Constants::GCS_LED_WINDOW_ID, Constants::GCS_LED_DOCKSPACE, []() { LedWindow::render(); });
     HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { MapWindow::render(); });
     HelloImGui::DockableWindow controlsDockWin(Constants::GCS_CONTROLS_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { ControlsWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
-    dockableWindows.push_back(ledDockWin);
     dockableWindows.push_back(loggingDockWin);
     dockableWindows.push_back(mapDockWin);
     dockableWindows.push_back(controlsDockWin);
