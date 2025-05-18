@@ -21,6 +21,9 @@ PlotData RocketPlotData;
 PlotData TemperatureSensorPlotData;
 PlotData ValvePlotData;
 
+PlotData LoadCell1Data("Load Cell 1", PlotColors::BLUE);
+PlotData LoadCell2Data("Load Cell 2", PlotColors::RED);
+
 PlotData ADC1PlotData("1", PlotColors::BLUE);
 PlotData ADC2PlotData("2", PlotColors::RED);
 PlotData ADC3PlotData("3", PlotColors::GREEN);

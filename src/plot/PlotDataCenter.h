@@ -21,6 +21,9 @@ extern PlotData RocketPlotData;
 extern PlotData TemperatureSensorPlotData;
 extern PlotData ValvePlotData;
 
+extern PlotData LoadCell1Data;
+extern PlotData LoadCell2Data;
+
 extern PlotData ADC1PlotData;
 extern PlotData ADC2PlotData;
 extern PlotData ADC3PlotData;

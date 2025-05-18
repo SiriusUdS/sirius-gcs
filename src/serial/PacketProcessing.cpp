@@ -30,20 +30,27 @@ float TEMP_LOAD_CELL_CONVERSION(float adcValue) {
 }
 
 bool PacketProcessing::processIncomingPacket() {
-    // TODO: MAKE VERIFICATIONS
+    packetSize = SerialTask::com.nextPacketSize();
 
-    packetSize = SerialTask::com.getPacket(packetBuf);
-    TelemetryHeader* header = (TelemetryHeader*) packetBuf;
-
-    // GCS_LOG_TRACE("Try reading packet");
-
-    if (!packetSize) {
+    if (packetSize == 0) {
         // No available packets
+        return false;
+    } else if (packetSize < sizeof(TelemetryHeader)) {
+        GCS_LOG_WARN("PacketProcessing: Received packet size too small to fit header, ignoring packet.");
+        SerialTask::com.dumpNextPacket();
+        return false;
+    } else if (packetSize > Constants::RECV_PACKET_MAX_SIZE) {
+        GCS_LOG_WARN("PacketProcessing: Received packet size too big to fit in packet bufferk, ignoring packet");
+        SerialTask::com.dumpNextPacket();
         return false;
     }
 
-    // GCS_LOG_TRACE("Packet detected");
+    if (SerialTask::com.getPacket(packetBuf) != packetSize) {
+        GCS_LOG_WARN("PacketProcessing: The size of the packet that was just read does not match the expected packet size, ignoring packet.");
+        return false;
+    }
 
+    TelemetryHeader* header = (TelemetryHeader*) packetBuf;
     switch (header->bits.type) {
     case TELEMETRY_HEADER_TYPE_TELEMETRY:
         return processTelemetryPacket();
@@ -51,7 +58,7 @@ bool PacketProcessing::processIncomingPacket() {
         return processStatusPacket();
     }
 
-    // GCS_LOG_WARN("PacketProcessing: Unknown packet type, ignoring packet.");
+    GCS_LOG_WARN("PacketProcessing: Unknown packet type, ignoring packet.");
     return false;
 }
 
@@ -78,8 +85,11 @@ bool PacketProcessing::processTelemetryPacket() {
     PlotDataCenter::ADC12PlotData.addData(timeStamp, (float) packet->fields.adcValues[11]);
     PlotDataCenter::ADC13PlotData.addData(timeStamp, (float) packet->fields.adcValues[12]);
     PlotDataCenter::ADC14PlotData.addData(timeStamp, (float) packet->fields.adcValues[13]);
-    PlotDataCenter::ADC15PlotData.addData(timeStamp, (float) packet->fields.adcValues[14]);
+    PlotDataCenter::ADC15PlotData.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[14]));
     PlotDataCenter::ADC16PlotData.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[15]));
+
+    PlotDataCenter::LoadCell1Data.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[14]));
+    PlotDataCenter::LoadCell2Data.addData(timeStamp, TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[15]));
     return true;
 }
 
@@ -90,127 +100,6 @@ bool PacketProcessing::processStatusPacket() {
 
     EngineStatusPacket* packet = (EngineStatusPacket*) packetBuf;
 
-    return true;
-}
-
-bool PacketProcessing::processAccelerometerPacket() {
-    if (!validateIncomingPacketSize(sizeof(AccelerometerPacket), "AccelerometerPacket")) {
-        return false;
-    }
-
-    AccelerometerPacket* packet = (AccelerometerPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawX = packet->fields.rawData.data.rawX;
-    float rawY = packet->fields.rawData.data.rawY;
-    float rawZ = packet->fields.rawData.data.rawZ;
-    PlotDataCenter::AccelerometerXPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::AccelerometerYPlotData.addData(timeStamp, rawY);
-    PlotDataCenter::AccelerometerZPlotData.addData(timeStamp, rawZ);
-    return true;
-}
-
-bool PacketProcessing::processGyroscopePacket() {
-    if (!validateIncomingPacketSize(sizeof(GyroscopePacket), "GyroscopePacket")) {
-        return false;
-    }
-
-    GyroscopePacket* packet = (GyroscopePacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawX = packet->fields.rawData.data.rawX;
-    float rawY = packet->fields.rawData.data.rawY;
-    float rawZ = packet->fields.rawData.data.rawZ;
-    PlotDataCenter::GyroscopeXPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::GyroscopeYPlotData.addData(timeStamp, rawY);
-    PlotDataCenter::GyroscopeZPlotData.addData(timeStamp, rawZ);
-    return true;
-}
-
-bool PacketProcessing::processAltimeterPacket() {
-    if (!validateIncomingPacketSize(sizeof(AltimeterPacket), "AltimeterPacket")) {
-        return false;
-    }
-
-    AltimeterPacket* packet = (AltimeterPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawAltitude = packet->fields.rawData.data.rawAltitude;
-    PlotDataCenter::AltimeterPlotData.addData(timeStamp, rawAltitude);
-    return true;
-}
-
-bool PacketProcessing::processGpsPacket() {
-    if (!validateIncomingPacketSize(sizeof(GpsPacket), "GpsPacket")) {
-        return false;
-    }
-
-    GpsPacket* packet = (GpsPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawLongitude = packet->fields.rawData.data.rawLongitude;
-    float rawLatitude = packet->fields.rawData.data.rawLatitude;
-    PlotDataCenter::GpsLongitudePlotData.addData(timeStamp, rawLongitude);
-    PlotDataCenter::GpsLatitudePlotData.addData(timeStamp, rawLatitude);
-    return true;
-}
-
-bool PacketProcessing::processMagnetometerPacket() {
-    if (!validateIncomingPacketSize(sizeof(MagnetometerPacket), "MagnetometerPacket")) {
-        return false;
-    }
-
-    MagnetometerPacket* packet = (MagnetometerPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawX = packet->fields.rawData.data.rawX;
-    float rawY = packet->fields.rawData.data.rawY;
-    float rawZ = packet->fields.rawData.data.rawZ;
-    PlotDataCenter::MagnetometerXPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::MagnetometerYPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::MagnetometerZPlotData.addData(timeStamp, rawX);
-    return true;
-}
-
-bool PacketProcessing::processPressureSensorPacket() {
-    if (!validateIncomingPacketSize(sizeof(PressureSensorPacket), "PressureSensorPacket")) {
-        return false;
-    }
-
-    PressureSensorPacket* packet = (PressureSensorPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawPressure = packet->fields.rawData.data.rawPressure;
-    PlotDataCenter::PressureSensorPlotData.addData(timeStamp, rawPressure);
-    return true;
-}
-
-bool PacketProcessing::processRocketPacket() {
-    if (!validateIncomingPacketSize(sizeof(RocketPacket), "RockerPacket")) {
-        return false;
-    }
-
-    RocketPacket* packet = (RocketPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    PlotDataCenter::RocketPlotData.addData(timeStamp, 0);
-    return true;
-}
-
-bool PacketProcessing::processTemperatureSensorPacket() {
-    if (!validateIncomingPacketSize(sizeof(TemperatureSensorPacket), "TemperatureSensorPacket")) {
-        return false;
-    }
-
-    TemperatureSensorPacket* packet = (TemperatureSensorPacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float rawTemperature = packet->fields.rawData.data.rawTemperature;
-    PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, rawTemperature);
-    return true;
-}
-
-bool PacketProcessing::processValvePacket() {
-    if (!validateIncomingPacketSize(sizeof(ValvePacket), "ValvePacket")) {
-        return false;
-    }
-
-    ValvePacket* packet = (ValvePacket*) packetBuf;
-    float timeStamp = packet->fields.rawData.timeStamp_ms;
-    float status = packet->fields.rawData.status.bits.state;
-    PlotDataCenter::ValvePlotData.addData(timeStamp, status);
     return true;
 }
 

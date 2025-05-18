@@ -8,19 +8,8 @@
 
 namespace PacketProcessing {
 bool processIncomingPacket();
-
 bool processTelemetryPacket();
 bool processStatusPacket();
-
-bool processAccelerometerPacket();
-bool processGyroscopePacket();
-bool processAltimeterPacket();
-bool processGpsPacket();
-bool processMagnetometerPacket();
-bool processPressureSensorPacket();
-bool processRocketPacket();
-bool processTemperatureSensorPacket();
-bool processValvePacket();
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
 
 extern size_t packetSize;

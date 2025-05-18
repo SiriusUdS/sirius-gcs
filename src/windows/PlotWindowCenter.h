@@ -17,6 +17,7 @@ extern PlotWindow gpsPlot;
 extern PlotWindow magnetometerPlot;
 extern PlotWindow pressureSensorPlot;
 extern PlotWindow temperatureSensorPlot;
+extern PlotWindow loadCellPlot;
 } // namespace PlotWindowCenter
 
 #endif // PLOTWINDOWCENTER_H
