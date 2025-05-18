@@ -1,4 +1,5 @@
 #include "PacketProcessing.h"
+#include "../TemperatureSensor.h"
 
 #include "Accelerometer/AccelerometerPacket.h"
 #include "Altimeter/AltimeterPacket.h"
