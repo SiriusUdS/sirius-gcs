@@ -1,8 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "SerialCom.h"
-
+#include <chrono>
 #include <hello_imgui/hello_imgui.h>
 #include <ini.h>
 
@@ -17,7 +16,6 @@ std::vector<HelloImGui::DockableWindow> createDockableWindows();
 
 extern mINI::INIFile iniFile;
 extern mINI::INIStructure iniStructure;
-extern SerialCom serialCom;
 } // namespace Application
 
 #endif // APPLICATION_H

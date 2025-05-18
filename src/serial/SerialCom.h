@@ -6,6 +6,7 @@
 #include "RecvBuffer.hpp"
 
 #include <ceserial.h>
+#include <chrono>
 #include <optional>
 
 /**
@@ -15,16 +16,22 @@
 class SerialCom {
 public:
     void start();
+    bool read();
+    bool write(uint8_t* msg, size_t size);
     bool comOpened();
-    void read();
+    bool comWorking();
     size_t getPacket(uint8_t* recv);
     uint32_t nextPacketHeaderCode();
     size_t nextPacketSize();
     bool dumpNextPacket();
-    bool write(uint8_t* msg, size_t size);
+    size_t packetsReadPerSecond();
     void shutdown();
 
 private:
+    size_t consecutiveFailedReads{};
+    size_t consecutiveFailedWrites{};
+    size_t packetsRead{};
+    std::chrono::time_point<std::chrono::steady_clock> comStartTimePoint;
     ceSerial com;
     RecvBuffer<Constants::RECV_BUF_SIZE> recvBuf;
 };

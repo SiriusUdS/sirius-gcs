@@ -32,18 +32,6 @@ bool msgEqual(uint8_t* rcv, const char* expected, size_t size) {
     return true;
 }
 
-TEST_CASE("Writes should only be performed if there's enough space left in the buffer") {
-    RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
-
-    SUBCASE("Successful write") {
-        CHECK(fillRecvBuffer(recvBuf, TEST_RECVBUFFER_SIZE));
-    }
-
-    SUBCASE("Failed write") {
-        CHECK_FALSE(fillRecvBuffer(recvBuf, TEST_RECVBUFFER_SIZE + 1));
-    }
-}
-
 TEST_CASE("Should detect correct amount of packets during writes") {
     RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
 
@@ -202,30 +190,12 @@ TEST_CASE("Should read packets correctly") {
     }
 }
 
-TEST_CASE("Should detect when the buffer is full") {
-    RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
-    uint8_t rcv[TEST_RECVBUFFER_SIZE];
-    size_t dataSize;
-
-    CHECK_FALSE(recvBuf.isFull());
-    CHECK(writeToRecvBuffer(recvBuf, "\0CCA", 4));
-    CHECK(fillRecvBuffer(recvBuf, 46));
-    CHECK_FALSE(recvBuf.isFull());
-    CHECK(writeToRecvBuffer(recvBuf, "\0CCA", 4));
-    CHECK(fillRecvBuffer(recvBuf, 46));
-    CHECK(recvBuf.isFull());
-    dataSize = recvBuf.readPacket(rcv);
-    CHECK(dataSize == 50);
-    CHECK_FALSE(recvBuf.isFull());
-    CHECK(fillRecvBuffer(recvBuf, 50));
-    CHECK(recvBuf.isFull());
-}
-
-TEST_CASE("Should clear correctly") {
+TEST_CASE("Should automatically clear when full and no packets available") {
     RecvBuffer<TEST_RECVBUFFER_SIZE> recvBuf;
 
-    CHECK(writeToRecvBuffer(recvBuf, "\0CCAabcd\x00AVLVzaaaaaaa\0SPGqwertyazerty\0MHT", 40));
-    recvBuf.clear();
-    CHECK(recvBuf.availablePackets() == 0);
+    CHECK_FALSE(recvBuf.isFull());
+    CHECK(fillRecvBuffer(recvBuf, TEST_RECVBUFFER_SIZE));
+    CHECK_FALSE(recvBuf.isFull());
+    CHECK(fillRecvBuffer(recvBuf, TEST_RECVBUFFER_SIZE * 2));
     CHECK_FALSE(recvBuf.isFull());
 }

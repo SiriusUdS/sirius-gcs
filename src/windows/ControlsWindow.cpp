@@ -1,6 +1,6 @@
 #include "ControlsWindow.h"
 
-#include "Application.h"
+#include "SerialTask.h"
 
 #include <imgui.h>
 
@@ -26,48 +26,23 @@ void render() {
     }
 
     static char sendPacket[13] = "bonjour hi! ";
-    static char recvPacket[512] = {0};
 
     if (ImGui::CollapsingHeader("Serial")) {
         ImGui::Text("COM Opened: ");
         ImGui::SameLine();
-        ImGui::Text(Application::serialCom.comOpened() ? "Yes" : "No");
+        ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
 
-        if (ImGui::Button("Open COM")) {
-            Application::serialCom.start();
-            if (Application::serialCom.comOpened()) {
-                GCS_LOG_INFO("ControlsWindow: COM opened.");
-            } else {
-                GCS_LOG_WARN("ControlsWindow: Couldn't open COM port.");
-            }
-        }
+        ImGui::Text("Packets read/s: %d", SerialTask::com.packetsReadPerSecond());
 
         if (ImGui::Button("Send test packet")) {
-            bool success = Application::serialCom.write((uint8_t*) sendPacket, 12);
+            bool success = SerialTask::com.write((uint8_t*) sendPacket, 12);
             if (success) {
                 GCS_LOG_INFO("ControlsWindow: Sent following packet: {}", sendPacket);
             } else {
                 GCS_LOG_WARN("ControlsWindow: Couldn't send packet.");
             }
         }
-
-        if (ImGui::Button("Read incoming packet")) {
-            size_t size = Application::serialCom.getPacket((uint8_t*) recvPacket);
-            if (size > 0) {
-                for (int i = 0; i < size; i++) {
-                    if (recvPacket[i] == '\0') {
-                        recvPacket[i] = '_';
-                    }
-                }
-                recvPacket[size] = '\0';
-                GCS_LOG_INFO("ControlsWindow: Received packet of size {}, contents are: {}", size, recvPacket);
-            } else {
-                GCS_LOG_WARN("ControlsWindow: Can't receive packet, no packets are available.");
-            }
-        }
     }
-
-    Application::serialCom.read();
 }
 
 void renderValveState(const char* id, ValveState state) {
@@ -97,6 +72,6 @@ void renderValveState(const char* id, ValveState state) {
 }
 
 void shutdown() {
-    Application::serialCom.shutdown();
+    SerialTask::com.shutdown();
 }
 } // namespace ControlsWindow
