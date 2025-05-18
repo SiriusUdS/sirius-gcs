@@ -21,7 +21,6 @@ public:
     bool comOpened();
     bool comWorking();
     size_t getPacket(uint8_t* recv);
-    uint32_t nextPacketHeaderCode();
     size_t nextPacketSize();
     bool dumpNextPacket();
     size_t packetsReadPerSecond();
@@ -34,6 +33,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> comStartTimePoint;
     ceSerial com;
     RecvBuffer<Constants::RECV_BUF_SIZE> recvBuf;
+    std::mutex mtx;
 };
 
 #endif // SERIALCOM_H

@@ -6,14 +6,58 @@
 
 namespace SerialTask {
 SerialCom com;
+std::thread thread;
+std::chrono::steady_clock::time_point lastCompletedTaskLoopIteration = std::chrono::steady_clock::now();
+std::atomic<bool> running = false;
+std::atomic<bool> shouldStop = false;
+} // namespace SerialTask
+
+void SerialTask::start() {
+    if (running) {
+        return;
+    }
+
+    shouldStop = false;
+    thread = std::thread(&SerialTask::execute);
+    running = true;
 }
 
-void SerialTask::performTask() {
-    // TODO - Add actual condition for this loop
-    while (true) {
+void SerialTask::execute() {
+    while (!shouldStop) {
+        // TODO: Make this more beautiful
+        auto now = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCompletedTaskLoopIteration);
+        if (duration.count() < 50) {
+            continue;
+        }
+
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
         PacketProcessing::processIncomingPacket();
         CommandCenter::processCommands();
+        lastCompletedTaskLoopIteration = std::chrono::steady_clock::now();
     }
+}
+
+void SerialTask::restart() {
+    stop();
+    start();
+}
+
+void SerialTask::stop() {
+    if (!running) {
+        return;
+    }
+
+    shouldStop = true;
+    if (thread.joinable()) {
+        thread.join();
+    }
+    running = false;
+}
+
+size_t SerialTask::secondsSinceLastUpdate() {
+    auto now = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration<double>(now - lastCompletedTaskLoopIteration);
+    return duration.count();
 }

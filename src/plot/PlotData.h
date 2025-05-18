@@ -12,6 +12,7 @@
 class PlotData {
 public:
     PlotData();
+    PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
     void setName(const char* n);
     void setColor(ImVec4 c);

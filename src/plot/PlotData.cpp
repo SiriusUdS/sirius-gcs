@@ -9,6 +9,9 @@ PlotData::PlotData() : name{"Unnamed"}, color{PlotColors::BLUE}, weight{2} {
     vy.reserve(BASE_DATA_VECTOR_CAPACITY);
 }
 
+PlotData::PlotData(const char* n, ImVec4 c) : name{n}, color{c}, weight{2} {
+}
+
 /**
  * @brief Adds a single data point to the plot data.
  */

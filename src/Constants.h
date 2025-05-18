@@ -3,7 +3,6 @@
 
 namespace Constants {
 // Window names
-constexpr const char* GCS_LED_WINDOW_ID = "LED";
 constexpr const char* GCS_LOGGING_WINDOW_ID = "Logs";
 constexpr const char* GCS_MAP_WINDOW_ID = "Map";
 constexpr const char* GCS_BASE_PLOT_WINDOW_ID = "Plot - ";
@@ -23,7 +22,6 @@ constexpr const size_t GCS_MAP_MAX_TILES_DOWNLOAD = 100'000;
 constexpr const size_t GCS_TILE_REQUEST_LIMIT = 25;
 
 // Dock space names
-constexpr const char* GCS_LED_DOCKSPACE = "MainDockSpace";
 constexpr const char* GCS_LOGGING_DOCKSPACE = "LogSpace";
 constexpr const char* GCS_MAP_DOCKSPACE = "MapSpace";
 constexpr const char* GCS_PLOT_DOCKSPACE = "MainDockSpace";
@@ -55,14 +53,15 @@ typedef struct {
     float TEMPERATURE;
     float RESISTANCE;
 } RT_Point;
-constexpr RT_Point RT_TABLE[] = {{-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990}, {20, 125250}, {25, 100000}, {30, 81000},
-                      {40, 53500},    {50, 35900},   {60, 25000},   {70, 17550}, {80, 12540},  {90, 9100},   {100, 6710}}; // Resistor-Temperature values table
+constexpr RT_Point RT_TABLE[] = {
+  {-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990}, {20, 125250}, {25, 100000}, {30, 81000},
+  {40, 53500},    {50, 35900},   {60, 25000},   {70, 17550}, {80, 12540},  {90, 9100},   {100, 6710}}; // Resistor-Temperature values table
 constexpr int RT_TABLE_SIZE = sizeof(Constants::RT_TABLE) / sizeof(Constants::RT_TABLE[0]);
 
 // Load cell
-constexpr float ADC_MIN_LOADCELL = 50.0;      
-constexpr float ADC_MAX_LOADCELL = 4000.0;    
-constexpr float LOADCELL_SCALE_FACTOR = 0.01; 
+constexpr float ADC_MIN_LOADCELL = 0.0;
+constexpr float ADC_MAX_LOADCELL = 4095.0;
+constexpr float LOADCELL_SCALE_FACTOR = 0.01;
 
 // Serial COM
 constexpr size_t SERIAL_CONNECTION_ATTEMPT_DELAY_IN_SECS = 3;
@@ -70,6 +69,7 @@ constexpr size_t SERIAL_MAX_CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 100;
 constexpr size_t SERIAL_MAX_CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE = 100;
 constexpr size_t RECV_BUF_SIZE = 10000;
 constexpr size_t RECV_BYTES_TO_READ_PER_SECOND = 10000;
+constexpr size_t RECV_PACKET_MAX_SIZE = 64;
 constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
 
 // Commands
