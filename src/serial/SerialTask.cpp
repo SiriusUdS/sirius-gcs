@@ -34,7 +34,7 @@ void SerialTask::execute() {
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
         PacketProcessing::processIncomingPacket();
-        CommandCenter::processCommands();
+        CommandCenter::processCommand();
     }
 }
 

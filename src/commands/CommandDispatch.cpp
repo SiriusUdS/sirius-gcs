@@ -5,23 +5,15 @@
 #include "Telecommunication/BoardCommand.h"
 
 void CommandDispatch::test() {
-    size_t commandSlotId = CommandCenter::reserveSlot();
-    if (!CommandCenter::isValidSlotId(commandSlotId)) {
-        GCS_LOG_WARN("CommandDispatch: Couldn't send command, no command slot available.");
+    if (CommandCenter::available()) {
+        GCS_LOG_WARN("CommandDispatch: Couldn't send command, another command is already being processed.");
         return;
     }
 
-    Command* command = (Command*) CommandCenter::get(commandSlotId);
-    if (!command) {
-        GCS_LOG_WARN("CommandDispatch: Couldn't send command, command slot pointer is null.");
-        return;
-    }
-    command->size = sizeof(BoardCommand);
-
-    BoardCommand* boardCommand = (BoardCommand*) command->data;
+    BoardCommand* boardCommand = (BoardCommand*) CommandCenter::get().data;
     boardCommand->fields.crc = 1;
     boardCommand->fields.header.value = 1234;
     boardCommand->fields.value = 5678;
 
-    CommandCenter::ready(commandSlotId);
+    CommandCenter::ready(sizeof(BoardCommand));
 }

@@ -4,87 +4,48 @@
 #include "SerialTask.h"
 
 namespace CommandCenter {
-Command commands[Constants::COMMAND_STORAGE_MAX_SIZE];
+Command command;
 std::mutex mtx;
 } // namespace CommandCenter
 
-Command* CommandCenter::get(size_t commandSlotId) {
-    std::lock_guard<std::mutex> lock(mtx);
-    if (!isValidSlotId(commandSlotId) || commands[commandSlotId].state == CommandState::NONE) {
-        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid or unreserved.", commandSlotId);
-        return nullptr;
-    }
-    return &commands[commandSlotId];
+Command& CommandCenter::get() {
+    return command;
 }
 
-size_t CommandCenter::reserveSlot() {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (size_t i = 0; i < Constants::COMMAND_STORAGE_MAX_SIZE; i++) {
-        if (commands[i].state == CommandState::NONE) {
-            commands[i].state = CommandState::RESERVED;
-            return i;
-        }
-    }
-    GCS_LOG_WARN("CommandCenter: Couldn't reserve command slot, no more space available.");
-    return Constants::COMMAND_STORAGE_MAX_SIZE;
+bool CommandCenter::available() {
+    return command.state == CommandState::NONE;
 }
 
-bool CommandCenter::ready(size_t commandSlotId) {
+bool CommandCenter::ready(size_t commandSize) {
     std::lock_guard<std::mutex> lock(mtx);
-    if (commands[commandSlotId].state != CommandState::RESERVED) {
-        GCS_LOG_WARN("CommandCenter: Couldn't mark command as ready as the state wasn't RESERVED.");
+    if (command.state != CommandState::NONE) {
+        GCS_LOG_WARN("CommandCenter: Couldn't mark command as ready, another command is already being processed.");
         return false;
     }
-    commands[commandSlotId].state = CommandState::READY;
+    command.size = commandSize;
+    command.state = CommandState::READY;
     return true;
 }
 
-bool CommandCenter::freeSlot(size_t commandSlotId) {
+bool CommandCenter::processAck() {
     std::lock_guard<std::mutex> lock(mtx);
-    if (!isValidSlotId(commandSlotId)) {
-        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandSlotId);
-        return false;
-    }
-    commands[commandSlotId].state = CommandState::NONE;
+    // TODO: Write ack function
     return true;
 }
 
-bool CommandCenter::processAck(size_t commandSlotId) {
+void CommandCenter::processCommand() {
     std::lock_guard<std::mutex> lock(mtx);
-    if (!isValidSlotId(commandSlotId)) {
-        GCS_LOG_WARN("CommandCenter: Command ID {} is invalid.", commandSlotId);
-        return false;
-    } else if (commands[commandSlotId].state == CommandState::NONE) {
-        GCS_LOG_WARN("CommandCenter: Tried to process ACK packet for command that doesn't exist.");
-        return false;
-    } else if (commands[commandSlotId].state == CommandState::READY) {
-        GCS_LOG_WARN("CommandCenter: Tried to process ACK packet for command that hasn't been sent yet.");
-        return false;
+    if (command.state == CommandState::READY) {
+        SerialTask::com.write(command.data, command.size);
+        command.state = CommandState::SENT;
+        command.lastTimeSent = std::chrono::steady_clock::now();
+    } else if (command.state == CommandState::SENT) {
+        command.state = CommandState::NONE; // TODO: Switch this back to sent later so ack can be processed
+        // auto now = std::chrono::steady_clock::now();
+        // auto elapsedTimeLastSentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - commands[i].lastTimeSent);
+        // if (elapsedTimeLastSentMs.count() >= Constants::COMMAND_TIME_BEFORE_RESENDING_MS) {
+        //     SerialTask::com.write(commands[i].data, commands[i].size);
+        //     commands[i].lastTimeSent = now;
+        // }
     }
-    // commands[commandSlotId].state = CommandState::NONE;
-    // freeSlot(commandSlotId);
-    return true;
-}
-
-void CommandCenter::processCommands() {
-    std::lock_guard<std::mutex> lock(mtx);
-    for (size_t i = 0; i < Constants::COMMAND_STORAGE_MAX_SIZE; i++) {
-        if (commands[i].state == CommandState::READY) {
-            SerialTask::com.write(commands[i].data, commands[i].size);
-            commands[i].state = CommandState::SENT;
-            commands[i].lastTimeSent = std::chrono::steady_clock::now();
-        } else if (commands[i].state == CommandState::SENT) {
-            commands[i].state = CommandState::NONE; // TODO: Switch this back to sent later so ack can be processed
-            // auto now = std::chrono::steady_clock::now();
-            // auto elapsedTimeLastSentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - commands[i].lastTimeSent);
-            // if (elapsedTimeLastSentMs.count() >= Constants::COMMAND_TIME_BEFORE_RESENDING_MS) {
-            //     SerialTask::com.write(commands[i].data, commands[i].size);
-            //     commands[i].lastTimeSent = now;
-            // }
-        }
-    }
-}
-
-bool CommandCenter::isValidSlotId(size_t commandSlotId) {
-    return commandSlotId < Constants::COMMAND_STORAGE_MAX_SIZE;
 }
