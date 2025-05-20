@@ -157,7 +157,7 @@ bool PacketProcessing::processTemperatureSensorPacket() {
     float timeStamp = packet.fields.rawData.members.timeStamp_ms;
     float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
     float convertVoltage = voltageConverter_V(rawTemperature);
-    float sensorIndex = packet.fields.header.values[0] & 0x000000ff;  
+    float sensorIndex = packet.fields.header.values[0] & 0x000000ff;
     float convertTemperature = pressureConverter_NAME1_PSI(convertVoltage, sensorIndex);
     PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, convertTemperature);
     return true;
