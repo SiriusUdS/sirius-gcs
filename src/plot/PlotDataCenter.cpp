@@ -3,22 +3,6 @@
 #include "PlotColors.h"
 
 namespace PlotDataCenter {
-PlotData AccelerometerXPlotData;
-PlotData AccelerometerYPlotData;
-PlotData AccelerometerZPlotData;
-PlotData GyroscopeXPlotData;
-PlotData GyroscopeYPlotData;
-PlotData GyroscopeZPlotData;
-PlotData AltimeterPlotData;
-PlotData GpsLongitudePlotData;
-PlotData GpsLatitudePlotData;
-PlotData MagnetometerXPlotData;
-PlotData MagnetometerYPlotData;
-PlotData MagnetometerZPlotData;
-PlotData RocketPlotData;
-PlotData TemperatureSensorPlotData;
-PlotData ValvePlotData;
-
 PlotData Thermistor1PlotData("Thermistor 1", PlotColors::BLUE);
 PlotData Thermistor2PlotData("Thermistor 2", PlotColors::RED);
 PlotData Thermistor3PlotData("Thermistor 3", PlotColors::GREEN);

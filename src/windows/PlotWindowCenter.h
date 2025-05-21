@@ -10,11 +10,6 @@ std::vector<HelloImGui::DockableWindow> createDockableWindows();
 void loadState(const mINI::INIStructure& iniStructure);
 void saveState(mINI::INIStructure& iniStructure);
 
-extern PlotWindow accelerometerPlot;
-extern PlotWindow gyroscopePlot;
-extern PlotWindow altimeterPlot;
-extern PlotWindow gpsPlot;
-extern PlotWindow magnetometerPlot;
 extern PlotWindow thermistorPlot;
 extern PlotWindow pressureSensorPlot;
 extern PlotWindow loadCellPlot;

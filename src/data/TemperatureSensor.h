@@ -3,7 +3,7 @@
 
 namespace TemperatureSensor {
 float interpolateTemperature(float measuredResistance);
-float temperatureInfos(float adcValue);
+float convertToTemperature(float adcValue);
 } // namespace TemperatureSensor
 
 #endif // TEMPERATURESENSOR_H

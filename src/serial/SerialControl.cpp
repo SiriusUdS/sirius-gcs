@@ -27,7 +27,7 @@ void SerialControl::readIncomingBytesAtSetRate() {
     std::chrono::duration<double> elapsedSeconds = now - lastSerialReadTime;
     lastSerialReadTime = now;
 
-    size_t bytesToRead = Constants::RECV_BYTES_TO_READ_PER_SECOND * elapsedSeconds.count();
+    size_t bytesToRead = (size_t) (Constants::RECV_BYTES_TO_READ_PER_SECOND * elapsedSeconds.count());
     while (0 < bytesToRead--) {
         if (!SerialTask::com.read()) {
             break;

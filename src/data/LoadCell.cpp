@@ -11,7 +11,7 @@ float LoadCell::convertRawToForce(float adcValue) {
 
     // TODO - Make sure this is correct formula (volts to lb)
     // float force = adcValue * Constants::LOADCELL_SCALE_FACTOR;
-    float force = 200 * ((adcValue * 3.3f / 4096.f) / 209.f) / 0.015; // / 209.f;
+    float force = 200 * ((adcValue * 3.3f / 4096.f) / 209.f) / 0.015f;
 
     GCS_LOG_INFO("Load Cell Force: {} N", force);
     return force;

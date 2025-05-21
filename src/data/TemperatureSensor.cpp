@@ -15,7 +15,7 @@ float TemperatureSensor::interpolateTemperature(float measuredResistance) {
     return -1;
 }
 
-float TemperatureSensor::temperatureInfos(float adcValue) {
+float TemperatureSensor::convertToTemperature(float adcValue) {
     float temperature = 0.0;
 
     if (adcValue < Constants::ADC_MIN_TEMPERATURE) {

@@ -9,12 +9,7 @@ constexpr const char* GCS_BASE_PLOT_WINDOW_ID = "Plot - ";
 constexpr const char* GCS_CONTROLS_WINDOW_ID = "Controls";
 
 // Plot/axis names
-constexpr const char* GCS_ACCELEROMETER_PLOT_NAME = "Accelerometer";
-constexpr const char* GCS_GYROSCOPE_PLOT_NAME = "Gyroscope";
-constexpr const char* GCS_ALTIMETER_PLOT_NAME = "Altimeter";
-constexpr const char* GCS_GPS_PLOT_NAME = "GPS";
-constexpr const char* GCS_MAGNETOMETER_PLOT_NAME = "Magnetometer";
-constexpr const char* GCS_PRESSURE_SENSOR_PLOT_NAME = "Pressure";
+constexpr const char* PLOT_AXIS_TIMESTAMP_NAME = "Timestamp (ms)";
 
 // Map component
 constexpr const size_t GCS_MAP_MAX_TILES_DOWNLOAD = 100'000;
@@ -39,15 +34,15 @@ constexpr const char* HELLO_IMGUI_MENU_APP_TITLE = "Sirius GCS";
 
 // Font related params
 constexpr const char* IMGUI_MAIN_FONT_FILENAME = "assets/fonts/Nunito-Regular.ttf";
-constexpr float IMGUI_MAIN_FONT_SIZE = 28.0f;
+constexpr float IMGUI_MAIN_FONT_SIZE = 28;
 
 // Temperature sensor
-constexpr float ADC_MIN_TEMPERATURE = 10.0;
-constexpr float ADC_MAX_TEMPERATURE = 4090.0;
+constexpr float ADC_MIN_TEMPERATURE = 10;
+constexpr float ADC_MAX_TEMPERATURE = 4090;
 constexpr int MAX_TEMPERATURE = 100;
 constexpr int MIN_TEMPERATURE = 0;
-constexpr float MULTIPLICATIVE_FACTOR = 10000.0;
-constexpr float ADDITIVE_FACTOR = 4096.0;
+constexpr float MULTIPLICATIVE_FACTOR = 10000;
+constexpr float ADDITIVE_FACTOR = 4096;
 typedef struct {
     float TEMPERATURE;
     float RESISTANCE;
@@ -58,9 +53,9 @@ constexpr RT_Point RT_TABLE[] = {
 constexpr int RT_TABLE_SIZE = sizeof(Constants::RT_TABLE) / sizeof(Constants::RT_TABLE[0]);
 
 // Load cell
-constexpr float ADC_MIN_LOADCELL = 0.0;
-constexpr float ADC_MAX_LOADCELL = 4095.0;
-constexpr float LOADCELL_SCALE_FACTOR = 0.01;
+constexpr float ADC_MIN_LOADCELL = 0;
+constexpr float ADC_MAX_LOADCELL = 4095;
+constexpr float LOADCELL_SCALE_FACTOR = 0.01f;
 
 // Serial COM
 constexpr size_t SERIAL_TASK_LOOPS_PER_SECOND = 20;

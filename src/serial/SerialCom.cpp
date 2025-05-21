@@ -121,7 +121,7 @@ size_t SerialCom::packetsReadPerSecond() {
     std::lock_guard<std::mutex> lock(mtx);
     auto now = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsedSeconds = now - comStartTimePoint;
-    return packetsRead / elapsedSeconds.count();
+    return (size_t) (packetsRead / elapsedSeconds.count());
 }
 
 /**

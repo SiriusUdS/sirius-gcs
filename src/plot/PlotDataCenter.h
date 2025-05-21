@@ -4,21 +4,6 @@
 #include "PlotData.h"
 
 namespace PlotDataCenter {
-extern PlotData AccelerometerXPlotData;
-extern PlotData AccelerometerYPlotData;
-extern PlotData AccelerometerZPlotData;
-extern PlotData GyroscopeXPlotData;
-extern PlotData GyroscopeYPlotData;
-extern PlotData GyroscopeZPlotData;
-extern PlotData AltimeterPlotData;
-extern PlotData GpsLongitudePlotData;
-extern PlotData GpsLatitudePlotData;
-extern PlotData MagnetometerXPlotData;
-extern PlotData MagnetometerYPlotData;
-extern PlotData MagnetometerZPlotData;
-extern PlotData RocketPlotData;
-extern PlotData ValvePlotData;
-
 extern PlotData Thermistor1PlotData;
 extern PlotData Thermistor2PlotData;
 extern PlotData Thermistor3PlotData;

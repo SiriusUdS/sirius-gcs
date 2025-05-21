@@ -58,5 +58,5 @@ void SerialTask::stop() {
 size_t SerialTask::secondsSinceLastUpdate() {
     auto now = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration<double>(now - timeLastUpdate);
-    return duration.count();
+    return (size_t) duration.count();
 }
