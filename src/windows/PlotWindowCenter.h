@@ -15,8 +15,8 @@ extern PlotWindow gyroscopePlot;
 extern PlotWindow altimeterPlot;
 extern PlotWindow gpsPlot;
 extern PlotWindow magnetometerPlot;
+extern PlotWindow thermistorPlot;
 extern PlotWindow pressureSensorPlot;
-extern PlotWindow temperatureSensorPlot;
 extern PlotWindow loadCellPlot;
 } // namespace PlotWindowCenter
 

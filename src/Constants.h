@@ -15,7 +15,6 @@ constexpr const char* GCS_ALTIMETER_PLOT_NAME = "Altimeter";
 constexpr const char* GCS_GPS_PLOT_NAME = "GPS";
 constexpr const char* GCS_MAGNETOMETER_PLOT_NAME = "Magnetometer";
 constexpr const char* GCS_PRESSURE_SENSOR_PLOT_NAME = "Pressure";
-constexpr const char* GCS_TEMPERATURE_SENSOR_PLOT_NAME = "Temperature";
 
 // Map component
 constexpr const size_t GCS_MAP_MAX_TILES_DOWNLOAD = 100'000;

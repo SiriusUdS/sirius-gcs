@@ -58,27 +58,27 @@ bool PacketProcessing::processTelemetryPacket() {
 
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
     float timeStamp = (float) packet->fields.timestamp_ms;
-    // float v1 = TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[14]);
-    // float v2 = TEMP_LOAD_CELL_CONVERSION((float) packet->fields.adcValues[15]);
-    PlotDataCenter::ADC1PlotData.addData(timeStamp, (float) packet->fields.adcValues[0]);
-    PlotDataCenter::ADC2PlotData.addData(timeStamp, (float) packet->fields.adcValues[1]);
-    PlotDataCenter::ADC3PlotData.addData(timeStamp, (float) packet->fields.adcValues[2]);
-    PlotDataCenter::ADC4PlotData.addData(timeStamp, (float) packet->fields.adcValues[3]);
-    PlotDataCenter::ADC5PlotData.addData(timeStamp, (float) packet->fields.adcValues[4]);
-    PlotDataCenter::ADC6PlotData.addData(timeStamp, (float) packet->fields.adcValues[5]);
-    PlotDataCenter::ADC7PlotData.addData(timeStamp, (float) packet->fields.adcValues[6]);
-    PlotDataCenter::ADC8PlotData.addData(timeStamp, (float) packet->fields.adcValues[7]);
-    PlotDataCenter::ADC9PlotData.addData(timeStamp, (float) packet->fields.adcValues[8]);
-    PlotDataCenter::ADC10PlotData.addData(timeStamp, (float) packet->fields.adcValues[9]);
-    PlotDataCenter::ADC11PlotData.addData(timeStamp, (float) packet->fields.adcValues[10]);
-    PlotDataCenter::ADC12PlotData.addData(timeStamp, (float) packet->fields.adcValues[11]);
-    PlotDataCenter::ADC13PlotData.addData(timeStamp, (float) packet->fields.adcValues[12]);
-    PlotDataCenter::ADC14PlotData.addData(timeStamp, (float) packet->fields.adcValues[13]);
-    PlotDataCenter::ADC15PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
-    PlotDataCenter::ADC16PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
 
-    PlotDataCenter::LoadCell1Data.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
-    PlotDataCenter::LoadCell2Data.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
+    PlotDataCenter::Thermistor1PlotData.addData(timeStamp, (float) packet->fields.adcValues[0]);
+    PlotDataCenter::Thermistor2PlotData.addData(timeStamp, (float) packet->fields.adcValues[1]);
+    PlotDataCenter::Thermistor3PlotData.addData(timeStamp, (float) packet->fields.adcValues[2]);
+    PlotDataCenter::Thermistor4PlotData.addData(timeStamp, (float) packet->fields.adcValues[3]);
+    PlotDataCenter::Thermistor5PlotData.addData(timeStamp, (float) packet->fields.adcValues[4]);
+    PlotDataCenter::Thermistor6PlotData.addData(timeStamp, (float) packet->fields.adcValues[5]);
+    PlotDataCenter::Thermistor7PlotData.addData(timeStamp, (float) packet->fields.adcValues[6]);
+    PlotDataCenter::Thermistor8PlotData.addData(timeStamp, (float) packet->fields.adcValues[7]);
+
+    // PlotDataCenter::ADC9PlotData.addData(timeStamp, (float) packet->fields.adcValues[8]);
+    // PlotDataCenter::ADC10PlotData.addData(timeStamp, (float) packet->fields.adcValues[9]);
+
+    PlotDataCenter::PressureSensor1PlotData.addData(timeStamp, (float) packet->fields.adcValues[10]);
+    PlotDataCenter::PressureSensor2PlotData.addData(timeStamp, (float) packet->fields.adcValues[11]);
+
+    // PlotDataCenter::ADC13PlotData.addData(timeStamp, (float) packet->fields.adcValues[12]);
+    // PlotDataCenter::ADC14PlotData.addData(timeStamp, (float) packet->fields.adcValues[13]);
+
+    PlotDataCenter::LoadCell1PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
+    PlotDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
     return true;
 }
 
