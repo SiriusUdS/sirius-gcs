@@ -21,7 +21,8 @@ void PlotData::addData(float x, float y) {
         GCS_LOG_WARN("PlotData: Received unordered data for plot data {}, clearing data.", name);
         vx.clear();
         vy.clear();
-        return;
+        compressedVx.clear();
+        compressedVy.clear();
     }
 
     vx.push_back(x);

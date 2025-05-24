@@ -7,6 +7,10 @@
 class ITile;
 class ITileSaver;
 
+/**
+ * @class TileSourceAsync
+ * @brief Represents an asynchronous tile source
+ */
 class TileSourceAsync : public ITileSource {
 public:
     TileSourceAsync(int requestLimit, bool preload);

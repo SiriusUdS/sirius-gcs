@@ -1,10 +1,13 @@
 #include "PressureTransducer.h"
 
-float voltageConverter_V(float adcValue) {
-    float VoltageInput = (adcValue / PRESSURE_SENSOR_ADC_RANGE_BIT) * PRESSURE_SENSOR_VOLTAGE_RANGE_V;
-    return VoltageInput;
-}
+#include "Logging.h"
 
-float pressureConverter_NAME1_PSI(float VoltageInput, uint8_t index) {
-    return (PRESSURE_SENSOR_ARRAY_SLOPE[index] * VoltageInput) + PRESSURE_SENSOR_ARRAY_CONST[index];
+float PressureTransducer::convertRawToPressure(float adcValue, uint8_t sensorIndex) {
+    if (sensorIndex >= 4) {
+        GCS_LOG_ERROR("PressureTransducer: damn");
+        return 0;
+    }
+
+    double voltage = ((double) adcValue / PRESSURE_SENSOR_ADC_RANGE_BIT) * PRESSURE_SENSOR_VOLTAGE_RANGE_V;
+    return (float) ((PRESSURE_SENSOR_ARRAY_SLOPE[sensorIndex] * voltage) + PRESSURE_SENSOR_ARRAY_CONST[sensorIndex]);
 }

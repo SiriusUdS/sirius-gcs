@@ -8,6 +8,11 @@
 
 using namespace std::chrono_literals;
 
+/**
+ * @brief Constructs a TileSourceAsync
+ * @param requestLimit Maximum number of concurrent requests that can be made to fetch tiles
+ * @param preload Whether the tile is immediately loaded as a texture
+ */
 TileSourceAsync::TileSourceAsync(int requestLimit, bool preload) : _requestLimit{requestLimit}, _preload{preload} {
 }
 

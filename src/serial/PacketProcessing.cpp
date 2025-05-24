@@ -64,7 +64,7 @@ bool PacketProcessing::processTelemetryPacket() {
     PlotDataCenter::Thermistor1PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[0]));
     PlotDataCenter::Thermistor2PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[1]));
     PlotDataCenter::Thermistor3PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[2]));
-    PlotDataCenter::Thermistor4PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[3]));
+    PlotDataCenter::Thermistor4PlotData.addData(timeStamp, ((float) packet->fields.adcValues[3]));
     PlotDataCenter::Thermistor5PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[4]));
     PlotDataCenter::Thermistor6PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[5]));
     PlotDataCenter::Thermistor7PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[6]));
@@ -73,8 +73,12 @@ bool PacketProcessing::processTelemetryPacket() {
     // PlotDataCenter::ADC9PlotData.addData(timeStamp, (float) packet->fields.adcValues[8]);
     // PlotDataCenter::ADC10PlotData.addData(timeStamp, (float) packet->fields.adcValues[9]);
 
-    PlotDataCenter::PressureSensor1PlotData.addData(timeStamp, (float) packet->fields.adcValues[10]);
-    PlotDataCenter::PressureSensor2PlotData.addData(timeStamp, (float) packet->fields.adcValues[11]);
+    float pressureSensor1 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[10], 3);
+    float pressureSensor2 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[11], 3);
+    PlotDataCenter::PressureSensor1PlotData.addData(timeStamp, pressureSensor1);
+    PlotDataCenter::PressureSensor2PlotData.addData(timeStamp, pressureSensor2);
+    // PlotDataCenter::PressureSensor1PlotData.addData(timeStamp, packet->fields.adcValues[10]);
+    // PlotDataCenter::PressureSensor2PlotData.addData(timeStamp, packet->fields.adcValues[11]);
 
     // PlotDataCenter::ADC13PlotData.addData(timeStamp, (float) packet->fields.adcValues[12]);
     // PlotDataCenter::ADC14PlotData.addData(timeStamp, (float) packet->fields.adcValues[13]);
@@ -83,10 +87,6 @@ bool PacketProcessing::processTelemetryPacket() {
     PlotDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
 
     // Pressure Transducer
-    // float convertVoltage = voltageConverter_V(rawTemperature);
-    // float sensorIndex = packet.fields.header.values[0] & 0x000000ff;
-    // float convertTemperature = pressureConverter_NAME1_PSI(convertVoltage, sensorIndex);
-    // PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, convertTemperature);
 
     return true;
 }
