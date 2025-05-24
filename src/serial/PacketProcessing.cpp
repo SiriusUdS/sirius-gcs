@@ -8,12 +8,12 @@
 #include "Magnetometer/MagnetometerPacket.h"
 #include "PlotDataCenter.h"
 #include "PressureSensor/PressureSensorPacket.h"
+#include "PressureTransducer.h"
 #include "Rocket/RocketPacket.h"
 #include "SerialTask.h"
 #include "TemperatureSensor.h"
 #include "TemperatureSensor/TemperatureSensorPacket.h"
 #include "Valve/ValvePacket.h"
-#include "PressureTransducer.h"
 
 namespace PacketProcessing {
 size_t packetSize{};
@@ -81,6 +81,13 @@ bool PacketProcessing::processTelemetryPacket() {
 
     PlotDataCenter::LoadCell1PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
     PlotDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
+
+    // Pressure Transducer
+    // float convertVoltage = voltageConverter_V(rawTemperature);
+    // float sensorIndex = packet.fields.header.values[0] & 0x000000ff;
+    // float convertTemperature = pressureConverter_NAME1_PSI(convertVoltage, sensorIndex);
+    // PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, convertTemperature);
+
     return true;
 }
 
