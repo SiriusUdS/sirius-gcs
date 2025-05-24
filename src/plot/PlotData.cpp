@@ -6,6 +6,11 @@
 
 #include <implot.h>
 
+/**
+ * @brief Constructs a plot data from a name and a color of the plot data line
+ * @param n Name of the plot data
+ * @param c Color of the plot data line
+ */
 PlotData::PlotData(const char* n, ImVec4 c) : name{n}, color{c}, weight{2} {
 }
 

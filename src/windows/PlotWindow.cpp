@@ -17,6 +17,9 @@ PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel,
     Utils::convertStringToIniId(autofitIniId);
 }
 
+/**
+ * @brief Renders the plot window with ImGui
+ */
 void PlotWindow::render() {
     ImGui::Checkbox("Auto-fit", &autofit);
     if (autofit) {
@@ -34,6 +37,10 @@ void PlotWindow::render() {
     }
 }
 
+/**
+ * @brief Loads the state of the window from an ini file
+ * @param ini The struct of the ini file
+ */
 void PlotWindow::loadState(const mINI::INIStructure& ini) {
     if (ini.has(Constants::GCS_INI_SECTION)) {
         if (ini.get(Constants::GCS_INI_SECTION).has(autofitIniId)) {
@@ -42,10 +49,18 @@ void PlotWindow::loadState(const mINI::INIStructure& ini) {
     }
 }
 
+/**
+ * @brief Saves the state of the window to an ini file
+ * @param ini The struct of the ini file
+ */
 void PlotWindow::saveState(mINI::INIStructure& ini) {
     ini[Constants::GCS_INI_SECTION].set(autofitIniId, std::to_string(autofit));
 }
 
+/**
+ * @brief Generates a window id to uniquely identify different plot windows
+ * @returns The generated window id
+ */
 std::string PlotWindow::getWindowId() {
     return std::string(Constants::GCS_BASE_PLOT_WINDOW_ID) + name;
 }

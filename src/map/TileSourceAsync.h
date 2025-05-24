@@ -41,6 +41,13 @@ public:
     };
 
 protected:
+    /**
+     * @brief Fetches the tile at position x,y,z and writes its data in a TileData struct
+     * @param z The zoom level of the tile
+     * @param x The x position of the tile
+     * @param y The y position of the tile
+     * @param data The TileData struct in which the received tile data will be writter
+     */
     virtual bool receiveTile(int z, int x, int y, TileData& data) = 0;
 
 private:

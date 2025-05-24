@@ -75,6 +75,10 @@ bool SerialCom::comOpened() {
     return com.IsOpened();
 }
 
+/**
+ * @brief Returns whether the serial com is currently working
+ * @returns True if the serial com is working, else false
+ */
 bool SerialCom::comWorking() {
     std::lock_guard<std::mutex> lock(mtx);
     return consecutiveFailedReads < Constants::SERIAL_MAX_CONSECUTIVE_FAILED_READS_BEFORE_FAILURE

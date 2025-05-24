@@ -7,6 +7,10 @@
 #include <ini.h>
 #include <vector>
 
+/**
+ * @class PlotWindow
+ * @brief UI window to display plot data
+ */
 class PlotWindow {
 public:
     PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<PlotData*> plotData);
