@@ -2,184 +2,100 @@
 
 #include "Accelerometer/AccelerometerPacket.h"
 #include "Altimeter/AltimeterPacket.h"
-#include "Application.h"
 #include "GPS/GpsPacket.h"
 #include "Gyroscope/GyroscopePacket.h"
+#include "LoadCell.h"
 #include "Magnetometer/MagnetometerPacket.h"
 #include "PlotDataCenter.h"
 #include "PressureSensor/PressureSensorPacket.h"
 #include "Rocket/RocketPacket.h"
+#include "SerialTask.h"
+#include "TemperatureSensor.h"
 #include "TemperatureSensor/TemperatureSensorPacket.h"
 #include "Valve/ValvePacket.h"
 #include "PressureTransducer.h"
 
-bool PacketProcessing::processIncomingPacket() {
-    uint32_t headerCode = Application::serialCom.nextPacketHeaderCode();
+namespace PacketProcessing {
+size_t packetSize{};
+uint8_t packetBuf[Constants::RECV_PACKET_MAX_SIZE];
+} // namespace PacketProcessing
 
-    switch (headerCode) {
-    case 0:
+bool PacketProcessing::processIncomingPacket() {
+    packetSize = SerialTask::com.nextPacketSize();
+
+    if (packetSize == 0) {
+        // No available packets
         return false;
-    case ACCELEROMETER_DATA_HEADER_CODE:
-        return processAccelerometerPacket();
-    case GYROSCOPE_DATA_HEADER_CODE:
-        return processGyroscopePacket();
-    case ALTIMETER_DATA_HEADER_CODE:
-        return processAltimeterPacket();
-    case GPS_DATA_HEADER_CODE:
-        return processGpsPacket();
-    case MAGNETOMETER_DATA_HEADER_CODE:
-        return processMagnetometerPacket();
-    case PRESSURE_SENSOR_DATA_HEADER_CODE:
-        return processPressureSensorPacket();
-    case ROCKET_DATA_HEADER_CODE:
-        return processRocketPacket();
-    case TEMPERATURE_SENSOR_DATA_HEADER_CODE:
-        return processTemperatureSensorPacket();
-    case VALVE_DATA_HEADER_CODE:
-        return processValvePacket();
+    } else if (packetSize < sizeof(TelemetryHeader)) {
+        GCS_LOG_WARN("PacketProcessing: Received packet size too small to fit header, ignoring packet.");
+        SerialTask::com.dumpNextPacket();
+        return false;
+    } else if (packetSize > Constants::RECV_PACKET_MAX_SIZE) {
+        GCS_LOG_WARN("PacketProcessing: Received packet size too big to fit in packet bufferk, ignoring packet");
+        SerialTask::com.dumpNextPacket();
+        return false;
     }
 
-    GCS_LOG_WARN("PacketProcessing: Unknown packet header code, ignoring packet.");
+    if (SerialTask::com.getPacket(packetBuf) != packetSize) {
+        GCS_LOG_WARN("PacketProcessing: The size of the packet that was just read does not match the expected packet size, ignoring packet.");
+        return false;
+    }
+
+    TelemetryHeader* header = (TelemetryHeader*) packetBuf;
+    switch (header->bits.type) {
+    case TELEMETRY_HEADER_TYPE_TELEMETRY:
+        return processTelemetryPacket();
+    case TELEMETRY_HEADER_TYPE_STATUS:
+        return processStatusPacket();
+    }
+
+    GCS_LOG_WARN("PacketProcessing: Unknown packet type, ignoring packet.");
     return false;
 }
 
-bool PacketProcessing::processAccelerometerPacket() {
-    if (!validateIncomingPacketSize(sizeof(AccelerometerPacket), "AccelerometerPacket")) {
+bool PacketProcessing::processTelemetryPacket() {
+    if (!validateIncomingPacketSize(sizeof(EngineTelemetryPacket), "EngineTelemetryPacket")) {
         return false;
     }
 
-    AccelerometerPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawX = packet.fields.rawData.members.data.rawX;
-    float rawY = packet.fields.rawData.members.data.rawY;
-    float rawZ = packet.fields.rawData.members.data.rawZ;
-    PlotDataCenter::AccelerometerXPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::AccelerometerYPlotData.addData(timeStamp, rawY);
-    PlotDataCenter::AccelerometerZPlotData.addData(timeStamp, rawZ);
+    EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
+    float timeStamp = (float) packet->fields.timestamp_ms;
+
+    PlotDataCenter::Thermistor1PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[0]));
+    PlotDataCenter::Thermistor2PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[1]));
+    PlotDataCenter::Thermistor3PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[2]));
+    PlotDataCenter::Thermistor4PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[3]));
+    PlotDataCenter::Thermistor5PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[4]));
+    PlotDataCenter::Thermistor6PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[5]));
+    PlotDataCenter::Thermistor7PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[6]));
+    PlotDataCenter::Thermistor8PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[7]));
+
+    // PlotDataCenter::ADC9PlotData.addData(timeStamp, (float) packet->fields.adcValues[8]);
+    // PlotDataCenter::ADC10PlotData.addData(timeStamp, (float) packet->fields.adcValues[9]);
+
+    PlotDataCenter::PressureSensor1PlotData.addData(timeStamp, (float) packet->fields.adcValues[10]);
+    PlotDataCenter::PressureSensor2PlotData.addData(timeStamp, (float) packet->fields.adcValues[11]);
+
+    // PlotDataCenter::ADC13PlotData.addData(timeStamp, (float) packet->fields.adcValues[12]);
+    // PlotDataCenter::ADC14PlotData.addData(timeStamp, (float) packet->fields.adcValues[13]);
+
+    PlotDataCenter::LoadCell1PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
+    PlotDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
     return true;
 }
 
-bool PacketProcessing::processGyroscopePacket() {
-    if (!validateIncomingPacketSize(sizeof(GyroscopePacket), "GyroscopePacket")) {
+bool PacketProcessing::processStatusPacket() {
+    if (!validateIncomingPacketSize(sizeof(EngineStatusPacket), "EngineStatusPacket")) {
         return false;
     }
 
-    GyroscopePacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawX = packet.fields.rawData.members.data.rawX;
-    float rawY = packet.fields.rawData.members.data.rawY;
-    float rawZ = packet.fields.rawData.members.data.rawZ;
-    PlotDataCenter::GyroscopeXPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::GyroscopeYPlotData.addData(timeStamp, rawY);
-    PlotDataCenter::GyroscopeZPlotData.addData(timeStamp, rawZ);
-    return true;
-}
-
-bool PacketProcessing::processAltimeterPacket() {
-    if (!validateIncomingPacketSize(sizeof(AltimeterPacket), "AltimeterPacket")) {
-        return false;
-    }
-
-    AltimeterPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawAltitude = packet.fields.rawData.members.data.rawAltitude;
-    PlotDataCenter::AltimeterPlotData.addData(timeStamp, rawAltitude);
-    return true;
-}
-
-bool PacketProcessing::processGpsPacket() {
-    if (!validateIncomingPacketSize(sizeof(GpsPacket), "GpsPacket")) {
-        return false;
-    }
-
-    GpsPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawLongitude = packet.fields.rawData.members.data.rawLongitude;
-    float rawLatitude = packet.fields.rawData.members.data.rawLatitude;
-    PlotDataCenter::GpsLongitudePlotData.addData(timeStamp, rawLongitude);
-    PlotDataCenter::GpsLatitudePlotData.addData(timeStamp, rawLatitude);
-    return true;
-}
-
-bool PacketProcessing::processMagnetometerPacket() {
-    if (!validateIncomingPacketSize(sizeof(MagnetometerPacket), "MagnetometerPacket")) {
-        return false;
-    }
-
-    MagnetometerPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawX = packet.fields.rawData.members.data.rawX;
-    float rawY = packet.fields.rawData.members.data.rawY;
-    float rawZ = packet.fields.rawData.members.data.rawZ;
-    PlotDataCenter::MagnetometerXPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::MagnetometerYPlotData.addData(timeStamp, rawX);
-    PlotDataCenter::MagnetometerZPlotData.addData(timeStamp, rawX);
-    return true;
-}
-
-bool PacketProcessing::processPressureSensorPacket() {
-    if (!validateIncomingPacketSize(sizeof(PressureSensorPacket), "PressureSensorPacket")) {
-        return false;
-    }
-
-    PressureSensorPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawPressure = packet.fields.rawData.members.data.rawPressure;
-    PlotDataCenter::PressureSensorPlotData.addData(timeStamp, rawPressure);
-    return true;
-}
-
-bool PacketProcessing::processRocketPacket() {
-    if (!validateIncomingPacketSize(sizeof(RocketPacket), "RockerPacket")) {
-        return false;
-    }
-
-    RocketPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.packet.rawData[0].members.timeStamp_ms; // TODO - changer quand yaura plus struct packet dans rocket packet
-    PlotDataCenter::RocketPlotData.addData(timeStamp, 0);
-    return true;
-}
-
-bool PacketProcessing::processTemperatureSensorPacket() {
-    if (!validateIncomingPacketSize(sizeof(TemperatureSensorPacket), "TemperatureSensorPacket")) {
-        return false;
-    }
-
-    TemperatureSensorPacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float rawTemperature = packet.fields.rawData.members.data.rawTemperature;
-    float convertVoltage = voltageConverter_V(rawTemperature);
-    float sensorIndex = packet.fields.header.values[0] & 0x000000ff;
-    float convertTemperature = pressureConverter_NAME1_PSI(convertVoltage, sensorIndex);
-    PlotDataCenter::TemperatureSensorPlotData.addData(timeStamp, convertTemperature);
-    return true;
-}
-
-bool PacketProcessing::processValvePacket() {
-    if (!validateIncomingPacketSize(sizeof(ValvePacket), "ValvePacket")) {
-        return false;
-    }
-
-    ValvePacket packet;
-    Application::serialCom.getPacket(packet.data);
-    float timeStamp = packet.fields.rawData.members.timeStamp_ms;
-    float status = packet.fields.rawData.members.status.bits.state;
-    PlotDataCenter::ValvePlotData.addData(timeStamp, status);
+    EngineStatusPacket* packet = (EngineStatusPacket*) packetBuf;
     return true;
 }
 
 bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
-    size_t packetSize = Application::serialCom.nextPacketSize();
     if (packetSize != targetPacketSize) {
-        if (!Application::serialCom.dumpNextPacket()) {
+        if (!SerialTask::com.dumpNextPacket()) {
             GCS_LOG_WARN("PacketProcessing: process{}() called, but there's no packet to process.", packetName);
             return false;
         }

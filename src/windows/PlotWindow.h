@@ -5,14 +5,21 @@
 
 #include <implot.h>
 #include <ini.h>
+#include <vector>
 
-namespace PlotWindow {
-void render();
-void loadState(const mINI::INIStructure& ini);
-void saveState(mINI::INIStructure& ini);
+class PlotWindow {
+public:
+    PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<PlotData*> plotData);
+    void render();
+    void loadState(const mINI::INIStructure& ini);
+    void saveState(mINI::INIStructure& ini);
+    std::string getWindowId();
 
-extern ImPlotFlags flags;
-extern bool autofit;
-} // namespace PlotWindow
+private:
+    std::string name, xLabel, yLabel, autofitIniId;
+    std::vector<PlotData*> plotData;
+    ImPlotFlags flags{};
+    bool autofit{};
+}; // namespace PlotWindow
 
 #endif // PLOTWINDOW_H

@@ -2,13 +2,14 @@
 
 #include "Constants.h"
 #include "ControlsWindow.h"
-#include "LedWindow.h"
 #include "Logging.h"
 #include "LoggingWindow.h"
 #include "MapWindow.h"
 #include "PacketProcessing.h"
-#include "PlotWindow.h"
+#include "PlotWindowCenter.h"
+#include "SerialControl.h"
 
+#include <SerialTask.h>
 #include <WinSock2.h>
 #include <imgui.h>
 #include <implot.h>
@@ -18,7 +19,6 @@
 namespace Application {
 mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
 mINI::INIStructure iniStructure;
-SerialCom serialCom;
 } // namespace Application
 
 void Application::loadFonts() {
@@ -39,24 +39,24 @@ void Application::init() {
 
     iniFile.read(iniStructure);
 
-    ControlsWindow::init();
     MapWindow::init();
 
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
-    PlotWindow::loadState(iniStructure);
+    PlotWindowCenter::loadState(iniStructure);
+
+    SerialTask::start();
 }
 
 void Application::preNewFrame() {
-    PacketProcessing::processIncomingPacket();
 }
 
 void Application::shutdown() {
+    SerialTask::stop();
+
     LoggingWindow::saveState(iniStructure);
     MapWindow::saveState(iniStructure);
-    PlotWindow::saveState(iniStructure);
-
-    ControlsWindow::shutdown();
+    PlotWindowCenter::saveState(iniStructure);
 
     iniFile.write(iniStructure);
 
@@ -83,11 +83,14 @@ std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
 }
 
 std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
-    HelloImGui::DockableWindow ledDockWin(Constants::GCS_LED_WINDOW_ID, Constants::GCS_LED_DOCKSPACE, []() { LedWindow::render(); });
     HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { MapWindow::render(); });
-    HelloImGui::DockableWindow plotDockWin(Constants::GCS_PLOT_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { PlotWindow::render(); });
     HelloImGui::DockableWindow controlsDockWin(Constants::GCS_CONTROLS_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { ControlsWindow::render(); });
 
-    return {ledDockWin, loggingDockWin, mapDockWin, plotDockWin, controlsDockWin};
+    std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
+    dockableWindows.push_back(loggingDockWin);
+    dockableWindows.push_back(mapDockWin);
+    dockableWindows.push_back(controlsDockWin);
+
+    return dockableWindows;
 }

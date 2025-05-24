@@ -11,7 +11,7 @@ public:
 private:
     void performConnectivityTest(std::string url);
 
-    std::mutex testMutex;
+    std::mutex mtx;
     std::atomic_bool lastFetchSuccessful{false};
 };
 

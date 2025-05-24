@@ -1,8 +1,9 @@
 #ifndef RECVBUFFER_H
 #define RECVBUFFER_H
 
-#include "Telecommunication/TelecommunicationHeader.h"
-#include "WordFormatter.h"
+#include "Logging.h"
+#include "Telecommunication/TelemetryHeader.h"
+#include "Telecommunication/TelemetryPacket.h"
 
 #include <optional>
 #include <queue>
@@ -13,7 +14,6 @@ public:
     size_t readPacket(uint8_t* recv);
     bool writeChar(uint8_t c);
     size_t availablePackets();
-    uint32_t nextPacketHeaderCode();
     size_t nextPacketSize();
     bool dumpNextPacket();
     bool isFull();
@@ -22,7 +22,6 @@ public:
 private:
     std::optional<uint32_t> searchAnyHeader(size_t idx);
     bool searchSpecificHeader(uint32_t headerCode, size_t idx);
-    uint32_t getHeaderAtIdx(size_t idx);
 
     size_t nextIndex(size_t idx, size_t increment = 1);
     size_t prevIndex(size_t idx, size_t decrement = 1);
@@ -65,12 +64,8 @@ bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
     currPacketSize++;
     bufFull = (writeIdx == readIdx);
 
-    if (currPacketSize < HEADER_SIZE_BYTE) {
-        return true;
-    }
-
-    if (currPacketSize >= HEADER_SIZE_BYTE) {
-        std::optional<uint32_t> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, HEADER_SIZE_BYTE));
+    if (currPacketSize >= sizeof(TelemetryHeader)) {
+        std::optional<uint32_t> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, sizeof(TelemetryHeader)));
         if (optionalHeaderCode.has_value()) {
             if (!writingValidPacket) {
                 writingValidPacket = true;
@@ -81,20 +76,17 @@ bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
         }
     }
 
+    if (isFull() && availablePackets() == 0) {
+        GCS_LOG_WARN("RecvBuffer: Buffer full, but no packets detected. Clearing buffer.");
+        clear();
+    }
+
     return true;
 }
 
 template <size_t BUFSIZE>
 size_t RecvBuffer<BUFSIZE>::availablePackets() {
     return availablePacketSizeQueue.size();
-}
-
-template <size_t BUFSIZE>
-inline uint32_t RecvBuffer<BUFSIZE>::nextPacketHeaderCode() {
-    if (availablePacketSizeQueue.empty()) {
-        return 0;
-    }
-    return getHeaderAtIdx(readIdx);
 }
 
 template <size_t BUFSIZE>
@@ -135,16 +127,9 @@ inline void RecvBuffer<BUFSIZE>::clear() {
 template <size_t BUFSIZE>
 std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
     // clang-format off
-    static const uint32_t HEADER_CODES[9] = {
-        ACCELEROMETER_DATA_HEADER_CODE,
-        GYROSCOPE_DATA_HEADER_CODE,
-        ALTIMETER_DATA_HEADER_CODE,
-        GPS_DATA_HEADER_CODE,
-        MAGNETOMETER_DATA_HEADER_CODE,
-        PRESSURE_SENSOR_DATA_HEADER_CODE,
-        ROCKET_DATA_HEADER_CODE,
-        TEMPERATURE_SENSOR_DATA_HEADER_CODE,
-        VALVE_DATA_HEADER_CODE
+    static const uint32_t HEADER_CODES[] = {
+        TELEMETRY_HEADER_TYPE_TELEMETRY,
+        TELEMETRY_HEADER_TYPE_STATUS
     };
     // clang-format on
 
@@ -153,19 +138,14 @@ std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
             return headerCode;
         }
     }
-
     return {};
 }
 
 template <size_t BUFSIZE>
 bool RecvBuffer<BUFSIZE>::searchSpecificHeader(uint32_t headerCode, size_t idx) {
-    return headerCode == getHeaderAtIdx(idx);
-}
-
-template <size_t BUFSIZE>
-inline uint32_t RecvBuffer<BUFSIZE>::getHeaderAtIdx(size_t idx) {
-    // The header code is received in reverse order (little endian), so it needs to be flipped (Ex. Received as \0MHT, converted to THM\0)
-    return (buf[nextIndex(idx, 1)] << 8) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 3)] << 24);
+    TelemetryHeader header;
+    header.value = (buf[nextIndex(idx, 3)] << 24) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 1)] << 8) | buf[idx];
+    return headerCode == header.bits.type;
 }
 
 template <size_t BUFSIZE>

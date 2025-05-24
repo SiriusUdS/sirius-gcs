@@ -2,6 +2,7 @@
 #define PLOTDATA_H
 
 #include <imgui.h>
+#include <mutex>
 #include <vector>
 
 /**
@@ -10,20 +11,21 @@
  */
 class PlotData {
 public:
-    PlotData();
+    PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
-    void setName(const char* n);
-    void setColor(ImVec4 c);
+    void compress(size_t targetSize);
+    void dropOldData(size_t amount);
     void plot() const;
 
 private:
-    static const int BASE_DATA_VECTOR_CAPACITY = 1000;
-
     std::vector<float> vx;
     std::vector<float> vy;
+    std::vector<float> compressedVx;
+    std::vector<float> compressedVy;
     const char* name;
     ImVec4 color;
     float weight;
+    mutable std::mutex mtx;
 };
 
 #endif // PLOTDATA_H

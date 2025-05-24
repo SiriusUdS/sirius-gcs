@@ -1,6 +1,7 @@
 #include "ControlsWindow.h"
 
-#include "Application.h"
+#include "CommandDispatch.h"
+#include "SerialTask.h"
 
 #include <imgui.h>
 
@@ -10,93 +11,18 @@ ValveState valveState2{ValveState::CLOSED};
 } // namespace ControlsWindow
 
 namespace ControlsWindow {
-void init() {
-    // serialTest.start();
-}
-
 void render() {
-    if (ImGui::CollapsingHeader("Valves")) {
-        ImGui::TextUnformatted("Valve 1");
-        ImGui::SameLine();
-        renderValveState("valve1", valveState1);
-
-        ImGui::TextUnformatted("Valve 2");
-        ImGui::SameLine();
-        renderValveState("valve2", valveState2);
-    }
-
-    static char sendPacket[13] = "bonjour hi! ";
-    static char recvPacket[512] = {0};
-
     if (ImGui::CollapsingHeader("Serial")) {
         ImGui::Text("COM Opened: ");
         ImGui::SameLine();
-        ImGui::Text(Application::serialCom.comOpened() ? "Yes" : "No");
+        ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
 
-        if (ImGui::Button("Open COM")) {
-            Application::serialCom.start();
-            if (Application::serialCom.comOpened()) {
-                GCS_LOG_INFO("ControlsWindow: COM opened.");
-            } else {
-                GCS_LOG_WARN("ControlsWindow: Couldn't open COM port.");
-            }
-        }
+        ImGui::Text("Packets read/s: %d", SerialTask::com.packetsReadPerSecond());
+        // ImGui::Text("Loop time SerialTask: %2.6f", SerialTask::secondsSinceLastUpdate());
 
-        if (ImGui::Button("Send test packet")) {
-            bool success = Application::serialCom.write((uint8_t*) sendPacket, 12);
-            if (success) {
-                GCS_LOG_INFO("ControlsWindow: Sent following packet: {}", sendPacket);
-            } else {
-                GCS_LOG_WARN("ControlsWindow: Couldn't send packet.");
-            }
-        }
-
-        if (ImGui::Button("Read incoming packet")) {
-            size_t size = Application::serialCom.getPacket((uint8_t*) recvPacket);
-            if (size > 0) {
-                for (int i = 0; i < size; i++) {
-                    if (recvPacket[i] == '\0') {
-                        recvPacket[i] = '_';
-                    }
-                }
-                recvPacket[size] = '\0';
-                GCS_LOG_INFO("ControlsWindow: Received packet of size {}, contents are: {}", size, recvPacket);
-            } else {
-                GCS_LOG_WARN("ControlsWindow: Can't receive packet, no packets are available.");
-            }
+        if (ImGui::Button("Send test command")) {
+            CommandDispatch::test();
         }
     }
-
-    Application::serialCom.read();
-}
-
-void renderValveState(const char* id, ValveState state) {
-    ImVec4 buttonColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    const char* buttonLabel = "Undefined";
-
-    if (state == ValveState::OPEN) {
-        buttonColor = ImVec4(0.0f, 0.6f, 0.0f, 1.0f);
-        buttonLabel = "Open";
-    } else if (state == ValveState::CLOSED) {
-        buttonColor = ImVec4(0.6f, 0.0f, 0.0f, 1.0f);
-        buttonLabel = "Closed";
-    } else if (state == ValveState::OPENING) {
-        buttonColor = ImVec4(0.0f, 0.6f, 0.0f, 1.0f);
-        buttonLabel = "Opening";
-    } else if (state == ValveState::CLOSING) {
-        buttonColor = ImVec4(0.6f, 0.0f, 0.0f, 1.0f);
-        buttonLabel = "Closing";
-    }
-
-    ImGui::PushStyleColor(ImGuiCol_Button, buttonColor);
-    ImGui::BeginDisabled();
-    std::string buttonID = std::string(buttonLabel) + "##" + id;
-    ImGui::Button(buttonID.c_str(), ImVec2(200.0f, 0.0f));
-    ImGui::EndDisabled();
-    ImGui::PopStyleColor(1);
-}
-
-void shutdown() {
-    Application::serialCom.shutdown();
 }
 } // namespace ControlsWindow

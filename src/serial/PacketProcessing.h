@@ -8,18 +8,12 @@
 
 namespace PacketProcessing {
 bool processIncomingPacket();
-
-bool processAccelerometerPacket();
-bool processGyroscopePacket();
-bool processAltimeterPacket();
-bool processGpsPacket();
-bool processMagnetometerPacket();
-bool processPressureSensorPacket();
-bool processRocketPacket();
-bool processTemperatureSensorPacket();
-bool processValvePacket();
-
+bool processTelemetryPacket();
+bool processStatusPacket();
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
+
+extern size_t packetSize;
+extern uint8_t packetBuf[Constants::RECV_PACKET_MAX_SIZE];
 } // namespace PacketProcessing
 
 #endif // PACKETPROCESSING_H
