@@ -5,7 +5,7 @@
 #include "Telecommunication/BoardCommand.h"
 
 void CommandDispatch::test() {
-    if (CommandCenter::available()) {
+    if (!CommandCenter::available()) {
         GCS_LOG_WARN("CommandDispatch: Couldn't send command, another command is already being processed.");
         return;
     }
