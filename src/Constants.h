@@ -8,7 +8,11 @@ constexpr const char* GCS_MAP_WINDOW_ID = "Map";
 constexpr const char* GCS_BASE_PLOT_WINDOW_ID = "Plot - ";
 constexpr const char* GCS_CONTROLS_WINDOW_ID = "Controls";
 
-// Plot/axis names
+// Plot
+constexpr size_t PLOT_MAX_DATA_SIZE_ORIGINAL = 100'000;
+constexpr size_t PLOT_DATA_AMOUNT_TO_DROP_IF_MAX_REACHED = 10'000;
+constexpr size_t PLOT_MAX_DATA_SIZE_COMPRESSED = 20'000;
+constexpr size_t PLOT_TARGET_DATA_SIZE_COMPRESSED = 10'000;
 constexpr const char* PLOT_AXIS_TIMESTAMP_NAME = "Timestamp (ms)";
 
 // Map component

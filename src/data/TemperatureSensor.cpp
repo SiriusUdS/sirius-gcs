@@ -35,7 +35,7 @@ float TemperatureSensor::convertToTemperature(float adcValue) {
             GCS_LOG_INFO("Too high temperature!");
             return -1;
         } else {
-            GCS_LOG_INFO("Temperature: {}°C", temperature);
+            GCS_LOG_INFO("Temperature: {}C", temperature);
         }
     }
 
