@@ -17,7 +17,6 @@ bool CommandCenter::available() {
 }
 
 bool CommandCenter::ready(size_t commandSize) {
-    std::lock_guard<std::mutex> lock(mtx);
     if (command.state != CommandState::NONE) {
         GCS_LOG_WARN("CommandCenter: Couldn't mark command as ready, another command is already being processed.");
         return false;
@@ -28,17 +27,18 @@ bool CommandCenter::ready(size_t commandSize) {
 }
 
 bool CommandCenter::processAck() {
-    std::lock_guard<std::mutex> lock(mtx);
     // TODO: Write ack function
     return true;
 }
 
 void CommandCenter::processCommand() {
-    std::lock_guard<std::mutex> lock(mtx);
     if (command.state == CommandState::READY) {
-        SerialTask::com.write(command.data, command.size);
-        command.state = CommandState::SENT;
-        command.lastTimeSent = std::chrono::steady_clock::now();
+        if (SerialTask::com.write(command.data, command.size)) {
+            command.state = CommandState::SENT;
+            command.lastTimeSent = std::chrono::steady_clock::now();
+        } else {
+            GCS_LOG_ERROR("CommandCenter: Couldn't send command over serial communication.");
+        }
     } else if (command.state == CommandState::SENT) {
         command.state = CommandState::NONE; // TODO: Switch this back to sent later so ack can be processed
         // auto now = std::chrono::steady_clock::now();

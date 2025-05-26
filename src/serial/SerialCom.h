@@ -29,7 +29,7 @@ public:
 private:
     size_t consecutiveFailedReads{};
     size_t consecutiveFailedWrites{};
-    size_t packetsRead{};
+    std::atomic<size_t> packetsRead{};
     std::chrono::time_point<std::chrono::steady_clock> comStartTimePoint;
     ceSerial com;
     RecvBuffer<Constants::RECV_BUF_SIZE> recvBuf;

@@ -13,7 +13,6 @@ bool processAck();
 void processCommand();
 
 extern Command command;
-extern std::mutex mtx;
 } // namespace CommandCenter
 
 #endif // COMMANDCENTER_H
