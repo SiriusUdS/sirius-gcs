@@ -16,6 +16,17 @@ float TemperatureSensor::interpolateTemperature(float measuredResistance) {
 }
 
 float TemperatureSensor::convertToTemperature(float adcValue) {
+    // TEMP
+    if (Constants::ADDITIVE_FACTOR - adcValue == 0) {
+        GCS_LOG_ERROR("THIS IS BAD");
+        return -1;
+    }
+    float voltage = (adcValue / 4096.0f) * 3.3f;
+    float resistance = (3.3f / voltage) * Constants::CONTROL_RESISTANCE;
+    float measuredResistance = (Constants::CONTROL_RESISTANCE * adcValue) / (Constants::ADDITIVE_FACTOR - adcValue); // Resistor value
+    return interpolateTemperature(resistance);
+    // END
+
     float temperature = 0.0;
 
     if (adcValue < Constants::ADC_MIN_TEMPERATURE) {
@@ -25,7 +36,7 @@ float TemperatureSensor::convertToTemperature(float adcValue) {
         GCS_LOG_ERROR("Short circuit detected on thermistor !");
         return -1;
     } else {
-        float measuredResistance = (Constants::MULTIPLICATIVE_FACTOR * adcValue) / (Constants::ADDITIVE_FACTOR - adcValue); // Resistor value
+        float measuredResistance = (Constants::CONTROL_RESISTANCE * adcValue) / (Constants::ADDITIVE_FACTOR - adcValue); // Resistor value
         temperature = interpolateTemperature(measuredResistance);
 
         if (temperature < Constants::MIN_TEMPERATURE) {

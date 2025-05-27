@@ -13,7 +13,7 @@ Command& CommandCenter::get() {
 }
 
 bool CommandCenter::available() {
-    return command.state == CommandState::NONE;
+    return command.state == CommandState::NONE && SerialTask::com.comOpened();
 }
 
 bool CommandCenter::ready(size_t commandSize) {

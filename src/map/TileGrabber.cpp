@@ -93,7 +93,7 @@ TileGrabber::FutureData TileGrabber::onLaunchGrab(const double minLat, const dou
                     std::erase_if(tiles, [](const auto& tile) { return tile->isDummy(); });
                     _source->takeAll(tiles);
                     _saver->saveMulti(tiles);
-                    _tileCounter += tiles.size();
+                    _tileCounter += (int) tiles.size();
                 }
                 _source->request(z, x, y);
             }
@@ -103,7 +103,7 @@ TileGrabber::FutureData TileGrabber::onLaunchGrab(const double minLat, const dou
     tiles.clear();
     _source->takeAll(tiles);
     _saver->saveMulti(tiles);
-    _tileCounter += tiles.size();
+    _tileCounter += (int) tiles.size();
 
     _isDone = true;
     return data;

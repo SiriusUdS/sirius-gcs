@@ -61,14 +61,14 @@ bool PacketProcessing::processTelemetryPacket() {
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
     float timeStamp = (float) packet->fields.timestamp_ms;
 
-    PlotDataCenter::Thermistor1PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[0]));
-    PlotDataCenter::Thermistor2PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[1]));
-    PlotDataCenter::Thermistor3PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[2]));
-    PlotDataCenter::Thermistor4PlotData.addData(timeStamp, ((float) packet->fields.adcValues[3]));
-    PlotDataCenter::Thermistor5PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[4]));
-    PlotDataCenter::Thermistor6PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[5]));
-    PlotDataCenter::Thermistor7PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[6]));
-    PlotDataCenter::Thermistor8PlotData.addData(timeStamp, TemperatureSensor::convertToTemperature((float) packet->fields.adcValues[7]));
+    PlotDataCenter::Thermistor1PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[0]));
+    PlotDataCenter::Thermistor2PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[1]));
+    PlotDataCenter::Thermistor3PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[2]));
+    PlotDataCenter::Thermistor4PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[3]));
+    PlotDataCenter::Thermistor5PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[4]));
+    PlotDataCenter::Thermistor6PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[5]));
+    PlotDataCenter::Thermistor7PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[6]));
+    PlotDataCenter::Thermistor8PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[7]));
 
     // PlotDataCenter::ADC9PlotData.addData(timeStamp, (float) packet->fields.adcValues[8]);
     // PlotDataCenter::ADC10PlotData.addData(timeStamp, (float) packet->fields.adcValues[9]);

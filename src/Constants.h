@@ -45,7 +45,7 @@ constexpr float ADC_MIN_TEMPERATURE = 10;
 constexpr float ADC_MAX_TEMPERATURE = 4090;
 constexpr int MAX_TEMPERATURE = 100;
 constexpr int MIN_TEMPERATURE = 0;
-constexpr float MULTIPLICATIVE_FACTOR = 10000;
+constexpr float CONTROL_RESISTANCE = 10'000.0f;
 constexpr float ADDITIVE_FACTOR = 4096;
 typedef struct {
     float TEMPERATURE;

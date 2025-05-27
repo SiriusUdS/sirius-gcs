@@ -320,8 +320,14 @@ inline long ceSerial::Open() {
 inline void ceSerial::Close() {
     if (IsOpened()) {
         SetCommTimeouts(hComm, &timeouts_ori);
-        CloseHandle(osReader.hEvent);
-        CloseHandle(osWrite.hEvent);
+        if (osReader.hEvent) {
+            CloseHandle(osReader.hEvent);
+            osReader.hEvent = NULL;
+        }
+        if (osWrite.hEvent) {
+            CloseHandle(osWrite.hEvent);
+            osWrite.hEvent = NULL;
+        }
         CloseHandle(hComm); // close comm port
         hComm = INVALID_HANDLE_VALUE;
     }

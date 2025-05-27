@@ -22,6 +22,10 @@ public:
     bool isStopping();
     bool done();
 
+    /**
+     * @brief The number of tiles that have been grabbed
+     * @returns Number of tiles grabbed
+     */
     inline int tileCounter() const {
         return _tileCounter.load();
     }
