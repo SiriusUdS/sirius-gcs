@@ -35,9 +35,13 @@ public:
         return _requestLimit;
     }
 
+    /**
+     * @struct TileData
+     * @brief The data of a single asynchronously fetched tile
+     */
     struct TileData {
-        std::atomic_bool& interrupt;
-        std::vector<std::byte> blob;
+        std::atomic_bool& interrupt; ///< Whether to interrupt the fetching of this tile's data
+        std::vector<std::byte> blob; ///< The tile's raw data blob
     };
 
 protected:

@@ -11,6 +11,13 @@
 #include <implot.h>
 #include <ini.h>
 
+/**
+ * @brief Constructs a plot window
+ * @param name Name of the plot window
+ * @param xLabel Text to display along the X axis
+ * @param yLabel Text to display along the Y axis
+ * @param plotData The plot data object to render the data from on the plot
+ */
 PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<PlotData*> plotData)
     : name(name), xLabel(xLabel), yLabel(yLabel), plotData(plotData) {
     autofitIniId = std::string(name) + std::string(Constants::GCS_INI_BASE_PLOT_WINDOW_AUTO_FIT);
