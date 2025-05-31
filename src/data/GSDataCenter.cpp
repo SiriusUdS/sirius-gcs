@@ -1,8 +1,8 @@
-#include "PlotDataCenter.h"
+#include "GSDataCenter.h"
 
 #include "PlotColors.h"
 
-namespace PlotDataCenter {
+namespace GSDataCenter {
 PlotData Thermistor1PlotData("Thermistor 1", PlotColors::BLUE);
 PlotData Thermistor2PlotData("Thermistor 2", PlotColors::RED);
 PlotData Thermistor3PlotData("Thermistor 3", PlotColors::GREEN);
@@ -15,4 +15,6 @@ PlotData PressureSensor1PlotData("Pressure Sensor 1", PlotColors::BLUE);
 PlotData PressureSensor2PlotData("Pressure Sensor 2", PlotColors::RED);
 PlotData LoadCell1PlotData("Load Cell 1", PlotColors::BLUE);
 PlotData LoadCell2PlotData("Load Cell 2", PlotColors::RED);
-} // namespace PlotDataCenter
+
+std::vector<SwitchData> SwitchDataVec({{"Switch 1", false}, {"Switch 2", true}, {"Switch 3", false}});
+} // namespace GSDataCenter

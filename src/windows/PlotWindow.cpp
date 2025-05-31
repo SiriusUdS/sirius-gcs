@@ -1,10 +1,6 @@
 #include "PlotWindow.h"
 
 #include "Constants.h"
-#include "Logging.h"
-#include "PacketProcessing.h"
-#include "PlotColors.h"
-#include "PlotDataCenter.h"
 #include "Utils.h"
 
 #include <imgui.h>

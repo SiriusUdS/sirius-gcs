@@ -8,6 +8,7 @@
 #include "PacketProcessing.h"
 #include "PlotWindowCenter.h"
 #include "SerialControl.h"
+#include "SwitchesWindow.h"
 
 #include <SerialTask.h>
 #include <WinSock2.h>
@@ -86,11 +87,13 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { MapWindow::render(); });
     HelloImGui::DockableWindow controlsDockWin(Constants::GCS_CONTROLS_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { ControlsWindow::render(); });
+    HelloImGui::DockableWindow switchesDockWin(Constants::GCS_SWITCHES_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { SwitchesWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
     dockableWindows.push_back(loggingDockWin);
     dockableWindows.push_back(mapDockWin);
     dockableWindows.push_back(controlsDockWin);
+    dockableWindows.push_back(switchesDockWin);
 
     return dockableWindows;
 }

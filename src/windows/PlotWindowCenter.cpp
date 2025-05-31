@@ -1,16 +1,16 @@
 #include "PlotWindowCenter.h"
 
 #include "Constants.h"
-#include "PlotDataCenter.h"
+#include "GSDataCenter.h"
 
 namespace PlotWindowCenter {
 // clang-format off
 PlotWindow thermistorPlot           ("Thermistors", Constants::PLOT_AXIS_TIMESTAMP_NAME, "Temperature (C)",
-                                     {&PlotDataCenter::Thermistor1PlotData, &PlotDataCenter::Thermistor2PlotData, &PlotDataCenter::Thermistor3PlotData, &PlotDataCenter::Thermistor4PlotData, &PlotDataCenter::Thermistor5PlotData, &PlotDataCenter::Thermistor6PlotData, &PlotDataCenter::Thermistor7PlotData, &PlotDataCenter::Thermistor8PlotData});
+                                     {&GSDataCenter::Thermistor1PlotData, &GSDataCenter::Thermistor2PlotData, &GSDataCenter::Thermistor3PlotData, &GSDataCenter::Thermistor4PlotData, &GSDataCenter::Thermistor5PlotData, &GSDataCenter::Thermistor6PlotData, &GSDataCenter::Thermistor7PlotData, &GSDataCenter::Thermistor8PlotData});
 PlotWindow pressureSensorPlot       ("Pressure Sensors", Constants::PLOT_AXIS_TIMESTAMP_NAME, "Pressure (psi)",
-                                     {&PlotDataCenter::PressureSensor1PlotData, &PlotDataCenter::PressureSensor2PlotData});
+                                     {&GSDataCenter::PressureSensor1PlotData, &GSDataCenter::PressureSensor2PlotData});
 PlotWindow loadCellPlot             ("Load Cells", Constants::PLOT_AXIS_TIMESTAMP_NAME, "Weight (lb)",
-                                     {&PlotDataCenter::LoadCell1PlotData, &PlotDataCenter::LoadCell2PlotData});
+                                     {&GSDataCenter::LoadCell1PlotData, &GSDataCenter::LoadCell2PlotData});
 // clang-format on
 } // namespace PlotWindowCenter
 

@@ -7,6 +7,7 @@ constexpr const char* GCS_LOGGING_WINDOW_ID = "Logs";
 constexpr const char* GCS_MAP_WINDOW_ID = "Map";
 constexpr const char* GCS_BASE_PLOT_WINDOW_ID = "Plot - ";
 constexpr const char* GCS_CONTROLS_WINDOW_ID = "Controls";
+constexpr const char* GCS_SWITCHES_WINDOW_ID = "Switches";
 
 // Plot
 constexpr size_t PLOT_MAX_DATA_SIZE_ORIGINAL = 100'000;
