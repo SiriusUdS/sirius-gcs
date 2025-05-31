@@ -5,7 +5,7 @@ struct SwitchData;
 
 namespace SwitchesWindow {
 void render();
-void showSwitchState(const SwitchData& data);
+void showSwitchState(const SwitchData* data);
 } // namespace SwitchesWindow
 
 #endif // SWITCHESWINDOW_H

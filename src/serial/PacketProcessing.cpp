@@ -6,6 +6,7 @@
 #include "PressureTransducer.h"
 #include "SerialCom.h"
 #include "SerialTask.h"
+#include "SwitchData.h"
 #include "Telecommunication/TelemetryPacket.h"
 #include "TemperatureSensor.h"
 
@@ -72,10 +73,10 @@ bool PacketProcessing::processTelemetryPacket() {
     GSDataCenter::Thermistor7PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[6]));
     GSDataCenter::Thermistor8PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[7]));
 
-    float pressureSensor1 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[10], 3);
-    float pressureSensor2 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[11], 3);
-    GSDataCenter::PressureSensor1PlotData.addData(timeStamp, pressureSensor1);
-    GSDataCenter::PressureSensor2PlotData.addData(timeStamp, pressureSensor2);
+    const float PRESSURE_SENSOR_1 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[10], 3);
+    const float PRESSURE_SENSOR_2 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[11], 3);
+    GSDataCenter::PressureSensor1PlotData.addData(timeStamp, PRESSURE_SENSOR_1);
+    GSDataCenter::PressureSensor2PlotData.addData(timeStamp, PRESSURE_SENSOR_2);
     // GSDataCenter::PressureSensor1PlotData.addData(timeStamp, packet->fields.adcValues[10]);
     // GSDataCenter::PressureSensor2PlotData.addData(timeStamp, packet->fields.adcValues[11]);
 
@@ -91,6 +92,15 @@ bool PacketProcessing::processGSControlPacket() {
     }
 
     GSControlStatusPacket* packet = (GSControlStatusPacket*) packetBuf;
+
+    GSDataCenter::AllowDumpSwitchData.isOn = packet->fields.status.bits.isAllowDumpSwitchOn;
+    GSDataCenter::AllowFillSwitchData.isOn = packet->fields.status.bits.isAllowFillSwitchOn;
+    GSDataCenter::ArmIgniterSwitchData.isOn = packet->fields.status.bits.isArmIgniterSwitchOn;
+    GSDataCenter::ArmServoSwitchData.isOn = packet->fields.status.bits.isArmServoSwitchOn;
+    GSDataCenter::EmergencyStopButtonData.isOn = packet->fields.status.bits.isEmergencyStopButtonPressed;
+    GSDataCenter::FireIgniterButtonData.isOn = packet->fields.status.bits.isFireIgniterButtonPressed;
+    GSDataCenter::UnsafeKeySwitchData.isOn = packet->fields.status.bits.isUnsafeKeySwitchPressed;
+    GSDataCenter::ValveStartButtonData.isOn = packet->fields.status.bits.isValveStartButtonPressed;
 
     return true;
 }

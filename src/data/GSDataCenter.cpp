@@ -18,12 +18,14 @@ PlotData PressureSensor2PlotData("Pressure Sensor 2", PlotColors::RED);
 PlotData LoadCell1PlotData("Load Cell 1", PlotColors::BLUE);
 PlotData LoadCell2PlotData("Load Cell 2", PlotColors::RED);
 
-SwitchData SwitchData1("Switch 1", false);
-SwitchData SwitchData2("Switch 2", true);
-SwitchData SwitchData3("Switch 3", false);
-SwitchData SwitchData4("Switch 4", true);
-SwitchData SwitchData5("Switch 5", false);
-SwitchData SwitchData6("Switch 6", true);
-SwitchData SwitchData7("Switch 7", false);
-std::vector<SwitchData> SwitchDataVec({SwitchData1, SwitchData2, SwitchData3, SwitchData4, SwitchData5, SwitchData6, SwitchData7});
+SwitchData AllowDumpSwitchData("Allow Dump", false);
+SwitchData AllowFillSwitchData("Allow Fill", false);
+SwitchData ArmIgniterSwitchData("Arm Igniter", false);
+SwitchData ArmServoSwitchData("Arm Servo", false);
+SwitchData EmergencyStopButtonData("Emergency Stop", false);
+SwitchData FireIgniterButtonData("Fire Igniter", false);
+SwitchData UnsafeKeySwitchData("Unsafe Key", false);
+SwitchData ValveStartButtonData("Valve Start", false);
+std::vector<SwitchData*> SwitchDataVec({&AllowDumpSwitchData, &AllowFillSwitchData, &ArmIgniterSwitchData, &ArmServoSwitchData,
+                                        &EmergencyStopButtonData, &FireIgniterButtonData, &UnsafeKeySwitchData, &ValveStartButtonData});
 } // namespace GSDataCenter

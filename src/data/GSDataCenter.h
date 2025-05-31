@@ -20,14 +20,15 @@ extern PlotData PressureSensor2PlotData;
 extern PlotData LoadCell1PlotData;
 extern PlotData LoadCell2PlotData;
 
-extern SwitchData SwitchData1;
-extern SwitchData SwitchData2;
-extern SwitchData SwitchData3;
-extern SwitchData SwitchData4;
-extern SwitchData SwitchData5;
-extern SwitchData SwitchData6;
-extern SwitchData SwitchData7;
-extern std::vector<SwitchData> SwitchDataVec;
+extern SwitchData AllowDumpSwitchData;
+extern SwitchData AllowFillSwitchData;
+extern SwitchData ArmIgniterSwitchData;
+extern SwitchData ArmServoSwitchData;
+extern SwitchData EmergencyStopButtonData;
+extern SwitchData FireIgniterButtonData;
+extern SwitchData UnsafeKeySwitchData;
+extern SwitchData ValveStartButtonData;
+extern std::vector<SwitchData*> SwitchDataVec;
 } // namespace GSDataCenter
 
 #endif // GSDATACENTER_H

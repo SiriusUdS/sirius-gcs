@@ -8,7 +8,7 @@ static const size_t TEST_RECVBUFFER_SIZE = 1000;
 
 bool writeTelemetryPacketToRecvBuffer(RecvBuffer<TEST_RECVBUFFER_SIZE>& recvBuf) {
     EngineTelemetryPacket packet;
-    packet.fields.header.bits.type = TELEMETRY_HEADER_TYPE_TELEMETRY;
+    packet.fields.header.bits.type = TELEMETRY_TYPE_CODE;
     packet.fields.header.bits.boardId = 1;
 
     for (uint16_t i = 0; i < ENGINE_ADC_CHANNEL_AMOUNT; i++) {
@@ -25,13 +25,9 @@ bool writeTelemetryPacketToRecvBuffer(RecvBuffer<TEST_RECVBUFFER_SIZE>& recvBuf)
 
 bool writeStatusPacketToRecvBuffer(RecvBuffer<TEST_RECVBUFFER_SIZE>& recvBuf) {
     EngineStatusPacket packet;
-    packet.fields.header.bits.type = TELEMETRY_HEADER_TYPE_STATUS;
+    packet.fields.header.bits.type = STATUS_TYPE_CODE;
     packet.fields.header.bits.boardId = 1;
-
-    packet.fields.engineStatus = 1;
-    for (uint16_t i = 0; i < ENGINE_VALVE_AMOUNT; i++) {
-        packet.fields.valvesStatus[i] = i;
-    }
+    packet.fields.valveStatus->value = 1010;
 
     for (size_t i = 0; i < sizeof(EngineStatusPacketFields); i++) {
         if (!recvBuf.writeChar(packet.data[i])) {
@@ -99,7 +95,7 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         SUBCASE("Split after 1st header code character") {
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
-            CHECK(fillRecvBuffer(recvBuf, 919));
+            CHECK(fillRecvBuffer(recvBuf, 911));
             dataSize = recvBuf.readPacket(rcv);
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
             CHECK(recvBuf.availablePackets() == 1);
@@ -108,7 +104,7 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         SUBCASE("Split after 2st header code character") {
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
-            CHECK(fillRecvBuffer(recvBuf, 918));
+            CHECK(fillRecvBuffer(recvBuf, 910));
             dataSize = recvBuf.readPacket(rcv);
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
             CHECK(recvBuf.availablePackets() == 1);
@@ -117,7 +113,7 @@ TEST_CASE("Should detect correct amount of packets during writes") {
         SUBCASE("Split after 3st header code character") {
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
-            CHECK(fillRecvBuffer(recvBuf, 917));
+            CHECK(fillRecvBuffer(recvBuf, 909));
             dataSize = recvBuf.readPacket(rcv);
             CHECK(writeStatusPacketToRecvBuffer(recvBuf));
             CHECK(recvBuf.availablePackets() == 1);
@@ -133,16 +129,16 @@ TEST_CASE("Should be able to detect next packet size and dump packets correctly"
     CHECK(writeStatusPacketToRecvBuffer(recvBuf));
     CHECK(writeTelemetryPacketToRecvBuffer(recvBuf));
     CHECK(writeStatusPacketToRecvBuffer(recvBuf));
-    CHECK(recvBuf.nextPacketSize() == 40);
+    CHECK(recvBuf.nextPacketSize() == sizeof(EngineStatusPacket));
 
     CHECK(recvBuf.dumpNextPacket());
-    CHECK(recvBuf.nextPacketSize() == 44);
+    CHECK(recvBuf.nextPacketSize() == sizeof(EngineTelemetryPacket));
 
     CHECK(recvBuf.dumpNextPacket());
-    CHECK(recvBuf.nextPacketSize() == 40);
+    CHECK(recvBuf.nextPacketSize() == sizeof(EngineStatusPacket));
 
     CHECK(recvBuf.dumpNextPacket());
-    CHECK(recvBuf.nextPacketSize() == 44);
+    CHECK(recvBuf.nextPacketSize() == sizeof(EngineTelemetryPacket));
 
     CHECK(recvBuf.dumpNextPacket());
     CHECK(recvBuf.nextPacketSize() == 0);
@@ -169,18 +165,15 @@ TEST_CASE("Should read packets correctly") {
         CHECK(fillRecvBuffer(recvBuf, 900));
         CHECK(writeStatusPacketToRecvBuffer(recvBuf));
         dataSize = recvBuf.readPacket(rcv);
-        CHECK(dataSize == 940);
+        CHECK(dataSize == 900 + sizeof(EngineStatusPacket));
         CHECK(writeStatusPacketToRecvBuffer(recvBuf));
         CHECK(writeStatusPacketToRecvBuffer(recvBuf));
         dataSize = recvBuf.readPacket(rcv);
-        CHECK(dataSize == 40);
+        CHECK(dataSize == sizeof(EngineStatusPacket));
         dataSize = recvBuf.readPacket(rcv);
-        CHECK(dataSize == 40);
+        CHECK(dataSize == sizeof(EngineStatusPacket));
         EngineStatusPacket* packet = (EngineStatusPacket*) rcv;
-        CHECK(packet->fields.engineStatus == 1);
-        for (uint16_t i = 0; i < ENGINE_VALVE_AMOUNT; i++) {
-            CHECK(packet->fields.valvesStatus[i] == i);
-        }
+        CHECK(packet->fields.valveStatus->value == 1010);
     }
 }
 
