@@ -2,6 +2,7 @@
 
 #include "CommandCenter.h"
 #include "PacketProcessing.h"
+#include "SerialCom.h"
 #include "SerialControl.h"
 
 namespace SerialTask {

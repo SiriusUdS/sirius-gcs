@@ -128,8 +128,8 @@ template <size_t BUFSIZE>
 std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
     // clang-format off
     static const uint32_t HEADER_CODES[] = {
-        TELEMETRY_HEADER_TYPE_TELEMETRY,
-        TELEMETRY_HEADER_TYPE_STATUS
+        TELEMETRY_TYPE_CODE,
+        STATUS_TYPE_CODE
     };
     // clang-format on
 

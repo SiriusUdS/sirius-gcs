@@ -1,10 +1,11 @@
 #ifndef SERIALTASK_H
 #define SERIALTASK_H
 
-#include "SerialCom.h"
-
 #include <atomic>
 #include <chrono>
+#include <thread>
+
+class SerialCom;
 
 namespace SerialTask {
 void start();

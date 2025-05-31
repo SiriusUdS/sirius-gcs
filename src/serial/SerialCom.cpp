@@ -19,6 +19,7 @@ void SerialCom::start() {
 
     std::string comPath = std::string("\\\\.\\") + availableComPorts[0];
     com.SetPortName(comPath);
+    com.SetBaudRate(CBR_19200);
     com.Open();
     {
         std::lock_guard<std::mutex> lock(mtx);

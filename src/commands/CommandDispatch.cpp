@@ -1,5 +1,6 @@
 #include "CommandDispatch.h"
 
+#include "Command.h"
 #include "CommandCenter.h"
 #include "Logging.h"
 #include "Telecommunication/BoardCommand.h"

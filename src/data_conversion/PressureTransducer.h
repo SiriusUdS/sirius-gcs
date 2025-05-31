@@ -1,7 +1,7 @@
 #ifndef PRESSURETRANSDUCER_H
 #define PRESSURETRANSDUCER_H
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace PressureTransducer {
 #define PRESSURE_SENSOR_VOLTAGE_RANGE_V 3.3f

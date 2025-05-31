@@ -1,9 +1,9 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include "ImGuiTextBufferSink.h"
-
 #include <spdlog/spdlog.h>
+
+class ImGuiTextBufferSink;
 
 namespace Logging {
 void init();

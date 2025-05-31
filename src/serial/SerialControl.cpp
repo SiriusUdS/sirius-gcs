@@ -1,6 +1,7 @@
 #include "SerialControl.h"
 
 #include "Constants.h"
+#include "SerialCom.h"
 #include "SerialTask.h"
 
 namespace SerialControl {

@@ -1,9 +1,7 @@
 #ifndef COMMANDCENTER_H
 #define COMMANDCENTER_H
 
-#include "Command.h"
-
-#include <mutex>
+struct Command;
 
 namespace CommandCenter {
 Command& get();

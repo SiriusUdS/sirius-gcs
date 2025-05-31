@@ -1,8 +1,10 @@
 #include "SwitchesWindow.h"
 
 #include "GSDataCenter.h"
+#include "SwitchData.h"
 
 #include <imgui.h>
+#include <string>
 
 void SwitchesWindow::render() {
     for (const SwitchData& switchData : GSDataCenter::SwitchDataVec) {
@@ -13,7 +15,7 @@ void SwitchesWindow::render() {
     }
 }
 
-void SwitchesWindow::showSwitchState(const SwitchData data) {
+void SwitchesWindow::showSwitchState(const SwitchData& data) {
     std::string label = data.isOn ? "ON###" : "OFF###";
     label += data.name;
     ImVec4 color = data.isOn ? ImVec4(0.0f, 0.45f, 0.0f, 1.0f)  // Green

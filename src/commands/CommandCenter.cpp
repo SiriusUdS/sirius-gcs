@@ -1,6 +1,8 @@
 #include "CommandCenter.h"
 
+#include "Command.h"
 #include "Logging.h"
+#include "SerialCom.h"
 #include "SerialTask.h"
 
 namespace CommandCenter {
@@ -40,12 +42,6 @@ void CommandCenter::processCommand() {
             GCS_LOG_ERROR("CommandCenter: Couldn't send command over serial communication.");
         }
     } else if (command.state == CommandState::SENT) {
-        command.state = CommandState::NONE; // TODO: Switch this back to sent later so ack can be processed
-        // auto now = std::chrono::steady_clock::now();
-        // auto elapsedTimeLastSentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - commands[i].lastTimeSent);
-        // if (elapsedTimeLastSentMs.count() >= Constants::COMMAND_TIME_BEFORE_RESENDING_MS) {
-        //     SerialTask::com.write(commands[i].data, commands[i].size);
-        //     commands[i].lastTimeSent = now;
-        // }
+        command.state = CommandState::NONE; // TODO: Implement Ack
     }
 }

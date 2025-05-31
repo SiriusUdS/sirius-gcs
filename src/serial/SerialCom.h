@@ -2,12 +2,10 @@
 #define SERIALCOM_H
 
 #include "Constants.h"
-#include "Logging.h"
 #include "RecvBuffer.hpp"
 
 #include <ceserial.h>
 #include <chrono>
-#include <optional>
 
 /**
  * @class SerialCom
