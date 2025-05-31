@@ -48,9 +48,13 @@ constexpr int MAX_TEMPERATURE = 100;
 constexpr int MIN_TEMPERATURE = 0;
 constexpr float CONTROL_RESISTANCE = 10'000.0f;
 constexpr float ADDITIVE_FACTOR = 4096;
+/**
+ * @struct RT_Point
+ * @brief Describes a point in the RT table
+ */
 typedef struct {
-    float TEMPERATURE;
-    float RESISTANCE;
+    float TEMPERATURE; ///< Temperature in degrees celsius
+    float RESISTANCE;  ///< Resistance in ohms
 } RT_Point;
 constexpr RT_Point RT_TABLE[] = {
   {-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990}, {20, 125250}, {25, 100000}, {30, 81000},

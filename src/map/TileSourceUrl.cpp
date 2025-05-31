@@ -7,6 +7,12 @@ size_t onWrite(void* data, size_t size, size_t nmemb, void* userp);
 size_t onProgress(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 curl_socket_t onOpenSocket(void* clientp, curlsocktype purpose, struct curl_sockaddr* address);
 
+/**
+ * @brief Constructs a url tile source
+ * @param requestLimit The maximum number of concurrent requests that can be made to the url to fetch tiles
+ * @param preload Preload tile images
+ * @param userAgent Value of the user-agent field for curl
+ */
 TileSourceUrl::TileSourceUrl(int requestLimit, bool preload, const std::string& userAgent)
     : TileSourceAsync{requestLimit, preload}, _userAgent{userAgent} {
 }

@@ -2,6 +2,13 @@
 
 #include <sstream>
 
+/**
+ * @brief Constructs a custom url tile source
+ * @param request_limit Maximum number of concurrent requests that can be made to fetch tiles from the custom url
+ * @param preload Preload tile image
+ * @param url_tpl Template url which contains the x, y, z parameters to be replaced. The url template should contain $Z$, $X$ and $Y$ for the z, x and
+ * y params respectively.
+ */
 TileSourceUrlCustom::TileSourceUrlCustom(int request_limit, bool preload, const std::string& url_tpl)
     : TileSourceUrl{request_limit, preload}, _url_tpl{url_tpl} {
 }
@@ -25,6 +32,11 @@ std::string TileSourceUrlCustom::makeUrl(int z, int x, int y) {
 
 // -----------------------------------------------------------------------------
 
+/**
+ * @brief Constructs an OSM url tile source
+ * @param request_limit Maximum number of concurrent requests that can be made to fetch osm tiles
+ * @param preload Preload tile images
+ */
 TileSourceUrlOsm::TileSourceUrlOsm(int request_limit, bool preload) : TileSourceUrl{request_limit, preload} {
 }
 
@@ -41,6 +53,11 @@ std::string TileSourceUrlOsm::makeSourceUrl(int z, int x, int y) {
 
 // -----------------------------------------------------------------------------
 
+/**
+ * @brief Constructs an ARC imagery url tile source
+ * @param request_limit Maximum number of concurrent requests that can be made to fetch arc tiles
+ * @param preload Preload tile images
+ */
 TileSourceUrlArcImagery::TileSourceUrlArcImagery(int request_limit, bool preload) : TileSourceUrl{request_limit, preload} {
 }
 

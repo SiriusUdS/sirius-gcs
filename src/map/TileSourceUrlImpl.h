@@ -6,6 +6,10 @@
 // https://www.arcgis.com/apps/mapviewer/index.html
 // See Basemap
 
+/**
+ * @class TileSourceUrlCustom
+ * @brief Custom url tile source
+ */
 class TileSourceUrlCustom : public TileSourceUrl {
 public:
     TileSourceUrlCustom(int request_limit, bool preload, const std::string& url_tpl);
@@ -19,6 +23,10 @@ private:
 
 // -----------------------------------------------------------------------------
 
+/**
+ * @class TileSourceUrlOsm
+ * @brief Open Street Map (map tiles) tile source
+ */
 class TileSourceUrlOsm : public TileSourceUrl {
 public:
     TileSourceUrlOsm(int request_limit, bool preload);
@@ -34,6 +42,10 @@ public:
 
 // -----------------------------------------------------------------------------
 
+/**
+ * @class TileSourceUrlArcImagery
+ * @brief Arc Imagery (satellite tiles) tile source
+ */
 class TileSourceUrlArcImagery : public TileSourceUrl {
 public:
     TileSourceUrlArcImagery(int request_limit, bool preload);
