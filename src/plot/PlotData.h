@@ -1,9 +1,10 @@
 #ifndef PLOTDATA_H
 #define PLOTDATA_H
 
-#include <imgui.h>
+#include "PlotRawData.h"
+#include "PlotStyle.h"
+
 #include <mutex>
-#include <vector>
 
 /**
  * @class PlotData
@@ -13,18 +14,13 @@ class PlotData {
 public:
     PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
-    void compress(size_t targetSize);
     void dropOldData(size_t amount);
     void plot() const;
 
 private:
-    std::vector<float> vx;
-    std::vector<float> vy;
-    std::vector<float> compressedVx;
-    std::vector<float> compressedVy;
-    const char* name;
-    ImVec4 color;
-    float weight;
+    PlotRawData data;
+    PlotRawData compressedData;
+    PlotStyle style;
     mutable std::mutex mtx;
 };
 
