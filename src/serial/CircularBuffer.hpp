@@ -1,5 +1,5 @@
-#ifndef RECVBUFFER_H
-#define RECVBUFFER_H
+#ifndef CIRCULARBUFFER_H
+#define CIRCULARBUFFER_H
 
 #include "Logging.h"
 #include "Telecommunication/TelemetryHeader.h"
@@ -13,6 +13,7 @@ class RecvBuffer {
 public:
     size_t readPacket(uint8_t* recv);
     bool writeChar(uint8_t c);
+    std::optional<uint8_t> peekBack(size_t offset = 0);
     size_t availablePackets();
     size_t nextPacketSize();
     bool dumpNextPacket();
@@ -82,6 +83,11 @@ bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
     }
 
     return true;
+}
+
+template <size_t BUFSIZE>
+inline std::optional<uint8_t> RecvBuffer<BUFSIZE>::peekBack(size_t offset) {
+    return buf[prevIndex(readIdx, offset + 1)]
 }
 
 template <size_t BUFSIZE>
@@ -162,4 +168,4 @@ size_t RecvBuffer<BUFSIZE>::prevIndex(size_t idx, size_t decrement) {
     return idx - decrement;
 }
 
-#endif // RECVBUFFER_H
+#endif // CIRCULARBUFFER_H
