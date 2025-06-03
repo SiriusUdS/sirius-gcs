@@ -1,166 +1,123 @@
 #ifndef CIRCULARBUFFER_H
 #define CIRCULARBUFFER_H
 
+#include "Constants.h"
 #include "Logging.h"
-#include "Telecommunication/TelemetryHeader.h"
-#include "Telecommunication/TelemetryPacket.h"
 
-#include <optional>
-#include <queue>
-
-template <size_t BUFSIZE>
-class RecvBuffer {
+template <size_t BUFSIZE = Constants::RECV_BUF_SIZE>
+class CircularBuffer {
 public:
-    size_t readPacket(uint8_t* recv);
+    bool read(uint8_t* recv, size_t size);
+    bool dump(size_t size);
     bool writeChar(uint8_t c);
-    std::optional<uint8_t> peekBack(size_t offset = 0);
-    size_t availablePackets();
-    size_t nextPacketSize();
-    bool dumpNextPacket();
-    bool isFull();
     void clear();
+    std::optional<uint8_t> peekBack(size_t offset = 0) const;
+    bool isFull() const;
+    size_t readAvailable() const;
+    size_t writeAvailable() const;
 
 private:
-    std::optional<uint32_t> searchAnyHeader(size_t idx);
-    bool searchSpecificHeader(uint32_t headerCode, size_t idx);
-
-    size_t nextIndex(size_t idx, size_t increment = 1);
-    size_t prevIndex(size_t idx, size_t decrement = 1);
+    size_t nextIndex(size_t idx, size_t increment = 1) const;
+    size_t prevIndex(size_t idx, size_t decrement = 1) const;
 
     size_t readIdx{};
     size_t writeIdx{};
     uint8_t buf[BUFSIZE]{};
     bool bufFull{};
-    bool writingValidPacket{};
-    size_t currPacketSize{};
-    std::queue<size_t> availablePacketSizeQueue{};
 };
 
 template <size_t BUFSIZE>
-size_t RecvBuffer<BUFSIZE>::readPacket(uint8_t* recv) {
-    if (availablePacketSizeQueue.size() == 0) {
-        return 0;
+inline bool CircularBuffer<BUFSIZE>::read(uint8_t* recv, size_t size) {
+    const size_t READ_AVAILABLE = readAvailable();
+    if (READ_AVAILABLE < size) {
+        GCS_LOG_WARN("CircularBuffer: Tried to read {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
+        return false;
     }
 
-    size_t packetSize = availablePacketSizeQueue.front();
-    availablePacketSizeQueue.pop();
-
-    for (size_t idx = 0; idx < packetSize; idx++) {
+    for (size_t idx = 0; idx < size; idx++) {
         recv[idx] = buf[readIdx];
         readIdx = nextIndex(readIdx);
     }
 
     bufFull = false;
-    return packetSize;
+    return true;
 }
 
 template <size_t BUFSIZE>
-bool RecvBuffer<BUFSIZE>::writeChar(uint8_t c) {
+inline bool CircularBuffer<BUFSIZE>::dump(size_t size) {
+    const size_t READ_AVAILABLE = readAvailable();
+    if (READ_AVAILABLE < size) {
+        GCS_LOG_WARN("CircularBuffer: Tried to dump {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
+        return false;
+    }
+
+    readIdx = nextIndex(readIdx, size);
+    return true;
+}
+
+template <size_t BUFSIZE>
+inline bool CircularBuffer<BUFSIZE>::writeChar(uint8_t c) {
     if (bufFull) {
         return false;
     }
 
     buf[writeIdx] = c;
     writeIdx = nextIndex(writeIdx);
-    currPacketSize++;
     bufFull = (writeIdx == readIdx);
-
-    if (currPacketSize >= sizeof(TelemetryHeader)) {
-        std::optional<uint32_t> optionalHeaderCode = searchAnyHeader(prevIndex(writeIdx, sizeof(TelemetryHeader)));
-        if (optionalHeaderCode.has_value()) {
-            if (!writingValidPacket) {
-                writingValidPacket = true;
-            } else {
-                availablePacketSizeQueue.push(currPacketSize);
-            }
-            currPacketSize = 0;
-        }
-    }
-
-    if (isFull() && availablePackets() == 0) {
-        GCS_LOG_WARN("RecvBuffer: Buffer full, but no packets detected. Clearing buffer.");
-        clear();
-    }
 
     return true;
 }
 
 template <size_t BUFSIZE>
-inline std::optional<uint8_t> RecvBuffer<BUFSIZE>::peekBack(size_t offset) {
-    return buf[prevIndex(readIdx, offset + 1)]
+inline void CircularBuffer<BUFSIZE>::clear() {
+    readIdx = 0;
+    writeIdx = 0;
+    bufFull = false;
 }
 
 template <size_t BUFSIZE>
-size_t RecvBuffer<BUFSIZE>::availablePackets() {
-    return availablePacketSizeQueue.size();
+inline std::optional<uint8_t> CircularBuffer<BUFSIZE>::peekBack(size_t offset) const {
+    return buf[prevIndex(readIdx, offset + 1)];
 }
 
 template <size_t BUFSIZE>
-inline size_t RecvBuffer<BUFSIZE>::nextPacketSize() {
-    if (availablePacketSizeQueue.empty()) {
-        return 0;
-    }
-    return availablePacketSizeQueue.front();
-}
-
-template <size_t BUFSIZE>
-inline bool RecvBuffer<BUFSIZE>::dumpNextPacket() {
-    if (!availablePacketSizeQueue.empty()) {
-        readIdx = nextIndex(readIdx, availablePacketSizeQueue.front());
-        availablePacketSizeQueue.pop();
-        return true;
-    }
-    return false;
-}
-
-template <size_t BUFSIZE>
-inline bool RecvBuffer<BUFSIZE>::isFull() {
+inline bool CircularBuffer<BUFSIZE>::isFull() const {
     return bufFull;
 }
 
 template <size_t BUFSIZE>
-inline void RecvBuffer<BUFSIZE>::clear() {
-    readIdx = 0;
-    writeIdx = 0;
-    bufFull = false;
-    writingValidPacket = false;
-    currPacketSize = 0;
-    while (!availablePacketSizeQueue.empty()) {
-        availablePacketSizeQueue.pop();
+inline size_t CircularBuffer<BUFSIZE>::readAvailable() const {
+    if (bufFull) {
+        return 0;
+    } else if (readIdx < writeIdx) {
+        return writeIdx - readIdx;
+    } else if (readIdx > writeIdx) {
+        return BUFSIZE - (readIdx - writeIdx);
+    } else {
+        return BUFSIZE;
     }
 }
 
 template <size_t BUFSIZE>
-std::optional<uint32_t> RecvBuffer<BUFSIZE>::searchAnyHeader(size_t idx) {
-    // clang-format off
-    static const uint32_t HEADER_CODES[] = {
-        TELEMETRY_TYPE_CODE,
-        STATUS_TYPE_CODE
-    };
-    // clang-format on
-
-    for (const uint32_t headerCode : HEADER_CODES) {
-        if (searchSpecificHeader(headerCode, idx)) {
-            return headerCode;
-        }
+inline size_t CircularBuffer<BUFSIZE>::writeAvailable() const {
+    if (bufFull) {
+        return BUFSIZE;
+    } else if (writeIdx < readIdx) {
+        return readIdx - writeIdx;
+    } else if (readIdx < writeIdx) {
+        return BUFSIZE - (writeIdx - readIdx);
+    } else {
+        return 0;
     }
-    return {};
 }
 
 template <size_t BUFSIZE>
-bool RecvBuffer<BUFSIZE>::searchSpecificHeader(uint32_t headerCode, size_t idx) {
-    TelemetryHeader header;
-    header.value = (buf[nextIndex(idx, 3)] << 24) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 1)] << 8) | buf[idx];
-    return headerCode == header.bits.type;
-}
-
-template <size_t BUFSIZE>
-size_t RecvBuffer<BUFSIZE>::nextIndex(size_t idx, size_t increment) {
+inline size_t CircularBuffer<BUFSIZE>::nextIndex(size_t idx, size_t increment) const {
     return (idx + increment) % BUFSIZE;
 }
 
 template <size_t BUFSIZE>
-size_t RecvBuffer<BUFSIZE>::prevIndex(size_t idx, size_t decrement) {
+inline size_t CircularBuffer<BUFSIZE>::prevIndex(size_t idx, size_t decrement) const {
     decrement %= BUFSIZE;
     if (decrement > idx) {
         idx += BUFSIZE;

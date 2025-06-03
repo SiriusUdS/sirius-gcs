@@ -1,5 +1,9 @@
 #include "Application.h"
 
+// clang-format off
+#include <WinSock2.h>
+// clang-format on
+
 #include "Constants.h"
 #include "ControlsWindow.h"
 #include "Logging.h"
@@ -11,7 +15,6 @@
 #include "SwitchesWindow.h"
 
 #include <SerialTask.h>
-#include <WinSock2.h>
 #include <imgui.h>
 #include <implot.h>
 #include <windows.h>

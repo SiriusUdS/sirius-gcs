@@ -1,31 +1,101 @@
 #include "PacketFramer.h"
 
+#include "CircularBuffer.hpp"
 #include "Logging.h"
 #include "Telecommunication/TelemetryHeader.h"
 
-PacketFramer::PacketFramer(CircularBuffer& buf) : buf{buf} {
+PacketFramer::PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf) : buf{buf} {
 }
 
-std::optional<uint32_t> PacketFramer::checkForPacketStart() {
+void PacketFramer::tryFrame() {
+    if (!checkForPacketStart()) {
+        return;
+    }
+
+    currentPacketSize = 0;
+    if (readingValidPacket) {
+        availablePacketSizesQueue.push(currentPacketSize);
+    } else {
+        readingValidPacket = true;
+    }
+}
+
+bool PacketFramer::packetAvailable() const {
+    return availablePacketSizesQueue.size();
+}
+
+size_t PacketFramer::consumeNextPacketSize() {
+    size_t size = availablePacketSizesQueue.front();
+    availablePacketSizesQueue.pop();
+    return size;
+}
+
+bool PacketFramer::checkForPacketStart() {
+    return checkForTelemetryPacketStart();
+
+    // TODO: Check for GS Control packet
+}
+
+bool PacketFramer::checkForTelemetryPacketStart() {
     static const uint32_t TELEMETRY_HEADER_CODES[] = {TELEMETRY_TYPE_CODE, STATUS_TYPE_CODE};
 
+    if (currentPacketSize < sizeof(TelemetryHeader)) {
+        return {};
+    }
+
     for (const uint32_t headerCode : TELEMETRY_HEADER_CODES) {
-        TelemetryHeader header;
-        header.value = (buf[nextIndex(idx, 3)] << 24) | (buf[nextIndex(idx, 2)] << 16) | (buf[nextIndex(idx, 1)] << 8) | buf[idx];
-        if (headerCode == header.bits.type) {
+        getHeaderFromBuf(sizeof(TelemetryHeader));
+        TelemetryHeader* header = (TelemetryHeader*) headerBuf;
+        if (headerCode == header->bits.type) {
+            return true;
         }
     }
-    return {};
+
+    return false;
 }
 
 bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > Constants::RECV_PACKET_MAX_HEADER_SIZE) {
-        GCS_LOG_WARN("PacketFramer: Header size is bigger that the maximum header size accepted.");
+        GCS_LOG_WARN(
+          "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the maximum header size accepted of {}.",
+          headerSize, Constants::RECV_PACKET_MAX_HEADER_SIZE);
+        return false;
+    }
+
+    if (headerSize > currentPacketSize) {
+        GCS_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
+                     "read of size {}.",
+                     headerSize, currentPacketSize);
+        return false;
+    }
+
+    const size_t READ_AVAILABLE = buf.readAvailable();
+    if (headerSize > READ_AVAILABLE) {
+        GCS_LOG_WARN(
+          "PacketFramer: Tried to get header from buffer, but the header of size {} is bigger than the packet being currently read of size {}.",
+          headerSize, READ_AVAILABLE);
         return false;
     }
 
     for (size_t i = 0; i < headerSize; i++) {
+        std::optional<uint8_t> byte = buf.peekBack(i);
+        if (!byte.has_value()) {
+            GCS_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but not enough bytes are available.");
+            return false;
+        }
+        headerBuf[i] = byte.value();
     }
 
     return true;
+}
+
+void PacketFramer::byteWritten() {
+    currentPacketSize++;
+}
+
+void PacketFramer::clear() {
+    currentPacketSize = 0;
+    while (!availablePacketSizesQueue.empty()) {
+        availablePacketSizesQueue.pop();
+    }
 }

@@ -40,7 +40,7 @@ bool SerialCom::read() {
     char c = com.ReadChar(successFlag);
     if (successFlag) {
         consecutiveFailedReads = 0;
-        recvBuf.writeChar(c);
+        // recvBuf.writeChar(c); // TODO: Fix this
     } else {
         consecutiveFailedReads++;
     }
@@ -90,7 +90,7 @@ bool SerialCom::comWorking() {
  * @returns If a packet is found, the size of the packet is returned, otherwise 0 is returned
  */
 size_t SerialCom::getPacket(uint8_t* recv) {
-    size_t packetSize = recvBuf.readPacket(recv);
+    size_t packetSize = 0; // recvBuf.readPacket(recv); // TODO: Fix this
     if (packetSize > 0) {
         packetsRead++;
     }
@@ -102,7 +102,7 @@ size_t SerialCom::getPacket(uint8_t* recv) {
  * @returns The next packet's size if at least one packet is available, else 0
  */
 size_t SerialCom::nextPacketSize() {
-    return recvBuf.nextPacketSize();
+    return 0; // recvBuf.nextPacketSize(); // TODO: Fix this
 }
 
 /**
@@ -110,7 +110,7 @@ size_t SerialCom::nextPacketSize() {
  * @returns True if a packet was dumped, else false
  */
 bool SerialCom::dumpNextPacket() {
-    return recvBuf.dumpNextPacket();
+    return 0; // recvBuf.dumpNextPacket(); // TODO: Fix this
 }
 
 /**

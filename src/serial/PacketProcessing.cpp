@@ -2,6 +2,7 @@
 
 #include "GSDataCenter.h"
 #include "LoadCell.h"
+#include "Logging.h"
 #include "PlotData.h"
 #include "PressureTransducer.h"
 #include "SerialCom.h"
