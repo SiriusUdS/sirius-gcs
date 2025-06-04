@@ -4,7 +4,7 @@
 #include "Logging.h"
 #include "Telecommunication/TelemetryHeader.h"
 
-PacketFramer::PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf) : buf{buf} {
+PacketFramer::PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf) : buf{buf}, headerBuf{{0}} {
 }
 
 void PacketFramer::tryFrame() {
@@ -12,12 +12,12 @@ void PacketFramer::tryFrame() {
         return;
     }
 
-    currentPacketSize = 0;
     if (readingValidPacket) {
         availablePacketSizesQueue.push(currentPacketSize);
     } else {
         readingValidPacket = true;
     }
+    currentPacketSize = 0;
 }
 
 bool PacketFramer::packetAvailable() const {
@@ -25,9 +25,25 @@ bool PacketFramer::packetAvailable() const {
 }
 
 size_t PacketFramer::consumeNextPacketSize() {
+    if (!availablePacketSizesQueue.size()) {
+        GCS_LOG_WARN("PacketFramer: Tried to consume next packet size, but no packets available.");
+        return 0;
+    }
+
     size_t size = availablePacketSizesQueue.front();
     availablePacketSizesQueue.pop();
     return size;
+}
+
+void PacketFramer::byteWritten() {
+    currentPacketSize++;
+}
+
+void PacketFramer::clear() {
+    currentPacketSize = 0;
+    while (!availablePacketSizesQueue.empty()) {
+        availablePacketSizesQueue.pop();
+    }
 }
 
 bool PacketFramer::checkForPacketStart() {
@@ -78,7 +94,7 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     }
 
     for (size_t i = 0; i < headerSize; i++) {
-        std::optional<uint8_t> byte = buf.peekBack(i);
+        std::optional<uint8_t> byte = buf.peekBack(headerSize - i - 1);
         if (!byte.has_value()) {
             GCS_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but not enough bytes are available.");
             return false;
@@ -87,15 +103,4 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     }
 
     return true;
-}
-
-void PacketFramer::byteWritten() {
-    currentPacketSize++;
-}
-
-void PacketFramer::clear() {
-    currentPacketSize = 0;
-    while (!availablePacketSizesQueue.empty()) {
-        availablePacketSizesQueue.pop();
-    }
 }

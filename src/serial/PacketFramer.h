@@ -14,12 +14,12 @@ public:
     void tryFrame();
     bool packetAvailable() const;
     size_t consumeNextPacketSize();
-    bool checkForPacketStart();
-    bool checkForTelemetryPacketStart();
     void byteWritten();
     void clear();
 
 private:
+    bool checkForPacketStart();
+    bool checkForTelemetryPacketStart();
     bool getHeaderFromBuf(size_t headerSize);
 
     const CircularBuffer<Constants::RECV_BUF_SIZE>& buf;

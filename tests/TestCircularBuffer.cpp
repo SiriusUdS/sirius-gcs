@@ -66,7 +66,7 @@ TEST_CASE("Dump data from circular buffer") {
     CHECK(buf.readAvailable() == 0);
 }
 
-TEST_CASE("writeAvailable/writeAvailable values in circular buffer") {
+TEST_CASE("Check available read and write space in circular buffer") {
     CircularBuffer<TEST_CIRCULAR_BUFFER_SIZE> buf;
     CHECK(buf.readAvailable() == 0);
     CHECK(buf.writeAvailable() == 10);
