@@ -52,6 +52,7 @@ inline bool CircularBuffer<BUFSIZE>::dump(size_t size) {
     }
 
     readIdx = nextIndex(readIdx, size);
+    bufFull = false;
     return true;
 }
 
@@ -77,7 +78,10 @@ inline void CircularBuffer<BUFSIZE>::clear() {
 
 template <size_t BUFSIZE>
 inline std::optional<uint8_t> CircularBuffer<BUFSIZE>::peekBack(size_t offset) const {
-    return buf[prevIndex(readIdx, offset + 1)];
+    if (offset >= readAvailable()) {
+        return {};
+    }
+    return buf[prevIndex(writeIdx, offset + 1)];
 }
 
 template <size_t BUFSIZE>
@@ -88,26 +92,26 @@ inline bool CircularBuffer<BUFSIZE>::isFull() const {
 template <size_t BUFSIZE>
 inline size_t CircularBuffer<BUFSIZE>::readAvailable() const {
     if (bufFull) {
-        return 0;
+        return BUFSIZE;
     } else if (readIdx < writeIdx) {
         return writeIdx - readIdx;
     } else if (readIdx > writeIdx) {
         return BUFSIZE - (readIdx - writeIdx);
     } else {
-        return BUFSIZE;
+        return 0;
     }
 }
 
 template <size_t BUFSIZE>
 inline size_t CircularBuffer<BUFSIZE>::writeAvailable() const {
     if (bufFull) {
-        return BUFSIZE;
+        return 0;
     } else if (writeIdx < readIdx) {
         return readIdx - writeIdx;
     } else if (readIdx < writeIdx) {
         return BUFSIZE - (writeIdx - readIdx);
     } else {
-        return 0;
+        return BUFSIZE;
     }
 }
 
