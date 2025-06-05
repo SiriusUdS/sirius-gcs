@@ -9,7 +9,7 @@ class CircularBuffer {
 public:
     bool read(uint8_t* recv, size_t size);
     bool dump(size_t size);
-    bool writeChar(uint8_t c);
+    bool writeByte(uint8_t c);
     void clear();
     std::optional<uint8_t> peekBack(size_t offset = 0) const;
     bool isFull() const;
@@ -31,6 +31,10 @@ inline bool CircularBuffer<BUFSIZE>::read(uint8_t* recv, size_t size) {
     const size_t READ_AVAILABLE = readAvailable();
     if (READ_AVAILABLE < size) {
         GCS_LOG_WARN("CircularBuffer: Tried to read {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
+        return false;
+    }
+
+    if (size == 0) {
         return false;
     }
 
@@ -57,7 +61,7 @@ inline bool CircularBuffer<BUFSIZE>::dump(size_t size) {
 }
 
 template <size_t BUFSIZE>
-inline bool CircularBuffer<BUFSIZE>::writeChar(uint8_t c) {
+inline bool CircularBuffer<BUFSIZE>::writeByte(uint8_t c) {
     if (bufFull) {
         return false;
     }

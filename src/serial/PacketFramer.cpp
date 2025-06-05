@@ -20,10 +20,6 @@ void PacketFramer::tryFrame() {
     currentPacketSize = 0;
 }
 
-bool PacketFramer::packetAvailable() const {
-    return availablePacketSizesQueue.size();
-}
-
 size_t PacketFramer::consumeNextPacketSize() {
     if (!availablePacketSizesQueue.size()) {
         GCS_LOG_WARN("PacketFramer: Tried to consume next packet size, but no packets available.");
@@ -103,4 +99,15 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     }
 
     return true;
+}
+
+bool PacketFramer::packetAvailable() const {
+    return availablePacketSizesQueue.size();
+}
+
+size_t PacketFramer::peekNextPacketSize() const {
+    if (!availablePacketSizesQueue.size()) {
+        return 0;
+    }
+    return availablePacketSizesQueue.front();
 }

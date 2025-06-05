@@ -2,6 +2,7 @@
 #define SERIALCOM_H
 
 #include "Constants.h"
+#include "PacketReceiver.h"
 
 #include <ceserial.h>
 #include <chrono>
@@ -30,7 +31,7 @@ private:
     std::atomic<size_t> packetsRead{};
     std::chrono::time_point<std::chrono::steady_clock> comStartTimePoint;
     ceSerial com;
-    // RecvBuffer<Constants::RECV_BUF_SIZE> recvBuf;
+    PacketReceiver pr;
     std::mutex mtx;
 };
 

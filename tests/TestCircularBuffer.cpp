@@ -6,7 +6,7 @@ static const size_t TEST_CIRCULAR_BUFFER_SIZE = 10;
 
 bool write(CircularBuffer<TEST_CIRCULAR_BUFFER_SIZE>& buf, const char* str, size_t size) {
     for (size_t i = 0; i < size; i++) {
-        if (!buf.writeChar((uint8_t) str[i])) {
+        if (!buf.writeByte((uint8_t) str[i])) {
             return false;
         }
     }
@@ -15,7 +15,7 @@ bool write(CircularBuffer<TEST_CIRCULAR_BUFFER_SIZE>& buf, const char* str, size
 
 bool fill(CircularBuffer<TEST_CIRCULAR_BUFFER_SIZE>& buf, size_t size) {
     for (size_t i = 0; i < size; i++) {
-        if (!buf.writeChar((uint8_t) '0')) {
+        if (!buf.writeByte(0)) {
             return false;
         }
     }

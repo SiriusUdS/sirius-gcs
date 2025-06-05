@@ -12,10 +12,11 @@ class PacketFramer {
 public:
     PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf);
     void tryFrame();
-    bool packetAvailable() const;
     size_t consumeNextPacketSize();
     void byteWritten();
     void clear();
+    bool packetAvailable() const;
+    size_t peekNextPacketSize() const;
 
 private:
     bool checkForPacketStart();

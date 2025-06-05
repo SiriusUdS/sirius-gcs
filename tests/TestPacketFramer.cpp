@@ -11,7 +11,7 @@ void writeTelemetryPacket(CircularBuffer<>& buf, PacketFramer& pf) {
 
     for (size_t i = 0; i < sizeof(EngineTelemetryPacket); i++) {
         uint8_t byte = packet.data[i];
-        buf.writeChar(byte);
+        buf.writeByte(byte);
         pf.byteWritten();
         pf.tryFrame();
     }
@@ -19,7 +19,7 @@ void writeTelemetryPacket(CircularBuffer<>& buf, PacketFramer& pf) {
 
 void fillCircularBuffer(CircularBuffer<>& buf, PacketFramer& pf, size_t size) {
     for (size_t i = 0; i < size; i++) {
-        buf.writeChar('0');
+        buf.writeByte(0);
         pf.byteWritten();
         pf.tryFrame();
     }
