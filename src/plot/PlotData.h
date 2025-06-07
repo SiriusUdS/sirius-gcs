@@ -15,7 +15,7 @@ public:
     PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
     void dropOldData(size_t amount);
-    void plot() const;
+    void plot(bool showCompressedData) const;
 
 private:
     PlotRawData data;

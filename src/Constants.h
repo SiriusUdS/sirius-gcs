@@ -30,6 +30,7 @@ constexpr const char* GCS_INI_SECTION = "GCS";
 constexpr const char* GCS_INI_FILENAME = "sirius_gcs.ini";
 constexpr const char* GCS_INI_MAP_WINDOW_MAP_VIEW = "map_window_map_view";
 constexpr const char* GCS_INI_BASE_PLOT_WINDOW_AUTO_FIT = "_plot_window_auto_fit";
+constexpr const char* GCS_INI_BASE_PLOT_WINDOW_SHOW_COMPRESSED_DATA = "_plot_window_show_compressed_data";
 constexpr const char* GCS_INI_LOG_WINDOW_AUTO_SCROLL = "log_window_auto_scroll";
 
 // HelloImGui specific params

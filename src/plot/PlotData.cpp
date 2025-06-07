@@ -37,7 +37,7 @@ void PlotData::addData(float x, float y) {
     }
 
     if (compressedData.size() > Constants::PLOT_MAX_DATA_SIZE_COMPRESSED) {
-        PlotDataCompression::compress(data, compressedData, Constants::PLOT_TARGET_DATA_SIZE_COMPRESSED, style.name);
+        PlotDataCompression::meanCompression(data, compressedData, Constants::PLOT_TARGET_DATA_SIZE_COMPRESSED, style.name);
     }
 }
 
@@ -55,16 +55,18 @@ void PlotData::dropOldData(size_t amount) {
     }
 
     data.eraseOld(amount);
-    PlotDataCompression::compress(data, compressedData, Constants::PLOT_TARGET_DATA_SIZE_COMPRESSED, style.name);
+    PlotDataCompression::meanCompression(data, compressedData, Constants::PLOT_TARGET_DATA_SIZE_COMPRESSED, style.name);
 
     GCS_LOG_DEBUG("PlotData: Plot data {} successfully dropped old data, went from size {} to {}.", style.name, oldDataSize, data.size());
 }
 
 /**
  * @brief Display the plot line. This should be called after a "ImPlot::BeginPlot" call.
+ * @param showCompressedData Plot compressed data to improve performances
  */
-void PlotData::plot() const {
+void PlotData::plot(bool showCompressedData) const {
     std::lock_guard<std::mutex> lock(mtx);
     ImPlot::SetNextLineStyle(style.color, style.weight);
-    ImPlot::PlotLine(style.name, compressedData.getRawX(), compressedData.getRawY(), (int) compressedData.size());
+    const PlotRawData& dataToPlot = showCompressedData ? compressedData : data;
+    ImPlot::PlotLine(style.name, dataToPlot.getRawX(), dataToPlot.getRawY(), (int) dataToPlot.size());
 }

@@ -20,10 +20,11 @@ public:
     std::string getWindowId();
 
 private:
-    std::string name, xLabel, yLabel, autofitIniId;
+    std::string name, xLabel, yLabel, autofitIniId, showCompressedDataIniId;
     std::vector<PlotData*> plotData;
     ImPlotFlags flags{};
     bool autofit{};
+    bool showCompressedData{};
 }; // namespace PlotWindow
 
 #endif // PLOTWINDOW_H

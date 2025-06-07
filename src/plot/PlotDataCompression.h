@@ -4,7 +4,7 @@
 class PlotRawData;
 
 namespace PlotDataCompression {
-void compress(const PlotRawData& originalData, PlotRawData& compressedData, size_t targetCompressionSize, const char* name);
+void meanCompression(const PlotRawData& originalData, PlotRawData& compressedData, size_t targetCompressionSize, const char* name = "Unnamed");
 }
 
 #endif // PLOTDATACOMPRESSION_H
