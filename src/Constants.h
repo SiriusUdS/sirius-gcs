@@ -32,6 +32,10 @@ constexpr const char* GCS_INI_MAP_WINDOW_MAP_VIEW = "map_window_map_view";
 constexpr const char* GCS_INI_BASE_PLOT_WINDOW_AUTO_FIT = "_plot_window_auto_fit";
 constexpr const char* GCS_INI_BASE_PLOT_WINDOW_SHOW_COMPRESSED_DATA = "_plot_window_show_compressed_data";
 constexpr const char* GCS_INI_LOG_WINDOW_AUTO_SCROLL = "log_window_auto_scroll";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_DEBUG = "log_window_show_debug";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_INFO = "log_window_show_info";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_WARN = "log_window_show_warn";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_ERROR = "log_window_show_error";
 
 // HelloImGui specific params
 constexpr const char* HELLO_IMGUI_INI_FILENAME = "hello_imgui.ini";
