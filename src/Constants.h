@@ -44,7 +44,9 @@ constexpr const char* HELLO_IMGUI_MENU_APP_TITLE = "Sirius GCS";
 
 // Font related params
 constexpr const char* IMGUI_MAIN_FONT_FILENAME = "assets/fonts/Nunito-Regular.ttf";
+constexpr const char* IMGUI_ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
 constexpr float IMGUI_MAIN_FONT_SIZE = 28;
+constexpr float IMGUI_ICONS_SIZE = 22;
 
 // Temperature sensor
 constexpr float ADC_MIN_TEMPERATURE = 10;

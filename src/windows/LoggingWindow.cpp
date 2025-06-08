@@ -1,6 +1,7 @@
 #include "LoggingWindow.h"
 
 #include "Constants.h"
+#include "FontAwesome.h"
 #include "Logging.h"
 #include "ToggleButton.h"
 
@@ -17,13 +18,13 @@ ImVector<spdlog::level::level_enum> logLevels;
 void LoggingWindow::render() {
     ImGui::Checkbox("Auto Scroll", &autoScroll);
     ImGui::SameLine();
-    ToggleButton("Debug", &showDebug, ImVec4(0.0f, 0.5f, 1.0f, 1.0f));
+    ToggleButton(ICON_FA_BUG " Debug", &showDebug, ImVec4(0.0f, 0.5f, 1.0f, 1.0f));
     ImGui::SameLine();
-    ToggleButton("Info", &showInfo, ImVec4(0.0f, 0.6f, 0.15f, 1.0f));
+    ToggleButton(ICON_FA_INFO_CIRCLE " Info", &showInfo, ImVec4(0.0f, 0.6f, 0.15f, 1.0f));
     ImGui::SameLine();
-    ToggleButton("Warn", &showWarn, ImVec4(0.7f, 0.55f, 0.0f, 1.0f));
+    ToggleButton(ICON_FA_EXCLAMATION_TRIANGLE " Warn", &showWarn, ImVec4(0.7f, 0.55f, 0.0f, 1.0f));
     ImGui::SameLine();
-    ToggleButton("Error", &showError, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+    ToggleButton(ICON_FA_BOMB " Error", &showError, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
     ImGui::SameLine();
     if (ImGui::Button("Clear")) {
         clear();
@@ -41,15 +42,16 @@ void LoggingWindow::render() {
         for (int lineNo = 0; lineNo < lineOffsets.size(); lineNo++) {
             const char* lineStart = bufBegin + lineOffsets[lineNo];
             const char* lineEnd = (lineNo + 1 < lineOffsets.size()) ? (bufBegin + lineOffsets[lineNo + 1] - 1) : bufEnd;
+            ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);
 
             if (lineEnd != bufEnd) {
                 bool show = false;
                 // clang-format off
                 switch (logLevels[lineNo]) {
-                    case spdlog::level::debug: show = showDebug; break;
+                    case spdlog::level::debug: show = showDebug; color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
                     case spdlog::level::info:  show = showInfo;  break;
-                    case spdlog::level::warn:  show = showWarn;  break;
-                    case spdlog::level::err:   show = showError; break;
+                    case spdlog::level::warn:  show = showWarn;  color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); break;
+                    case spdlog::level::err:   show = showError; color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f); break;
                     default:                   show = true;      break;
                 }
                 // clang-format on
@@ -62,7 +64,9 @@ void LoggingWindow::render() {
                 continue;
             }
 
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
             ImGui::TextUnformatted(lineStart, lineEnd);
+            ImGui::PopStyleColor();
         }
 
         if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {

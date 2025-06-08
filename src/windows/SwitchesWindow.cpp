@@ -10,7 +10,7 @@ void SwitchesWindow::render() {
     for (const SwitchData* switchData : GSDataCenter::SwitchDataVec) {
         ImGui::AlignTextToFramePadding();
         ImGui::Text("%s", switchData->name);
-        ImGui::SameLine(220);
+        ImGui::SameLine(260);
         showSwitchState(switchData);
     }
 }

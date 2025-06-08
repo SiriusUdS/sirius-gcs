@@ -28,6 +28,13 @@ mINI::INIStructure iniStructure;
 void Application::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF(Constants::IMGUI_MAIN_FONT_FILENAME, Constants::IMGUI_MAIN_FONT_SIZE);
+
+    static const ImWchar iconsRanges[] = {0xf000, 0xf8ff, 0};
+    ImFontConfig iconsConfig;
+    iconsConfig.MergeMode = true;
+    iconsConfig.PixelSnapH = true;
+
+    io.Fonts->AddFontFromFileTTF(Constants::IMGUI_ICONS_FONT, Constants::IMGUI_ICONS_SIZE, &iconsConfig, iconsRanges);
 }
 
 void Application::init() {
