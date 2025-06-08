@@ -3,6 +3,10 @@
 
 #include <future>
 
+/**
+ * @class TileSourceUrlConnTest
+ * @brief Tests connection to the url tile source
+ */
 class TileSourceUrlConnTest {
 public:
     bool successful();

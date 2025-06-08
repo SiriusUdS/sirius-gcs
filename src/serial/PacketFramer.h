@@ -8,6 +8,10 @@
 template <size_t>
 class CircularBuffer;
 
+/**
+ * @class PacketFramer
+ * @brief Frames packets by reading the bytes written into a circular buffer
+ */
 class PacketFramer {
 public:
     PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf);

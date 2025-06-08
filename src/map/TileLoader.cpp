@@ -5,6 +5,12 @@
 
 #include <algorithm>
 
+/**
+ * @brief Constructs a tile loader from a tile source
+ * @param source Tile source to load the tiles from
+ * @param dummiesAreFinal If a tile can't be fetched it is replaced by a dummy tile. Setting this to true means that no additionnal attempts will be
+ * made to fetch the tile if it is a dummy.
+ */
 TileLoader::TileLoader(std::shared_ptr<ITileSource> source, bool dummiesAreFinal) : _source{source}, _dummiesAreFinal{dummiesAreFinal} {
 }
 

@@ -44,6 +44,13 @@ std::string TileSourceUrlOsm::makeUrl(int z, int x, int y) {
     return TileSourceUrlOsm::makeSourceUrl(z, x, y);
 }
 
+/**
+ * @brief Construct tile source url to fetch a specific OSM tile
+ * @param z Zoom level of the tile
+ * @param x X position of the tile
+ * @param y Y position of the tile
+ * @returns Url to fetch the tile
+ */
 std::string TileSourceUrlOsm::makeSourceUrl(int z, int x, int y) {
     std::ostringstream urlmaker;
     urlmaker << "https://a.tile.openstreetmap.org";
@@ -65,6 +72,13 @@ std::string TileSourceUrlArcImagery::makeUrl(int z, int x, int y) {
     return TileSourceUrlArcImagery::makeSourceUrl(z, x, y);
 }
 
+/**
+ * @brief Construct tile source url to fetch a specific Arc tile
+ * @param z Zoom level of the tile
+ * @param x X position of the tile
+ * @param y Y position of the tile
+ * @returns Url to fetch the tile
+ */
 std::string TileSourceUrlArcImagery::makeSourceUrl(int z, int x, int y) {
     std::ostringstream urlmaker;
     urlmaker << "https://server.arcgisonline.com/ArcGIS/rest/"

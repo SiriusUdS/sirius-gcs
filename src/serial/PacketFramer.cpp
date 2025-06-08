@@ -4,9 +4,15 @@
 #include "Logging.h"
 #include "Telecommunication/TelemetryHeader.h"
 
+/**
+ * @brief Constructs a packet framer by specifing the circular buffer to read the bytes from
+ */
 PacketFramer::PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf) : buf{buf}, headerBuf{{0}} {
 }
 
+/**
+ * @brief Try to frame a packet, starting from the last byte received in the circular buffer
+ */
 void PacketFramer::tryFrame() {
     if (!checkForPacketStart()) {
         return;
@@ -20,6 +26,10 @@ void PacketFramer::tryFrame() {
     currentPacketSize = 0;
 }
 
+/**
+ * @brief Retrieve the size of the next packet and remove it from the packet framer
+ * @returns The size of the next packet
+ */
 size_t PacketFramer::consumeNextPacketSize() {
     if (!availablePacketSizesQueue.size()) {
         GCS_LOG_WARN("PacketFramer: Tried to consume next packet size, but no packets available.");
@@ -31,10 +41,16 @@ size_t PacketFramer::consumeNextPacketSize() {
     return size;
 }
 
+/**
+ * @brief Notify the packet framer that a byte was written in the circular buffer to keep track of the current packet's size
+ */
 void PacketFramer::byteWritten() {
     currentPacketSize++;
 }
 
+/**
+ * @brief Clears all packets detected from the packet framer
+ */
 void PacketFramer::clear() {
     currentPacketSize = 0;
     while (!availablePacketSizesQueue.empty()) {
@@ -42,12 +58,20 @@ void PacketFramer::clear() {
     }
 }
 
+/**
+ * @brief Check if a packet was received in the circular buffer, starting from the last byte written in the buffer
+ * @returns True if a packet was detected, else false
+ */
 bool PacketFramer::checkForPacketStart() {
     return checkForTelemetryPacketStart();
 
     // TODO: Check for GS Control packet
 }
 
+/**
+ * @brief Check if a telemetry packet was received in the circular buffer, starting from the last byte written in the buffer
+ * @returns True if a packet was detected, else false
+ */
 bool PacketFramer::checkForTelemetryPacketStart() {
     static const uint32_t TELEMETRY_HEADER_CODES[] = {TELEMETRY_TYPE_CODE, STATUS_TYPE_CODE};
 
@@ -66,6 +90,10 @@ bool PacketFramer::checkForTelemetryPacketStart() {
     return false;
 }
 
+/**
+ * @brief Copies the header of packet written in the circular buffer to an internal buffer in the packet framer for further processing
+ * @returns True if the header was successfully copied in the internal buffer, else false
+ */
 bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > Constants::RECV_PACKET_MAX_HEADER_SIZE) {
         GCS_LOG_WARN(
@@ -101,10 +129,18 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     return true;
 }
 
+/**
+ * @brief Returns whether a packet is available
+ * @returns True if a packet is available, else false
+ */
 bool PacketFramer::packetAvailable() const {
     return availablePacketSizesQueue.size();
 }
 
+/**
+ * @brief Get the size of the next packet without removing it from the packet framer
+ * @returns Size of the next packet
+ */
 size_t PacketFramer::peekNextPacketSize() const {
     if (!availablePacketSizesQueue.size()) {
         return 0;

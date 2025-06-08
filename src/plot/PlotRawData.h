@@ -3,6 +3,10 @@
 
 #include <vector>
 
+/**
+ * @class PlotRawData
+ * @brief Raw plot data consisting of multiple data points
+ */
 class PlotRawData {
 public:
     void add(float x, float y);

@@ -9,6 +9,10 @@
 class ITile;
 class ITileSource;
 
+/**
+ * @class TileLoader
+ * @brief Loads tiles from a tile source
+ */
 class TileLoader : public ITileLoader {
 public:
     TileLoader(std::shared_ptr<ITileSource> source, bool dummiesAreFinal = false);
