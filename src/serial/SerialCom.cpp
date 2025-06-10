@@ -7,9 +7,8 @@
  */
 void SerialCom::start() {
     com.Close();
-    packetsRead = 0;
-    consecutiveFailedReads = 0;
-    consecutiveFailedWrites = 0;
+    prm.reset();
+    sfm.reset();
 
     std::vector<std::string> availableComPorts;
     getAvailableComPorts(availableComPorts);
@@ -21,10 +20,6 @@ void SerialCom::start() {
     com.SetPortName(comPath);
     com.SetBaudRate(CBR_19200);
     com.Open();
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        comStartTimePoint = std::chrono::steady_clock::now();
-    }
 }
 
 /**
@@ -36,15 +31,13 @@ bool SerialCom::read() {
         return false;
     }
 
-    bool successFlag;
-    char c = com.ReadChar(successFlag);
-    if (successFlag) {
-        consecutiveFailedReads = 0;
+    bool successful;
+    char c = com.ReadChar(successful);
+    if (successful) {
         pr.receiveByte(c);
-    } else {
-        consecutiveFailedReads++;
     }
-    return successFlag;
+    sfm.trackRead(successful);
+    return successful;
 }
 
 /**
@@ -58,13 +51,9 @@ bool SerialCom::write(uint8_t* msg, size_t size) {
         return false;
     }
 
-    bool successfulFlag = com.Write((char*) msg, (long) size);
-    if (successfulFlag) {
-        consecutiveFailedWrites = 0;
-    } else {
-        consecutiveFailedWrites++;
-    }
-    return successfulFlag;
+    bool successful = com.Write((char*) msg, (long) size);
+    sfm.trackWrite(successful);
+    return successful;
 }
 
 /**
@@ -80,8 +69,7 @@ bool SerialCom::comOpened() {
  * @returns True if the serial com is working, else false
  */
 bool SerialCom::comWorking() {
-    return consecutiveFailedReads < Constants::SERIAL_MAX_CONSECUTIVE_FAILED_READS_BEFORE_FAILURE
-           && consecutiveFailedWrites < Constants::SERIAL_MAX_CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE;
+    return sfm.isComWorking();
 }
 
 /**
@@ -92,7 +80,7 @@ bool SerialCom::comWorking() {
 size_t SerialCom::getPacket(uint8_t* recv) {
     size_t packetSize = pr.getPacket(recv);
     if (packetSize > 0) {
-        packetsRead++;
+        prm.trackPacket();
     }
     return packetSize;
 }
@@ -118,14 +106,7 @@ bool SerialCom::dumpNextPacket() {
  * @returns Packets read per second
  */
 size_t SerialCom::packetsReadPerSecond() {
-    auto now = std::chrono::steady_clock::now();
-    std::chrono::time_point<std::chrono::steady_clock> startTime;
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        startTime = comStartTimePoint;
-    }
-    std::chrono::duration<double> elapsedSeconds = now - startTime;
-    return (size_t) (packetsRead / elapsedSeconds.count());
+    return (size_t) prm.getRatePerSecond();
 }
 
 /**

@@ -83,6 +83,7 @@ constexpr size_t RECV_BYTES_TO_READ_PER_SECOND = 19'200;
 constexpr size_t RECV_PACKET_MAX_SIZE = 64;
 constexpr size_t RECV_PACKET_MAX_HEADER_SIZE = 4;
 constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
+constexpr size_t PACKET_RATE_MONITOR_SAMPLE_TIME_POINT_SIZE = 10;
 
 // Commands
 constexpr size_t COMMAND_MAX_SIZE = 256;

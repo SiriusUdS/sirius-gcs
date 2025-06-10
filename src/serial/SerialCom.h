@@ -2,7 +2,9 @@
 #define SERIALCOM_H
 
 #include "Constants.h"
+#include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
+#include "SerialFailureMonitor.h"
 
 #include <ceserial.h>
 #include <chrono>
@@ -26,13 +28,10 @@ public:
     void shutdown();
 
 private:
-    size_t consecutiveFailedReads{};
-    size_t consecutiveFailedWrites{};
-    std::atomic<size_t> packetsRead{};
-    std::chrono::time_point<std::chrono::steady_clock> comStartTimePoint;
     ceSerial com;
+    SerialFailureMonitor sfm;
+    PacketRateMonitor prm;
     PacketReceiver pr;
-    std::mutex mtx;
 };
 
 #endif // SERIALCOM_H
