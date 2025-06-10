@@ -19,7 +19,7 @@ double PacketRateMonitor::getRatePerSecond() {
     }
     const size_t oldestIndex = timePointBufferFilled ? timePointIndex : 0;
     const size_t newestIndex = timePointBufferFilled ? (timePointIndex + count - 1) % count : timePointIndex - 1;
-    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoints[newestIndex] - timePoints[oldestIndex]).count() / 1000.0;
+    const auto duration = std::chrono::duration<double>(timePoints[newestIndex] - timePoints[oldestIndex]).count();
     if (duration <= 0.0) {
         return 0.0;
     }
