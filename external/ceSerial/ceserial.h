@@ -358,7 +358,7 @@ inline bool ceSerial::Write(const char* data) {
         if (GetLastError() != ERROR_IO_PENDING) {
             fRes = FALSE;
         } else { // Write is pending.
-            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, TRUE))
+            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, FALSE))
                 fRes = FALSE;
             else
                 fRes = TRUE; // Write operation completed successfully.
@@ -385,7 +385,7 @@ inline bool ceSerial::Write(const char* data, long n) {
         if (GetLastError() != ERROR_IO_PENDING) {
             fRes = FALSE;
         } else { // Write is pending.
-            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, TRUE))
+            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, FALSE))
                 fRes = FALSE;
             else
                 fRes = TRUE; // Write operation completed successfully.
@@ -412,7 +412,7 @@ inline bool ceSerial::WriteArr(const uint8_t* data, long n) {
         if (GetLastError() != ERROR_IO_PENDING) {
             fRes = FALSE;
         } else { // Write is pending.
-            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, TRUE))
+            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, FALSE))
                 fRes = FALSE;
             else
                 fRes = TRUE; // Write operation completed successfully.

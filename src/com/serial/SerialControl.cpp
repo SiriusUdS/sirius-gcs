@@ -2,6 +2,7 @@
 
 #include "Constants.h"
 #include "SerialCom.h"
+#include "SerialFailureMonitor.h"
 #include "SerialTask.h"
 
 namespace SerialControl {
@@ -10,7 +11,7 @@ std::chrono::time_point<std::chrono::steady_clock> lastSerialReadTime = std::chr
 } // namespace SerialControl
 
 void SerialControl::startComIfNeeded() {
-    if (SerialTask::com.comOpened() && SerialTask::com.comWorking()) {
+    if (SerialTask::com.comOpened() && SerialTask::serialFailureMonitor.isComWorking()) {
         return;
     }
 

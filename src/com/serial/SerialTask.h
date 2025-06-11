@@ -5,6 +5,9 @@
 #include <chrono>
 #include <thread>
 
+class SerialFailureMonitor;
+class PacketRateMonitor;
+class PacketReceiver;
 class SerialCom;
 
 namespace SerialTask {
@@ -14,6 +17,9 @@ void restart();
 void stop();
 size_t secondsSinceLastUpdate();
 
+extern PacketRateMonitor packetRateMonitor;
+extern PacketReceiver packetReceiver;
+extern SerialFailureMonitor serialFailureMonitor;
 extern SerialCom com;
 extern std::thread thread;
 extern std::chrono::steady_clock::time_point timeLastUpdate;

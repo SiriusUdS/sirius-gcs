@@ -2,6 +2,8 @@
 
 #include "CommandCenter.h"
 #include "CommandDispatch.h"
+#include "PacketRateMonitor.h"
+#include "SerialFailureMonitor.h"
 #include "SerialTask.h"
 
 #include <imgui.h>
@@ -12,9 +14,11 @@ void render() {
         ImGui::Text("COM Opened: ");
         ImGui::SameLine();
         ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
+        ImGui::Text("COM Working: ");
+        ImGui::SameLine();
+        ImGui::Text(SerialTask::com.comOpened() && SerialTask::serialFailureMonitor.isComWorking() ? "Yes" : "No");
 
-        ImGui::Text("Packets read/s: %d", SerialTask::com.packetsReadPerSecond());
-        // ImGui::Text("Loop time SerialTask: %2.6f", SerialTask::secondsSinceLastUpdate());
+        ImGui::Text("Packets read/s: %d", SerialTask::packetRateMonitor.getRatePerSecond());
 
         ImGui::BeginDisabled(!CommandCenter::available());
         if (ImGui::Button("Send test command")) {

@@ -3,14 +3,20 @@
 #include "CommandCenter.h"
 #include "GSDataCenter.h"
 #include "PacketProcessing.h"
+#include "PacketRateMonitor.h"
+#include "PacketReceiver.h"
 #include "PlotData.h"
 #include "SerialCom.h"
 #include "SerialControl.h"
+#include "SerialFailureMonitor.h"
 
 #include <cmath>
 
 namespace SerialTask {
-SerialCom com;
+PacketRateMonitor packetRateMonitor;
+PacketReceiver packetReceiver;
+SerialFailureMonitor serialFailureMonitor;
+SerialCom com(packetRateMonitor, packetReceiver, serialFailureMonitor);
 std::thread thread;
 std::chrono::steady_clock::time_point timeLastUpdate = std::chrono::steady_clock::now();
 std::atomic<bool> running = false;

@@ -1,14 +1,21 @@
 #include "SerialCom.h"
 
 #include "ComDiscovery.h"
+#include "PacketRateMonitor.h"
+#include "PacketReceiver.h"
+#include "SerialFailureMonitor.h"
+
+SerialCom::SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialFailureMonitor& sfm)
+    : packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
+}
 
 /**
  * @brief Initializes communication on the first COM port found
  */
 void SerialCom::start() {
     com.Close();
-    prm.reset();
-    sfm.reset();
+    packetRateMonitor.reset();
+    serialFailureMonitor.reset();
 
     std::vector<std::string> availableComPorts;
     getAvailableComPorts(availableComPorts);
@@ -34,9 +41,9 @@ bool SerialCom::read() {
     bool successful;
     char c = com.ReadChar(successful);
     if (successful) {
-        pr.receiveByte(c);
+        packetReceiver.receiveByte(c);
     }
-    sfm.trackRead(successful);
+    serialFailureMonitor.trackRead(successful);
     return successful;
 }
 
@@ -51,8 +58,8 @@ bool SerialCom::write(uint8_t* msg, size_t size) {
         return false;
     }
 
-    bool successful = com.Write((char*) msg, (long) size);
-    sfm.trackWrite(successful);
+    bool successful = com.WriteArr(msg, (long) size);
+    serialFailureMonitor.trackWrite(successful);
     return successful;
 }
 
@@ -65,48 +72,16 @@ bool SerialCom::comOpened() {
 }
 
 /**
- * @brief Returns whether the serial com is currently working
- * @returns True if the serial com is working, else false
- */
-bool SerialCom::comWorking() {
-    return sfm.isComWorking();
-}
-
-/**
  * @brief Fetches a packet from the internal buffer if one is available
  * @param recv The char buffer to receive the bytes into
  * @returns If a packet is found, the size of the packet is returned, otherwise 0 is returned
  */
 size_t SerialCom::getPacket(uint8_t* recv) {
-    size_t packetSize = pr.getPacket(recv);
+    size_t packetSize = packetReceiver.getPacket(recv);
     if (packetSize > 0) {
-        prm.trackPacket();
+        packetRateMonitor.trackPacket();
     }
     return packetSize;
-}
-
-/**
- * @brief Returns the size of the next available packet that can be read
- * @returns The next packet's size if at least one packet is available, else 0
- */
-size_t SerialCom::nextPacketSize() {
-    return pr.nextPacketSize();
-}
-
-/**
- * @brief Dumps the next available packet.
- * @returns True if a packet was dumped, else false
- */
-bool SerialCom::dumpNextPacket() {
-    return pr.dumpNextPacket();
-}
-
-/**
- * @brief Returns the number of packets read per second
- * @returns Packets read per second
- */
-size_t SerialCom::packetsReadPerSecond() {
-    return (size_t) prm.getRatePerSecond();
 }
 
 /**

@@ -11,13 +11,15 @@ workspace "sirius-gcs"
 
     includedirs {
         "src",
+        "src/com",
+        "src/com/packet",
+        "src/com/serial",
         "src/commands",
         "src/data",
         "src/data_conversion",
         "src/logging",
         "src/map",
         "src/plot",
-        "src/serial",
         "src/switch",
         "src/widgets",
         "src/windows",

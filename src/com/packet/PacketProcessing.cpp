@@ -3,6 +3,7 @@
 #include "GSDataCenter.h"
 #include "LoadCell.h"
 #include "Logging.h"
+#include "PacketReceiver.h"
 #include "PlotData.h"
 #include "PressureTransducer.h"
 #include "SerialCom.h"
@@ -17,7 +18,7 @@ uint8_t packetBuf[Constants::RECV_PACKET_MAX_SIZE];
 } // namespace PacketProcessing
 
 bool PacketProcessing::processIncomingPacket() {
-    packetSize = SerialTask::com.nextPacketSize();
+    packetSize = SerialTask::packetReceiver.nextPacketSize();
 
     if (packetSize == 0) {
         // No available packets
@@ -127,7 +128,7 @@ bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const
 }
 
 bool PacketProcessing::dumpNextPacket(const char* packetName) {
-    if (!SerialTask::com.dumpNextPacket()) {
+    if (!SerialTask::packetReceiver.dumpNextPacket()) {
         GCS_LOG_WARN("PacketProcessing: process{}() called, but there's no packet to process.", packetName);
         return false;
     }
