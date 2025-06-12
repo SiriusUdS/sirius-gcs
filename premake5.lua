@@ -21,6 +21,7 @@ workspace "sirius-gcs"
         "src/map",
         "src/plot",
         "src/switch",
+        "src/utils",
         "src/widgets",
         "src/windows",
         "external/ceSerial",

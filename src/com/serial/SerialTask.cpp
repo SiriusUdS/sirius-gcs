@@ -2,6 +2,7 @@
 
 #include "CommandCenter.h"
 #include "GSDataCenter.h"
+#include "IntervalTimer.h"
 #include "PacketProcessing.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
@@ -17,6 +18,7 @@ PacketRateMonitor packetRateMonitor;
 PacketReceiver packetReceiver;
 SerialFailureMonitor serialFailureMonitor;
 SerialCom com(packetRateMonitor, packetReceiver, serialFailureMonitor);
+IntervalTimer intervalTimer(std::chrono::milliseconds(1000 / Constants::SERIAL_TASK_LOOPS_PER_SECOND));
 std::thread thread;
 std::chrono::steady_clock::time_point timeLastUpdate = std::chrono::steady_clock::now();
 std::atomic<bool> running = false;
@@ -49,15 +51,12 @@ void SerialTask::start() {
 
 void SerialTask::execute() {
     while (!shouldStop) {
-        auto now = std::chrono::steady_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - timeLastUpdate);
-        if (duration.count() < (1000.f / Constants::SERIAL_TASK_LOOPS_PER_SECOND)) {
+        if (intervalTimer.getElapsedCount() == 0) {
             continue;
         }
 
         addSineWavePoint();
-
-        timeLastUpdate = now;
+        intervalTimer.resetElapsedCount();
         // SerialControl::startComIfNeeded();
         // SerialControl::readIncomingBytesAtSetRate();
         // PacketProcessing::processIncomingPacket();
@@ -80,10 +79,4 @@ void SerialTask::stop() {
         thread.join();
     }
     running = false;
-}
-
-size_t SerialTask::secondsSinceLastUpdate() {
-    auto now = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration<double>(now - timeLastUpdate);
-    return (size_t) duration.count();
 }
