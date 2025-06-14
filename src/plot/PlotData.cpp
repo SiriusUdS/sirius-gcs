@@ -1,6 +1,5 @@
 #include "PlotData.h"
 
-#include "Constants.h"
 #include "Logging.h"
 #include "PlotColors.h"
 #include "PlotDataCompression.h"
@@ -32,12 +31,12 @@ void PlotData::addData(float x, float y) {
     data.add(x, y);
     compressedData.add(x, y);
 
-    if (data.size() > Constants::PLOT_MAX_DATA_SIZE_ORIGINAL) {
-        dropOldData(Constants::PLOT_DATA_AMOUNT_TO_DROP_IF_MAX_REACHED);
+    if (data.size() > MAX_ORIGINAL_DATA_SIZE) {
+        dropOldData(DATA_AMOUNT_TO_DROP_IF_MAX_REACHED);
     }
 
-    if (compressedData.size() > Constants::PLOT_MAX_DATA_SIZE_COMPRESSED) {
-        PlotDataCompression::meanCompression(data, compressedData, Constants::PLOT_TARGET_DATA_SIZE_COMPRESSED, style.name);
+    if (compressedData.size() > MAX_COMPRESSED_DATA_SIZE) {
+        PlotDataCompression::meanCompression(data, compressedData, TARGET_COMPRESSED_DATA_SIZE, style.name);
     }
 }
 
@@ -55,7 +54,7 @@ void PlotData::dropOldData(size_t amount) {
     }
 
     data.eraseOld(amount);
-    PlotDataCompression::meanCompression(data, compressedData, Constants::PLOT_TARGET_DATA_SIZE_COMPRESSED, style.name);
+    PlotDataCompression::meanCompression(data, compressedData, TARGET_COMPRESSED_DATA_SIZE, style.name);
 
     GCS_LOG_DEBUG("PlotData: Plot data {} successfully dropped old data, went from size {} to {}.", style.name, oldDataSize, data.size());
 }

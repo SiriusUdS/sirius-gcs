@@ -1,7 +1,7 @@
 #ifndef PACKETRECEIVER_H
 #define PACKETRECEIVER_H
 
-#include "CircularBuffer.hpp"
+#include "PacketCircularBuffer.h"
 #include "PacketFramer.h"
 
 /**
@@ -16,7 +16,7 @@ public:
     size_t nextPacketSize() const;
 
 private:
-    CircularBuffer<> buf;
+    PacketCircularBuffer buf;
     PacketFramer pf{buf};
 };
 

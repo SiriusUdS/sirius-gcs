@@ -1,13 +1,13 @@
 #include "PacketFramer.h"
 
-#include "CircularBuffer.hpp"
 #include "Logging.h"
+#include "PacketCircularBuffer.h"
 #include "Telecommunication/TelemetryHeader.h"
 
 /**
  * @brief Constructs a packet framer by specifing the circular buffer to read the bytes from
  */
-PacketFramer::PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf) : buf{buf}, headerBuf{{0}} {
+PacketFramer::PacketFramer(const PacketCircularBuffer& buf) : buf{buf}, headerBuf{{0}} {
 }
 
 /**
@@ -95,10 +95,10 @@ bool PacketFramer::checkForTelemetryPacketStart() {
  * @returns True if the header was successfully copied in the internal buffer, else false
  */
 bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
-    if (headerSize > Constants::RECV_PACKET_MAX_HEADER_SIZE) {
+    if (headerSize > MAX_HEADER_SIZE) {
         GCS_LOG_WARN(
           "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the maximum header size accepted of {}.",
-          headerSize, Constants::RECV_PACKET_MAX_HEADER_SIZE);
+          headerSize, MAX_HEADER_SIZE);
         return false;
     }
 

@@ -1,7 +1,5 @@
 #ifndef PACKETPROCESSING_H
 
-#include "Constants.h"
-
 #include <stdint.h>
 
 namespace PacketProcessing {

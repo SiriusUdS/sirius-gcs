@@ -1,12 +1,9 @@
 #ifndef PACKETFRAMER_H
 #define PACKETFRAMER_H
 
-#include "Constants.h"
+#include "PacketCircularBuffer.h"
 
 #include <queue>
-
-template <size_t>
-class CircularBuffer;
 
 /**
  * @class PacketFramer
@@ -14,7 +11,7 @@ class CircularBuffer;
  */
 class PacketFramer {
 public:
-    PacketFramer(const CircularBuffer<Constants::RECV_BUF_SIZE>& buf);
+    PacketFramer(const PacketCircularBuffer& buf);
     void tryFrame();
     size_t consumeNextPacketSize();
     void byteWritten();
@@ -27,8 +24,10 @@ private:
     bool checkForTelemetryPacketStart();
     bool getHeaderFromBuf(size_t headerSize);
 
-    const CircularBuffer<Constants::RECV_BUF_SIZE>& buf;
-    uint8_t headerBuf[Constants::RECV_PACKET_MAX_HEADER_SIZE];
+    static constexpr size_t MAX_HEADER_SIZE = 4;
+
+    const PacketCircularBuffer& buf;
+    uint8_t headerBuf[MAX_HEADER_SIZE];
     size_t currentPacketSize{};
     std::queue<size_t> availablePacketSizesQueue{};
     bool readingValidPacket{};

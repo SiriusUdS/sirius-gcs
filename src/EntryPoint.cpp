@@ -11,7 +11,7 @@ int main(int, char*[]) {
 
     HelloImGui::RunnerParams runnerParams;
 
-    runnerParams.appWindowParams.windowTitle = Constants::HELLO_IMGUI_WINDOW_TITLE;
+    runnerParams.appWindowParams.windowTitle = "Sirius GCS";
     runnerParams.appWindowParams.restorePreviousGeometry = true;
 
     runnerParams.appWindowParams.borderless = false;
@@ -26,11 +26,11 @@ int main(int, char*[]) {
     runnerParams.callbacks.PreNewFrame = Application::preNewFrame;
     runnerParams.callbacks.BeforeExit = Application::shutdown;
 
-    runnerParams.imGuiWindowParams.menuAppTitle = Constants::HELLO_IMGUI_MENU_APP_TITLE;
+    runnerParams.imGuiWindowParams.menuAppTitle = "Sirius GCS";
     runnerParams.imGuiWindowParams.showMenuBar = true;
     runnerParams.imGuiWindowParams.defaultImGuiWindowType = HelloImGui::DefaultImGuiWindowType::ProvideFullScreenDockSpace;
 
-    runnerParams.iniFilename = Constants::HELLO_IMGUI_INI_FILENAME;
+    runnerParams.iniFilename = "hello_imgui.ini";
 
     HelloImGui::Run(runnerParams);
 }

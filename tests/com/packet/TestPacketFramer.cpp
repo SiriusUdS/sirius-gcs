@@ -1,11 +1,11 @@
-#include "CircularBuffer.hpp"
+#include "PacketCircularBuffer.h"
 #include "PacketFramer.h"
 #include "Telecommunication/TelemetryHeader.h"
 #include "Telecommunication/TelemetryPacket.h"
 
 #include <doctest.h>
 
-void writeTelemetryPacket(CircularBuffer<>& buf, PacketFramer& pf) {
+void writeTelemetryPacket(PacketCircularBuffer& buf, PacketFramer& pf) {
     EngineTelemetryPacket packet;
     packet.fields.header.bits.type = TELEMETRY_TYPE_CODE;
 
@@ -17,7 +17,7 @@ void writeTelemetryPacket(CircularBuffer<>& buf, PacketFramer& pf) {
     }
 }
 
-void fillCircularBuffer(CircularBuffer<>& buf, PacketFramer& pf, size_t size) {
+void fillCircularBuffer(PacketCircularBuffer& buf, PacketFramer& pf, size_t size) {
     for (size_t i = 0; i < size; i++) {
         buf.writeByte(0);
         pf.byteWritten();
@@ -26,7 +26,7 @@ void fillCircularBuffer(CircularBuffer<>& buf, PacketFramer& pf, size_t size) {
 }
 
 TEST_CASE("Detect packets in packet framer") {
-    CircularBuffer buf;
+    PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
     CHECK_FALSE(pf.packetAvailable());
@@ -37,7 +37,7 @@ TEST_CASE("Detect packets in packet framer") {
 }
 
 TEST_CASE("Consume next packet size in packet framer") {
-    CircularBuffer buf;
+    PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
     CHECK(pf.consumeNextPacketSize() == 0);
@@ -57,7 +57,7 @@ TEST_CASE("Consume next packet size in packet framer") {
 }
 
 TEST_CASE("Clear packet framer") {
-    CircularBuffer buf;
+    PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
     CHECK_FALSE(pf.packetAvailable());

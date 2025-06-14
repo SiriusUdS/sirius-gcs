@@ -5,22 +5,21 @@
 // clang-format on
 
 #include "ControlsWindow.h"
+#include "ImGuiConfig.h"
 #include "Logging.h"
 #include "LoggingWindow.h"
 #include "MapWindow.h"
-#include "PacketProcessing.h"
 #include "PlotWindowCenter.h"
-#include "SerialControl.h"
+#include "SerialTask.h"
 #include "SwitchesWindow.h"
 
-#include <SerialTask.h>
 #include <imgui.h>
 #include <implot.h>
 #include <windows.h>
 #pragma comment(lib, "ws2_32.lib")
 
 namespace Application {
-mINI::INIFile iniFile(Constants::GCS_INI_FILENAME);
+mINI::INIFile iniFile("sirius_gcs.ini");
 mINI::INIStructure iniStructure;
 } // namespace Application
 
@@ -83,14 +82,14 @@ void Application::shutdown() {
 
 std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
     HelloImGui::DockingSplit splitPlotLogs;
-    splitPlotLogs.initialDock = "MainDockSpace";
-    splitPlotLogs.newDock = "LogSpace";
+    splitPlotLogs.initialDock = ImGuiConfig::Dockspace::PLOT;
+    splitPlotLogs.newDock = ImGuiConfig::Dockspace::LOGGING;
     splitPlotLogs.direction = ImGuiDir_Down;
     splitPlotLogs.ratio = 0.33f;
 
     HelloImGui::DockingSplit splitPlotMap;
-    splitPlotMap.initialDock = "MainDockSpace";
-    splitPlotMap.newDock = "MapSpace";
+    splitPlotMap.initialDock = ImGuiConfig::Dockspace::PLOT;
+    splitPlotMap.newDock = ImGuiConfig::Dockspace::MAP;
     splitPlotMap.direction = ImGuiDir_Left;
     splitPlotMap.ratio = 0.5f;
 
@@ -99,10 +98,10 @@ std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
 }
 
 std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
-    HelloImGui::DockableWindow loggingDockWin(Constants::GCS_LOGGING_WINDOW_ID, Constants::GCS_LOGGING_DOCKSPACE, []() { LoggingWindow::render(); });
-    HelloImGui::DockableWindow mapDockWin(Constants::GCS_MAP_WINDOW_ID, Constants::GCS_MAP_DOCKSPACE, []() { MapWindow::render(); });
-    HelloImGui::DockableWindow controlsDockWin(Constants::GCS_CONTROLS_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { ControlsWindow::render(); });
-    HelloImGui::DockableWindow switchesDockWin(Constants::GCS_SWITCHES_WINDOW_ID, Constants::GCS_PLOT_DOCKSPACE, []() { SwitchesWindow::render(); });
+    HelloImGui::DockableWindow loggingDockWin("Logs", ImGuiConfig::Dockspace::LOGGING, []() { LoggingWindow::render(); });
+    HelloImGui::DockableWindow mapDockWin("Map", ImGuiConfig::Dockspace::MAP, []() { MapWindow::render(); });
+    HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::PLOT, []() { ControlsWindow::render(); });
+    HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::PLOT, []() { SwitchesWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
     dockableWindows.push_back(loggingDockWin);

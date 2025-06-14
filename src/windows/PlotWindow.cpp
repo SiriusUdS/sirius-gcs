@@ -1,6 +1,6 @@
 #include "PlotWindow.h"
 
-#include "Constants.h"
+#include "IniConfig.h"
 #include "Utils.h"
 
 #include <imgui.h>
@@ -16,8 +16,8 @@
  */
 PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<PlotData*> plotData)
     : name(name), xLabel(xLabel), yLabel(yLabel), plotData(plotData) {
-    autofitIniId = std::string(name) + std::string(Constants::GCS_INI_BASE_PLOT_WINDOW_AUTO_FIT);
-    showCompressedDataIniId = std::string(name) + std::string(Constants::GCS_INI_BASE_PLOT_WINDOW_SHOW_COMPRESSED_DATA);
+    autofitIniId = std::string(name) + "_plot_window_auto_fit";
+    showCompressedDataIniId = std::string(name) + "_plot_window_show_compressed_data";
     Utils::convertStringToIniId(autofitIniId);
     Utils::convertStringToIniId(showCompressedDataIniId);
 }
@@ -50,12 +50,12 @@ void PlotWindow::render() {
  * @param ini The struct of the ini file
  */
 void PlotWindow::loadState(const mINI::INIStructure& ini) {
-    if (ini.has(Constants::GCS_INI_SECTION)) {
-        if (ini.get(Constants::GCS_INI_SECTION).has(autofitIniId)) {
-            autofit = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(autofitIniId));
+    if (ini.has(IniConfig::GCS_SECTION)) {
+        if (ini.get(IniConfig::GCS_SECTION).has(autofitIniId)) {
+            autofit = std::stoi(ini.get(IniConfig::GCS_SECTION).get(autofitIniId));
         }
-        if (ini.get(Constants::GCS_INI_SECTION).has(showCompressedDataIniId)) {
-            showCompressedData = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(showCompressedDataIniId));
+        if (ini.get(IniConfig::GCS_SECTION).has(showCompressedDataIniId)) {
+            showCompressedData = std::stoi(ini.get(IniConfig::GCS_SECTION).get(showCompressedDataIniId));
         }
     }
 }
@@ -65,14 +65,14 @@ void PlotWindow::loadState(const mINI::INIStructure& ini) {
  * @param ini The struct of the ini file
  */
 void PlotWindow::saveState(mINI::INIStructure& ini) {
-    ini[Constants::GCS_INI_SECTION].set(autofitIniId, std::to_string(autofit));
-    ini[Constants::GCS_INI_SECTION].set(showCompressedDataIniId, std::to_string(showCompressedData));
+    ini[IniConfig::GCS_SECTION].set(autofitIniId, std::to_string(autofit));
+    ini[IniConfig::GCS_SECTION].set(showCompressedDataIniId, std::to_string(showCompressedData));
 }
 
 /**
  * @brief Generates a window id to uniquely identify different plot windows
- * @returns The generated window id
+ * @returns The generatsed window id
  */
 std::string PlotWindow::getWindowId() {
-    return std::string(Constants::GCS_BASE_PLOT_WINDOW_ID) + name;
+    return "Plot - " + name;
 }

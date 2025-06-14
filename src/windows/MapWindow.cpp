@@ -1,6 +1,6 @@
 #include "MapWindow.h"
 
-#include "Constants.h"
+#include "IniConfig.h"
 #include "Logging.h"
 #include "TileLoaderImpl.h"
 #include "TileSaver.h"
@@ -9,6 +9,8 @@
 #include <sstream>
 
 namespace MapWindow {
+constexpr const char* INI_MAP_WINDOW_MAP_VIEW = "map_window_map_view";
+
 int mapView{};
 int prevMapView{};
 bool sourceIsFs{};
@@ -46,16 +48,16 @@ void MapWindow::init() {
 
 void MapWindow::loadState(const mINI::INIStructure& ini) {
     mapPlot->loadState(ini);
-    if (ini.has(Constants::GCS_INI_SECTION)) {
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_MAP_WINDOW_MAP_VIEW)) {
-            mapView = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_MAP_WINDOW_MAP_VIEW));
+    if (ini.has(IniConfig::GCS_SECTION)) {
+        if (ini.get(IniConfig::GCS_SECTION).has(INI_MAP_WINDOW_MAP_VIEW)) {
+            mapView = std::stoi(ini.get(IniConfig::GCS_SECTION).get(INI_MAP_WINDOW_MAP_VIEW));
         }
     }
 }
 
 void MapWindow::saveState(mINI::INIStructure& ini) {
     mapPlot->saveState(ini);
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_MAP_WINDOW_MAP_VIEW, std::to_string(mapView));
+    ini[IniConfig::GCS_SECTION].set(INI_MAP_WINDOW_MAP_VIEW, std::to_string(mapView));
 }
 
 void MapWindow::render() {

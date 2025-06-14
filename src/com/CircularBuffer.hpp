@@ -1,10 +1,9 @@
 #ifndef CIRCULARBUFFER_H
 #define CIRCULARBUFFER_H
 
-#include "Constants.h"
 #include "Logging.h"
 
-template <size_t BUFSIZE = Constants::RECV_BUF_SIZE>
+template <size_t BUFSIZE>
 class CircularBuffer {
 public:
     bool read(uint8_t* recv, size_t size);

@@ -1,13 +1,19 @@
 #include "LoggingWindow.h"
 
-#include "Constants.h"
 #include "FontAwesome.h"
+#include "IniConfig.h"
 #include "Logging.h"
 #include "ToggleButton.h"
 
 #include <ini.h>
 
 namespace LoggingWindow {
+constexpr const char* GCS_INI_LOG_WINDOW_AUTO_SCROLL = "log_window_auto_scroll";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_DEBUG = "log_window_show_debug";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_INFO = "log_window_show_info";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_WARN = "log_window_show_warn";
+constexpr const char* GCS_INI_LOG_WINDOW_SHOW_ERROR = "log_window_show_error";
+
 bool autoScroll{true}, showInfo{true}, showWarn{true}, showError{true}, showTrace{true}, showDebug{true};
 ImGuiTextBuffer buf;
 ImGuiTextFilter filter;
@@ -81,31 +87,31 @@ void LoggingWindow::render() {
 void LoggingWindow::loadState(const mINI::INIStructure& ini) {
     clear();
 
-    if (ini.has(Constants::GCS_INI_SECTION)) {
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_LOG_WINDOW_AUTO_SCROLL)) {
-            autoScroll = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_LOG_WINDOW_AUTO_SCROLL));
+    if (ini.has(IniConfig::GCS_SECTION)) {
+        if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_AUTO_SCROLL)) {
+            autoScroll = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_AUTO_SCROLL));
         }
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_LOG_WINDOW_SHOW_DEBUG)) {
-            showDebug = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_LOG_WINDOW_SHOW_DEBUG));
+        if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_SHOW_DEBUG)) {
+            showDebug = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_SHOW_DEBUG));
         }
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_LOG_WINDOW_SHOW_INFO)) {
-            showInfo = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_LOG_WINDOW_SHOW_INFO));
+        if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_SHOW_INFO)) {
+            showInfo = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_SHOW_INFO));
         }
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_LOG_WINDOW_SHOW_WARN)) {
-            showWarn = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_LOG_WINDOW_SHOW_WARN));
+        if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_SHOW_WARN)) {
+            showWarn = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_SHOW_WARN));
         }
-        if (ini.get(Constants::GCS_INI_SECTION).has(Constants::GCS_INI_LOG_WINDOW_SHOW_ERROR)) {
-            showError = std::stoi(ini.get(Constants::GCS_INI_SECTION).get(Constants::GCS_INI_LOG_WINDOW_SHOW_ERROR));
+        if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_SHOW_ERROR)) {
+            showError = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_SHOW_ERROR));
         }
     }
 }
 
 void LoggingWindow::saveState(mINI::INIStructure& ini) {
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_LOG_WINDOW_AUTO_SCROLL, std::to_string(autoScroll));
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_LOG_WINDOW_SHOW_DEBUG, std::to_string(showDebug));
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_LOG_WINDOW_SHOW_INFO, std::to_string(showInfo));
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_LOG_WINDOW_SHOW_WARN, std::to_string(showWarn));
-    ini[Constants::GCS_INI_SECTION].set(Constants::GCS_INI_LOG_WINDOW_SHOW_ERROR, std::to_string(showError));
+    ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_AUTO_SCROLL, std::to_string(autoScroll));
+    ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_DEBUG, std::to_string(showDebug));
+    ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_INFO, std::to_string(showInfo));
+    ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_WARN, std::to_string(showWarn));
+    ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_ERROR, std::to_string(showError));
 }
 
 void LoggingWindow::clear() {
