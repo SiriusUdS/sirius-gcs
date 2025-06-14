@@ -2,6 +2,7 @@
 #define PACKETRATEMONITOR_H
 
 #include <chrono>
+#include <deque>
 #include <mutex>
 
 class PacketRateMonitor {
@@ -10,12 +11,12 @@ public:
     double getRatePerSecond();
     void reset();
 
-private:
-    static constexpr size_t TIME_POINT_ARR_SIZE = 10;
+    static constexpr double TIME_WINDOW_SECONDS = 2.0;
 
-    std::chrono::steady_clock::time_point timePoints[TIME_POINT_ARR_SIZE];
-    bool timePointBufferFilled{};
-    size_t timePointIndex{};
+private:
+    void removeOldTimePoints();
+
+    std::deque<std::chrono::steady_clock::time_point> timePoints;
     std::mutex mtx;
 };
 

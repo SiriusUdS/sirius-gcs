@@ -1,5 +1,4 @@
 #include "Application.h"
-#include "Constants.h"
 
 #include <hello_imgui/hello_imgui.h>
 

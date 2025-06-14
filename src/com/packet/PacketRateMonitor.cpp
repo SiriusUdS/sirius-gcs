@@ -1,34 +1,37 @@
 #include "PacketRateMonitor.h"
 
+using namespace std::chrono;
+
 void PacketRateMonitor::trackPacket() {
     std::lock_guard lock(mtx);
+    auto now = steady_clock::now();
+    timePoints.push_back(now);
 
-    timePoints[timePointIndex] = std::chrono::steady_clock::now();
-    timePointIndex = (timePointIndex + 1) % TIME_POINT_ARR_SIZE;
-    if (timePointIndex == TIME_POINT_ARR_SIZE - 1) {
-        timePointBufferFilled = true;
-    }
+    removeOldTimePoints();
 }
 
 double PacketRateMonitor::getRatePerSecond() {
     std::lock_guard lock(mtx);
 
-    const size_t count = timePointBufferFilled ? TIME_POINT_ARR_SIZE : timePointIndex;
-    if (count < 2) {
+    auto now = steady_clock::now();
+
+    removeOldTimePoints();
+
+    if (timePoints.empty()) {
         return 0.0;
     }
-    const size_t oldestIndex = timePointBufferFilled ? timePointIndex : 0;
-    const size_t newestIndex = timePointBufferFilled ? (timePointIndex + count - 1) % count : timePointIndex - 1;
-    const auto duration = std::chrono::duration<double>(timePoints[newestIndex] - timePoints[oldestIndex]).count();
-    if (duration <= 0.0) {
-        return 0.0;
-    }
-    return (count - 1) / duration;
+
+    double durationSec = duration_cast<duration<double>>(now - timePoints.front()).count();
+    return timePoints.size() / durationSec;
 }
 
 void PacketRateMonitor::reset() {
     std::lock_guard lock(mtx);
+    timePoints.clear();
+}
 
-    timePointBufferFilled = false;
-    timePointIndex = 0;
+void PacketRateMonitor::removeOldTimePoints() {
+    while (!timePoints.empty() && duration_cast<duration<double>>(steady_clock::now() - timePoints.front()).count() > TIME_WINDOW_SECONDS) {
+        timePoints.pop_front();
+    }
 }
