@@ -4,7 +4,6 @@
 #include <WinSock2.h>
 // clang-format on
 
-#include "Constants.h"
 #include "ControlsWindow.h"
 #include "Logging.h"
 #include "LoggingWindow.h"
@@ -26,15 +25,21 @@ mINI::INIStructure iniStructure;
 } // namespace Application
 
 void Application::loadFonts() {
-    ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF(Constants::IMGUI_MAIN_FONT_FILENAME, Constants::IMGUI_MAIN_FONT_SIZE);
+    static constexpr ImWchar ICONS_RANGES[] = {0xf000, 0xf8ff, 0};
 
-    static const ImWchar iconsRanges[] = {0xf000, 0xf8ff, 0};
+    constexpr const char* MAIN_FONT = "assets/fonts/Nunito-Regular.ttf";
+    constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
+    constexpr float MAIN_FONT_SIZE = 28;
+    constexpr float ICONS_SIZE = 22;
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF(MAIN_FONT, MAIN_FONT_SIZE);
+
     ImFontConfig iconsConfig;
     iconsConfig.MergeMode = true;
     iconsConfig.PixelSnapH = true;
 
-    io.Fonts->AddFontFromFileTTF(Constants::IMGUI_ICONS_FONT, Constants::IMGUI_ICONS_SIZE, &iconsConfig, iconsRanges);
+    io.Fonts->AddFontFromFileTTF(ICONS_FONT, ICONS_SIZE, &iconsConfig, ICONS_RANGES);
 }
 
 void Application::init() {

@@ -4,8 +4,8 @@ void PacketRateMonitor::trackPacket() {
     std::lock_guard lock(mtx);
 
     timePoints[timePointIndex] = std::chrono::steady_clock::now();
-    timePointIndex = (timePointIndex + 1) % Constants::PACKET_RATE_MONITOR_SAMPLE_TIME_POINT_SIZE;
-    if (timePointIndex == Constants::PACKET_RATE_MONITOR_SAMPLE_TIME_POINT_SIZE - 1) {
+    timePointIndex = (timePointIndex + 1) % TIME_POINT_ARR_SIZE;
+    if (timePointIndex == TIME_POINT_ARR_SIZE - 1) {
         timePointBufferFilled = true;
     }
 }
@@ -13,7 +13,7 @@ void PacketRateMonitor::trackPacket() {
 double PacketRateMonitor::getRatePerSecond() {
     std::lock_guard lock(mtx);
 
-    const size_t count = timePointBufferFilled ? Constants::PACKET_RATE_MONITOR_SAMPLE_TIME_POINT_SIZE : timePointIndex;
+    const size_t count = timePointBufferFilled ? TIME_POINT_ARR_SIZE : timePointIndex;
     if (count < 2) {
         return 0.0;
     }

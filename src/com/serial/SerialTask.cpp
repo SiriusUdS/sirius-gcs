@@ -14,11 +14,13 @@
 #include <cmath>
 
 namespace SerialTask {
+static constexpr size_t SERIAL_TASK_LOOPS_PER_SECOND = 20;
+
 PacketRateMonitor packetRateMonitor;
 PacketReceiver packetReceiver;
 SerialFailureMonitor serialFailureMonitor;
 SerialCom com(packetRateMonitor, packetReceiver, serialFailureMonitor);
-IntervalTimer intervalTimer(std::chrono::milliseconds(1000 / Constants::SERIAL_TASK_LOOPS_PER_SECOND));
+IntervalTimer intervalTimer(std::chrono::milliseconds(1000 / SERIAL_TASK_LOOPS_PER_SECOND));
 std::thread thread;
 std::chrono::steady_clock::time_point timeLastUpdate = std::chrono::steady_clock::now();
 std::atomic<bool> running = false;

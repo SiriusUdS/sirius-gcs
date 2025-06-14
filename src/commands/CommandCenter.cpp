@@ -15,16 +15,16 @@ Command& CommandCenter::get() {
 }
 
 bool CommandCenter::available() {
-    return command.state == CommandState::NONE && SerialTask::com.comOpened();
+    return command.state == Command::State::NONE && SerialTask::com.comOpened();
 }
 
 bool CommandCenter::ready(size_t commandSize) {
-    if (command.state != CommandState::NONE) {
+    if (command.state != Command::State::NONE) {
         GCS_LOG_WARN("CommandCenter: Couldn't mark command as ready, another command is already being processed.");
         return false;
     }
     command.size = commandSize;
-    command.state = CommandState::READY;
+    command.state = Command::State::READY;
     return true;
 }
 
@@ -34,14 +34,14 @@ bool CommandCenter::processAck() {
 }
 
 void CommandCenter::processCommand() {
-    if (command.state == CommandState::READY) {
+    if (command.state == Command::State::READY) {
         if (SerialTask::com.write(command.data, command.size)) {
-            command.state = CommandState::SENT;
+            command.state = Command::State::SENT;
             command.lastTimeSent = std::chrono::steady_clock::now();
         } else {
             GCS_LOG_ERROR("CommandCenter: Couldn't send command over serial communication.");
         }
-    } else if (command.state == CommandState::SENT) {
-        command.state = CommandState::NONE; // TODO: Implement Ack
+    } else if (command.state == Command::State::SENT) {
+        command.state = Command::State::NONE; // TODO: Implement Ack
     }
 }

@@ -14,7 +14,7 @@
 
 namespace PacketProcessing {
 size_t packetSize{};
-uint8_t packetBuf[Constants::RECV_PACKET_MAX_SIZE];
+uint8_t packetBuf[MAX_PACKET_SIZE];
 } // namespace PacketProcessing
 
 bool PacketProcessing::processIncomingPacket() {
@@ -27,7 +27,7 @@ bool PacketProcessing::processIncomingPacket() {
         GCS_LOG_WARN("PacketProcessing: Received packet size too small to fit header, ignoring packet.");
         dumpNextPacket("IncomingPacket");
         return false;
-    } else if (packetSize > Constants::RECV_PACKET_MAX_SIZE) {
+    } else if (packetSize > MAX_PACKET_SIZE) {
         GCS_LOG_WARN("PacketProcessing: Received packet size too big to fit in packet bufferk, ignoring packet");
         dumpNextPacket("IncomingPacket");
         return false;

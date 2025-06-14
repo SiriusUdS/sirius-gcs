@@ -2,7 +2,6 @@
 #define SERIALTASK_H
 
 #include <atomic>
-#include <chrono>
 #include <thread>
 
 class SerialFailureMonitor;

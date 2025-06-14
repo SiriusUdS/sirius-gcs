@@ -1,8 +1,6 @@
 #ifndef PACKETRATEMONITOR_H
 #define PACKETRATEMONITOR_H
 
-#include "Constants.h"
-
 #include <chrono>
 #include <mutex>
 
@@ -13,7 +11,9 @@ public:
     void reset();
 
 private:
-    std::chrono::steady_clock::time_point timePoints[Constants::PACKET_RATE_MONITOR_SAMPLE_TIME_POINT_SIZE];
+    static constexpr size_t TIME_POINT_ARR_SIZE = 10;
+
+    std::chrono::steady_clock::time_point timePoints[TIME_POINT_ARR_SIZE];
     bool timePointBufferFilled{};
     size_t timePointIndex{};
     std::mutex mtx;

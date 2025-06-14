@@ -28,15 +28,17 @@ std::shared_ptr<TileSourceUrlConnTest> urlConnectionTest;
 } // namespace MapWindow
 
 void MapWindow::init() {
+    constexpr const size_t GCS_TILE_REQUEST_LIMIT = 25;
+
     mapPlot = std::make_shared<RichMapPlot>();
     storage = std::make_shared<MarkStorage>();
     urlConnectionTest = std::make_shared<TileSourceUrlConnTest>();
 
     std::string mapTileDir = getFsPathFromMapView(MAP_VIEW);
     std::string satelliteTileDir = getFsPathFromMapView(SATELLITE_VIEW);
-    mapTileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlOsm>(Constants::GCS_TILE_REQUEST_LIMIT, MAP_PRELOAD),
+    mapTileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlOsm>(GCS_TILE_REQUEST_LIMIT, MAP_PRELOAD),
                                                    std::make_shared<TileSaverSubDir>(mapTileDir));
-    satelliteTileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlArc>(Constants::GCS_TILE_REQUEST_LIMIT, MAP_PRELOAD),
+    satelliteTileGrabber = std::make_shared<TileGrabber>(std::make_shared<TileSourceUrlArc>(GCS_TILE_REQUEST_LIMIT, MAP_PRELOAD),
                                                          std::make_shared<TileSaverSubDir>(satelliteTileDir));
 
     addMark({46.14665264871996, -70.66861153239353}, "Tapis Venture");
@@ -57,12 +59,14 @@ void MapWindow::saveState(mINI::INIStructure& ini) {
 }
 
 void MapWindow::render() {
+    constexpr const size_t GCS_MAP_MAX_TILES_DOWNLOAD = 100'000;
+
     if (ImGui::CollapsingHeader("Download Tiles")) {
         ImGui::Indent(20.0f);
 
         size_t tilesSelectedTotal =
           2 * countTiles(mapPlot->minLat(), mapPlot->maxLat(), mapPlot->minLon(), mapPlot->maxLon(), downloadMinZ, downloadMaxZ);
-        bool maxTilesDownloadExceeded = tilesSelectedTotal > Constants::GCS_MAP_MAX_TILES_DOWNLOAD;
+        bool maxTilesDownloadExceeded = tilesSelectedTotal > GCS_MAP_MAX_TILES_DOWNLOAD;
 
         // Latitude and longitude
         ImGui::Text("Min Lat %.6f, Min Lon %.6f", mapPlot->minLat(), mapPlot->minLon());
@@ -82,7 +86,7 @@ void MapWindow::render() {
             ImGui::Text("Tiles Count:");
             ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-            ImGui::Text(">%lu (Too many tiles, can't download)", Constants::GCS_MAP_MAX_TILES_DOWNLOAD);
+            ImGui::Text(">%lu (Too many tiles, can't download)", GCS_MAP_MAX_TILES_DOWNLOAD);
             ImGui::PopStyleColor();
         } else {
             ImGui::Text("Tiles Count: %lu", tilesSelectedTotal);
@@ -102,7 +106,7 @@ void MapWindow::render() {
                 ImGui::SetTooltip(
                   "Map tiles cannot be downloaded because the tile provider cannot be accessed (likely because of no Internet access).");
             } else if (maxTilesDownloadExceeded) {
-                ImGui::SetTooltip("Downloads exceeding %lu tiles are not permitted.", Constants::GCS_MAP_MAX_TILES_DOWNLOAD);
+                ImGui::SetTooltip("Downloads exceeding %lu tiles are not permitted.", GCS_MAP_MAX_TILES_DOWNLOAD);
             } else {
                 ImGui::SetTooltip("Download map tiles that are currently on screen so they can be accessed without having to fetch them online.");
             }

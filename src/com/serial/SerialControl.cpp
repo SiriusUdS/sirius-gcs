@@ -1,35 +1,40 @@
 #include "SerialControl.h"
 
-#include "Constants.h"
 #include "SerialCom.h"
 #include "SerialFailureMonitor.h"
 #include "SerialTask.h"
 
+using namespace std::chrono;
+
 namespace SerialControl {
-std::chrono::time_point<std::chrono::steady_clock> lastSerialConnectionAttempt = std::chrono::steady_clock::now();
-std::chrono::time_point<std::chrono::steady_clock> lastSerialReadTime = std::chrono::steady_clock::now();
+steady_clock::time_point lastSerialConnectionAttempt = steady_clock::now();
+steady_clock::time_point lastSerialReadTime = steady_clock::now();
 } // namespace SerialControl
 
 void SerialControl::startComIfNeeded() {
+    constexpr size_t CONNECTION_ATTEMPT_DELAY_IN_SECS = 3;
+
     if (SerialTask::com.comOpened() && SerialTask::serialFailureMonitor.isComWorking()) {
         return;
     }
 
-    auto now = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedSeconds = now - lastSerialConnectionAttempt;
+    auto now = steady_clock::now();
+    duration<double> elapsedSeconds = now - lastSerialConnectionAttempt;
 
-    if (elapsedSeconds.count() > Constants::SERIAL_CONNECTION_ATTEMPT_DELAY_IN_SECS) {
+    if (elapsedSeconds.count() > CONNECTION_ATTEMPT_DELAY_IN_SECS) {
         lastSerialConnectionAttempt = now;
         SerialTask::com.start();
     }
 }
 
 void SerialControl::readIncomingBytesAtSetRate() {
-    auto now = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsedSeconds = now - lastSerialReadTime;
+    constexpr size_t BYTES_TO_READ_PER_SECOND = 19'200;
+
+    auto now = steady_clock::now();
+    duration<double> elapsedSeconds = now - lastSerialReadTime;
     lastSerialReadTime = now;
 
-    size_t bytesToRead = (size_t) (Constants::RECV_BYTES_TO_READ_PER_SECOND * elapsedSeconds.count());
+    size_t bytesToRead = (size_t) (BYTES_TO_READ_PER_SECOND * elapsedSeconds.count());
     while (0 < bytesToRead--) {
         if (!SerialTask::com.read()) {
             break;
