@@ -68,24 +68,24 @@ bool PacketProcessing::processTelemetryPacket() {
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
     float timeStamp = (float) packet->fields.timestamp_ms;
 
-    GSDataCenter::Thermistor1PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[0]));
-    GSDataCenter::Thermistor2PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[1]));
-    GSDataCenter::Thermistor3PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[2]));
-    GSDataCenter::Thermistor4PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[3]));
-    GSDataCenter::Thermistor5PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[4]));
-    GSDataCenter::Thermistor6PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[5]));
-    GSDataCenter::Thermistor7PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[6]));
-    GSDataCenter::Thermistor8PlotData.addData(timeStamp, (float) TemperatureSensor::convertToTemperature(packet->fields.adcValues[7]));
+    GSDataCenter::Thermistor1PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[0]));
+    GSDataCenter::Thermistor2PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[1]));
+    GSDataCenter::Thermistor3PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[2]));
+    GSDataCenter::Thermistor4PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[3]));
+    GSDataCenter::Thermistor5PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[4]));
+    GSDataCenter::Thermistor6PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[5]));
+    GSDataCenter::Thermistor7PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[6]));
+    GSDataCenter::Thermistor8PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[7]));
 
-    const float PRESSURE_SENSOR_1 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[10], 3);
-    const float PRESSURE_SENSOR_2 = PressureTransducer::convertRawToPressure(packet->fields.adcValues[11], 3);
+    const float PRESSURE_SENSOR_1 = PressureTransducer::adcToPressure(packet->fields.adcValues[10], 3);
+    const float PRESSURE_SENSOR_2 = PressureTransducer::adcToPressure(packet->fields.adcValues[11], 3);
     GSDataCenter::PressureSensor1PlotData.addData(timeStamp, PRESSURE_SENSOR_1);
     GSDataCenter::PressureSensor2PlotData.addData(timeStamp, PRESSURE_SENSOR_2);
     // GSDataCenter::PressureSensor1PlotData.addData(timeStamp, packet->fields.adcValues[10]);
     // GSDataCenter::PressureSensor2PlotData.addData(timeStamp, packet->fields.adcValues[11]);
 
-    GSDataCenter::LoadCell1PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[14]));
-    GSDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::convertRawToForce((float) packet->fields.adcValues[15]));
+    GSDataCenter::LoadCell1PlotData.addData(timeStamp, LoadCell::adcToForce((float) packet->fields.adcValues[14]));
+    GSDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::adcToForce((float) packet->fields.adcValues[15]));
 
     return true;
 }

@@ -2,8 +2,7 @@
 #define TEMPERATURESENSOR_H
 
 namespace TemperatureSensor {
-float interpolateTemperature(float measuredResistance);
-float convertToTemperature(float adcValue);
+float adcToTemperature(float adcValue);
 } // namespace TemperatureSensor
 
 #endif // TEMPERATURESENSOR_H

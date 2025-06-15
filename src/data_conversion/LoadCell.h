@@ -2,7 +2,7 @@
 #define LOADCELL_H
 
 namespace LoadCell {
-float convertRawToForce(float adcValue);
+float adcToForce(float adcValue);
 } // namespace LoadCell
 
 #endif // LOADCELL_H
