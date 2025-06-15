@@ -9,11 +9,6 @@ bool processGSControlPacket();
 bool processEngineStatusPacket();
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
 bool dumpNextPacket(const char* packetName);
-
-constexpr size_t MAX_PACKET_SIZE = 64;
-
-extern size_t packetSize;
-extern uint8_t packetBuf[MAX_PACKET_SIZE];
 } // namespace PacketProcessing
 
 #endif // PACKETPROCESSING_H

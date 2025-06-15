@@ -13,6 +13,8 @@
 #include "TemperatureSensor.h"
 
 namespace PacketProcessing {
+constexpr size_t MAX_PACKET_SIZE = 64;
+
 size_t packetSize{};
 uint8_t packetBuf[MAX_PACKET_SIZE];
 } // namespace PacketProcessing

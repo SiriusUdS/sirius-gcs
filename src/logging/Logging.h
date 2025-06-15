@@ -7,11 +7,6 @@ class ImGuiTextBufferSink;
 
 namespace Logging {
 void init();
-
-extern spdlog::sink_ptr consoleSink;
-extern spdlog::sink_ptr fileSink;
-extern std::shared_ptr<ImGuiTextBufferSink> imguiSink;
-extern std::vector<spdlog::sink_ptr> sinks;
 } // namespace Logging
 
 #define GCS_LOG_DEBUG(msg, ...) spdlog::debug(msg, __VA_ARGS__)

@@ -10,12 +10,8 @@ void loadFonts();
 void init();
 void preNewFrame();
 void shutdown();
-
 std::vector<HelloImGui::DockingSplit> createBaseDockingSplits();
 std::vector<HelloImGui::DockableWindow> createDockableWindows();
-
-extern mINI::INIFile iniFile;
-extern mINI::INIStructure iniStructure;
 } // namespace Application
 
 #endif // APPLICATION_H

@@ -20,10 +20,6 @@ extern PacketRateMonitor packetRateMonitor;
 extern PacketReceiver packetReceiver;
 extern SerialFailureMonitor serialFailureMonitor;
 extern SerialCom com;
-extern IntervalTimer intervalTimer;
-extern std::thread thread;
-extern std::atomic<bool> running;
-extern std::atomic<bool> shouldStop;
 } // namespace SerialTask
 
 #endif // SERIALTASK_H

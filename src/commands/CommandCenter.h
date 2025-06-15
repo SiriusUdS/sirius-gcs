@@ -9,8 +9,6 @@ bool available();
 bool ready(size_t commandSize);
 bool processAck();
 void processCommand();
-
-extern Command command;
 } // namespace CommandCenter
 
 #endif // COMMANDCENTER_H
