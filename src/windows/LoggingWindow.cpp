@@ -14,7 +14,7 @@ constexpr const char* GCS_INI_LOG_WINDOW_SHOW_INFO = "log_window_show_info";
 constexpr const char* GCS_INI_LOG_WINDOW_SHOW_WARN = "log_window_show_warn";
 constexpr const char* GCS_INI_LOG_WINDOW_SHOW_ERROR = "log_window_show_error";
 
-bool autoScroll{true}, showInfo{true}, showWarn{true}, showError{true}, showTrace{true}, showDebug{true};
+bool showInfo{true}, showWarn{true}, showError{true}, showTrace{true}, showDebug{true};
 ImGuiTextBuffer buf;
 ImGuiTextFilter filter;
 ImVector<int> lineOffsets;
@@ -22,8 +22,6 @@ ImVector<spdlog::level::level_enum> logLevels;
 } // namespace LoggingWindow
 
 void LoggingWindow::render() {
-    ImGui::Checkbox("Auto Scroll", &autoScroll);
-    ImGui::SameLine();
     ToggleButton(ICON_FA_BUG " Debug", &showDebug, ImVec4(0.0f, 0.5f, 1.0f, 1.0f));
     ImGui::SameLine();
     ToggleButton(ICON_FA_INFO_CIRCLE " Info", &showInfo, ImVec4(0.0f, 0.6f, 0.15f, 1.0f));
@@ -75,7 +73,7 @@ void LoggingWindow::render() {
             ImGui::PopStyleColor();
         }
 
-        if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
             ImGui::SetScrollHereY(1.0f);
         }
 
@@ -88,9 +86,6 @@ void LoggingWindow::loadState(const mINI::INIStructure& ini) {
     clear();
 
     if (ini.has(IniConfig::GCS_SECTION)) {
-        if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_AUTO_SCROLL)) {
-            autoScroll = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_AUTO_SCROLL));
-        }
         if (ini.get(IniConfig::GCS_SECTION).has(GCS_INI_LOG_WINDOW_SHOW_DEBUG)) {
             showDebug = std::stoi(ini.get(IniConfig::GCS_SECTION).get(GCS_INI_LOG_WINDOW_SHOW_DEBUG));
         }
@@ -107,7 +102,6 @@ void LoggingWindow::loadState(const mINI::INIStructure& ini) {
 }
 
 void LoggingWindow::saveState(mINI::INIStructure& ini) {
-    ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_AUTO_SCROLL, std::to_string(autoScroll));
     ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_DEBUG, std::to_string(showDebug));
     ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_INFO, std::to_string(showInfo));
     ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_WARN, std::to_string(showWarn));
