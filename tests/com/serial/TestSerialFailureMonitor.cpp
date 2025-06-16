@@ -19,7 +19,7 @@ TEST_CASE("SerialFailureMonitor should detect com is working if not enough conse
 
     consecutiveFailedReads(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE - 1);
     consecutiveFailedWrites(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE - 1);
-    CHECK(monitor.isComWorking() == true);
+    CHECK_FALSE(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor consecutive failed reads should be reset by a successful read") {
@@ -27,7 +27,7 @@ TEST_CASE("SerialFailureMonitor consecutive failed reads should be reset by a su
 
     consecutiveFailedReads(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
     monitor.trackRead(true);
-    CHECK(monitor.isComWorking() == true);
+    CHECK_FALSE(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor consecutive failed writes should be reset by a successful write") {
@@ -35,35 +35,35 @@ TEST_CASE("SerialFailureMonitor consecutive failed writes should be reset by a s
 
     consecutiveFailedWrites(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
     monitor.trackWrite(true);
-    CHECK(monitor.isComWorking() == true);
+    CHECK_FALSE(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor should detect com is not working after consecutive failed reads") {
     SerialFailureMonitor monitor;
 
     consecutiveFailedReads(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
-    CHECK(monitor.isComWorking() == false);
+    CHECK(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor should detect com is not working after consecutive failed writes") {
     SerialFailureMonitor monitor;
 
     consecutiveFailedWrites(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
-    CHECK(monitor.isComWorking() == false);
+    CHECK(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor should detect com is not working after a lot of consecutive failed reads") {
     SerialFailureMonitor monitor;
 
     consecutiveFailedReads(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE * 10);
-    CHECK(monitor.isComWorking() == false);
+    CHECK(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor should detect com is not working after a lot of consecutive failed writes") {
     SerialFailureMonitor monitor;
 
     consecutiveFailedWrites(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE * 10);
-    CHECK(monitor.isComWorking() == false);
+    CHECK(monitor.isComFailing());
 }
 
 TEST_CASE("SerialFailureMonitor should reset correctly") {
@@ -72,6 +72,5 @@ TEST_CASE("SerialFailureMonitor should reset correctly") {
     consecutiveFailedReads(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
     consecutiveFailedWrites(monitor, SerialFailureMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
     monitor.reset();
-    CHECK(monitor.isComWorking() == true);
-    CHECK(monitor.isComWorking() == true);
+    CHECK_FALSE(monitor.isComFailing());
 }

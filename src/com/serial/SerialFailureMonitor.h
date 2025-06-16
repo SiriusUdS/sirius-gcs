@@ -5,7 +5,7 @@ class SerialFailureMonitor {
 public:
     void trackRead(bool successful);
     void trackWrite(bool successful);
-    bool isComWorking();
+    bool isComFailing();
     void reset();
 
     static constexpr size_t CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 100;

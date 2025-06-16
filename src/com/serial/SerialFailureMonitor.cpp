@@ -16,8 +16,8 @@ void SerialFailureMonitor::trackWrite(bool successful) {
     }
 }
 
-bool SerialFailureMonitor::isComWorking() {
-    return consecutiveReadsFailed < CONSECUTIVE_FAILED_READS_BEFORE_FAILURE && consecutiveWritesFailed < CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE;
+bool SerialFailureMonitor::isComFailing() {
+    return consecutiveReadsFailed >= CONSECUTIVE_FAILED_READS_BEFORE_FAILURE || consecutiveWritesFailed >= CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE;
 }
 
 void SerialFailureMonitor::reset() {

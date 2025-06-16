@@ -16,7 +16,7 @@ void render() {
         ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
         ImGui::Text("COM Working: ");
         ImGui::SameLine();
-        ImGui::Text(SerialTask::com.comOpened() && SerialTask::serialFailureMonitor.isComWorking() ? "Yes" : "No");
+        ImGui::Text(SerialTask::com.comOpened() && !SerialTask::serialFailureMonitor.isComFailing() ? "Yes" : "No");
 
         ImGui::Text("Packets read/s: %d", SerialTask::packetRateMonitor.getRatePerSecond());
 
