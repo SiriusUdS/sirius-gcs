@@ -10,8 +10,16 @@
  * @brief Represents a command that can be sent to the GS.
  */
 struct Command {
-    enum class State { NONE, READY, SENT };
-    static constexpr size_t MAX_DATA_SIZE = 256;
+    /**
+     * @enum State
+     * @brief Represents the state of the command.
+     */
+    enum class State {
+        NONE,  ///< No state, command not initialized
+        READY, ///< Command is ready to be sent
+        SENT,  ///< Command has been sent, waiting for acknowledgment
+    };
+    static constexpr size_t MAX_DATA_SIZE = 256; ///< Maximum size of the command's data
 
     std::atomic<State> state = State::NONE;             ///< Current state of the command
     uint8_t data[MAX_DATA_SIZE] = {0};                  ///< Command data

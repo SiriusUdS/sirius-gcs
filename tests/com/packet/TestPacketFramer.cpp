@@ -25,7 +25,7 @@ void fillCircularBuffer(PacketCircularBuffer& buf, PacketFramer& pf, size_t size
     }
 }
 
-TEST_CASE("Detect packets in packet framer") {
+TEST_CASE("PacketFramer should detect packets") {
     PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
@@ -36,7 +36,7 @@ TEST_CASE("Detect packets in packet framer") {
     CHECK(pf.packetAvailable());
 }
 
-TEST_CASE("Consume next packet size in packet framer") {
+TEST_CASE("PacketFramer should consume next packet size") {
     PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
@@ -56,7 +56,7 @@ TEST_CASE("Consume next packet size in packet framer") {
     CHECK(pf.consumeNextPacketSize() == sizeof(EngineTelemetryPacket) + 100);
 }
 
-TEST_CASE("Clear packet framer") {
+TEST_CASE("PacketFramer should clear correctly") {
     PacketCircularBuffer buf;
     PacketFramer pf(buf);
 

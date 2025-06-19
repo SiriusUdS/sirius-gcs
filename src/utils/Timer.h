@@ -3,6 +3,10 @@
 
 #include <chrono>
 
+/**
+ * @class Timer
+ * @brief A simple timer class that measures elapsed time.
+ */
 class Timer {
 public:
     Timer();

@@ -5,7 +5,7 @@
 
 const size_t TEST_PLOT_RAW_DATA_SIZE = 10;
 
-TEST_CASE("Mean plot data compression") {
+TEST_CASE("PlotDataCompression mean compression") {
     PlotRawData data;
     PlotRawData compressed;
 

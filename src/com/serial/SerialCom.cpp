@@ -5,6 +5,9 @@
 #include "PacketReceiver.h"
 #include "SerialFailureMonitor.h"
 
+/**
+ * @brief Constructs a SerialCom object with the given monitors
+ */
 SerialCom::SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialFailureMonitor& sfm)
     : packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
 }

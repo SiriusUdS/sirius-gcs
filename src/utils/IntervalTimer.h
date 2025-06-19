@@ -3,6 +3,10 @@
 
 #include <chrono>
 
+/**
+ * @class IntervalTimer
+ * @brief A timer that counts the number of elapsed intervals.
+ */
 class IntervalTimer {
 public:
     IntervalTimer(std::chrono::steady_clock::duration interval);

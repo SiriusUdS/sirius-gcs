@@ -19,7 +19,7 @@ void fill(PacketReceiver& pr, size_t size) {
     }
 }
 
-TEST_CASE("Receive packet with packet receiver") {
+TEST_CASE("PacketReceiver should receive packet") {
     PacketReceiver pr;
 
     CHECK(pr.nextPacketSize() == 0);
@@ -29,7 +29,7 @@ TEST_CASE("Receive packet with packet receiver") {
     CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
 }
 
-TEST_CASE("Get packet from packet receiver") {
+TEST_CASE("PacketReceiver should be able to get packet") {
     PacketReceiver pr;
     EngineTelemetryPacket packet;
 
@@ -39,7 +39,7 @@ TEST_CASE("Get packet from packet receiver") {
     CHECK(packet.fields.adcValues[0] == 1234);
 }
 
-TEST_CASE("Dump next packet in packet receiver") {
+TEST_CASE("PacketReceiver should dump next packet") {
     PacketReceiver pr;
 
     writeTelemetryPacket(pr);
