@@ -59,10 +59,10 @@ void SerialTask::execute() {
 
         addSineWavePoint();
         intervalTimer.resetElapsedCount();
-        // SerialControl::startComIfNeeded();
-        // SerialControl::readIncomingBytesAtSetRate();
-        // PacketProcessing::processIncomingPacket();
-        // CommandCenter::processCommand();
+        SerialControl::startComIfNeeded();
+        SerialControl::readIncomingBytesAtSetRate();
+        PacketProcessing::processIncomingPacket();
+        CommandCenter::processCommand();
     }
 }
 

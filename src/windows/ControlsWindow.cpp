@@ -18,7 +18,7 @@ void render() {
         ImGui::SameLine();
         ImGui::Text(SerialTask::com.comOpened() && !SerialTask::serialFailureMonitor.isComFailing() ? "Yes" : "No");
 
-        ImGui::Text("Packets read/s: %d", SerialTask::packetRateMonitor.getRatePerSecond());
+        ImGui::Text("Packets read/s: %.1f", SerialTask::packetRateMonitor.getRatePerSecond());
 
         ImGui::BeginDisabled(!CommandCenter::available());
         if (ImGui::Button("Send test command")) {

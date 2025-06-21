@@ -13,8 +13,8 @@ public:
     void reset();
 
     // clang-format off
-    static constexpr size_t CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 100; ///< Number of consecutive failed reads before considering communication as failing.
-    static constexpr size_t CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE = 100; ///< Number of consecutive failed writes before considering communication as failing.
+    static constexpr size_t CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 10; ///< Number of consecutive failed reads before considering communication as failing.
+    static constexpr size_t CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE = 10; ///< Number of consecutive failed writes before considering communication as failing.
     // clang-format on
 
 private:

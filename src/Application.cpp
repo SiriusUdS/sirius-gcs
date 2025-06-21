@@ -100,8 +100,8 @@ std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
 std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow loggingDockWin("Logs", ImGuiConfig::Dockspace::LOGGING, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin("Map", ImGuiConfig::Dockspace::MAP, []() { MapWindow::render(); });
-    HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::PLOT, []() { ControlsWindow::render(); });
-    HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::PLOT, []() { SwitchesWindow::render(); });
+    HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::MAP, []() { ControlsWindow::render(); });
+    HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
     dockableWindows.push_back(loggingDockWin);

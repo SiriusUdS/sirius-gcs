@@ -26,17 +26,22 @@ bool PacketProcessing::processIncomingPacket() {
         // No available packets
         return false;
     } else if (packetSize < sizeof(TelemetryHeader)) {
-        GCS_LOG_WARN("PacketProcessing: Received packet size too small to fit header, ignoring packet.");
+        GCS_LOG_WARN("PacketProcessing: Received packet size ({}) too small to fit header ({}), ignoring packet.", packetSize,
+                     sizeof(TelemetryHeader));
         dumpNextPacket("IncomingPacket");
         return false;
     } else if (packetSize > MAX_PACKET_SIZE) {
-        GCS_LOG_WARN("PacketProcessing: Received packet size too big to fit in packet bufferk, ignoring packet");
+        GCS_LOG_WARN("PacketProcessing: Received packet size ({}) too big to fit in packet buffer ({}), ignoring packet", packetSize,
+                     MAX_PACKET_SIZE);
         dumpNextPacket("IncomingPacket");
         return false;
     }
 
-    if (SerialTask::com.getPacket(packetBuf) != packetSize) {
-        GCS_LOG_WARN("PacketProcessing: The size of the packet that was just read does not match the expected packet size, ignoring packet.");
+    size_t receivedPacketSize = SerialTask::com.getPacket(packetBuf);
+    if (receivedPacketSize != packetSize) {
+        GCS_LOG_WARN(
+          "PacketProcessing: The size of the packet that was just read ({}) does not match the expected packet size ({}), ignoring packet.",
+          receivedPacketSize, packetSize);
         return false;
     }
 
