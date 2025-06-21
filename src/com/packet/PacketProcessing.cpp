@@ -37,11 +37,8 @@ bool PacketProcessing::processIncomingPacket() {
         return false;
     }
 
-    size_t receivedPacketSize = SerialTask::com.getPacket(packetBuf);
-    if (receivedPacketSize != packetSize) {
-        GCS_LOG_WARN(
-          "PacketProcessing: The size of the packet that was just read ({}) does not match the expected packet size ({}), ignoring packet.",
-          receivedPacketSize, packetSize);
+    if (!SerialTask::com.getPacket(packetBuf)) {
+        GCS_LOG_ERROR("PacketProcessing: Something went wrong while getting the next packet.");
         return false;
     }
 

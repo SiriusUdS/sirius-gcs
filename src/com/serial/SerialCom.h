@@ -18,7 +18,7 @@ public:
     bool read();
     bool write(uint8_t* msg, size_t size);
     bool comOpened();
-    size_t getPacket(uint8_t* recv);
+    bool getPacket(uint8_t* recv);
     void shutdown();
 
 private:

@@ -77,14 +77,14 @@ bool SerialCom::comOpened() {
 /**
  * @brief Fetches a packet from the internal buffer if one is available
  * @param recv The char buffer to receive the bytes into
- * @returns If a packet is found, the size of the packet is returned, otherwise 0 is returned
+ * @returns True if a packet was successfully received, else false
  */
-size_t SerialCom::getPacket(uint8_t* recv) {
-    size_t packetSize = packetReceiver.getPacket(recv);
-    if (packetSize > 0) {
+bool SerialCom::getPacket(uint8_t* recv) {
+    bool successful = packetReceiver.getPacket(recv);
+    if (successful) {
         packetRateMonitor.trackPacket();
     }
-    return packetSize;
+    return successful;
 }
 
 /**
