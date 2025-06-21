@@ -37,7 +37,8 @@ void PlotWindow::render() {
         flags = ImPlotFlags_None;
     }
 
-    if (ImPlot::BeginPlot(name.c_str(), xLabel.c_str(), yLabel.c_str(), ImGui::GetContentRegionAvail(), flags)) {
+    if (ImPlot::BeginPlot(name.c_str(), ImGui::GetContentRegionAvail(), flags)) {
+        ImPlot::SetupAxes(xLabel.c_str(), yLabel.c_str());
         for (const PlotData* data : plotData) {
             data->plot(showCompressedData);
         }

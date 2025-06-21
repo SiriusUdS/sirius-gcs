@@ -30,7 +30,7 @@ std::shared_ptr<TileSourceUrlConnTest> urlConnectionTest;
 } // namespace MapWindow
 
 void MapWindow::init() {
-    constexpr const size_t GCS_TILE_REQUEST_LIMIT = 25;
+    constexpr const int GCS_TILE_REQUEST_LIMIT = 25;
 
     mapPlot = std::make_shared<RichMapPlot>();
     storage = std::make_shared<MarkStorage>();
@@ -88,10 +88,10 @@ void MapWindow::render() {
             ImGui::Text("Tiles Count:");
             ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-            ImGui::Text(">%lu (Too many tiles, can't download)", GCS_MAP_MAX_TILES_DOWNLOAD);
+            ImGui::Text(">%zu (Too many tiles, can't download)", GCS_MAP_MAX_TILES_DOWNLOAD);
             ImGui::PopStyleColor();
         } else {
-            ImGui::Text("Tiles Count: %lu", tilesSelectedTotal);
+            ImGui::Text("Tiles Count: %zu", tilesSelectedTotal);
         }
         ImGui::SameLine();
         ImGui::Text("Current Zoom Level: %d", mapPlot->zoom());
@@ -108,7 +108,7 @@ void MapWindow::render() {
                 ImGui::SetTooltip(
                   "Map tiles cannot be downloaded because the tile provider cannot be accessed (likely because of no Internet access).");
             } else if (maxTilesDownloadExceeded) {
-                ImGui::SetTooltip("Downloads exceeding %lu tiles are not permitted.", GCS_MAP_MAX_TILES_DOWNLOAD);
+                ImGui::SetTooltip("Downloads exceeding %zu tiles are not permitted.", GCS_MAP_MAX_TILES_DOWNLOAD);
             } else {
                 ImGui::SetTooltip("Download map tiles that are currently on screen so they can be accessed without having to fetch them online.");
             }
@@ -130,7 +130,7 @@ void MapWindow::render() {
         downloadProgress = float(downloadTileCount) / float(downloadTileTotal);
         downloadProgress = std::isnan(downloadProgress) ? 0.f : downloadProgress;
         ImGui::SameLine();
-        ImGui::Text("%d/%d", downloadTileCount, downloadTileTotal);
+        ImGui::Text("%zu/%zu", downloadTileCount, downloadTileTotal);
         ImGui::SameLine();
         ImGui::ProgressBar(downloadProgress);
 

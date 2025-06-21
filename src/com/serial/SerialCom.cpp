@@ -21,7 +21,7 @@ void SerialCom::start() {
     serialFailureMonitor.reset();
 
     std::vector<std::string> availableComPorts;
-    getAvailableComPorts(availableComPorts);
+    ComDiscovery::getAvailableComPorts(availableComPorts);
     if (availableComPorts.empty()) {
         return;
     }
