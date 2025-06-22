@@ -8,7 +8,7 @@ using namespace doctest;
 using namespace std::chrono;
 using namespace std::this_thread;
 
-constexpr double PRM_EPSILON = 0.1;
+constexpr double PRM_EPSILON = 0.05;
 
 double simulatePacketCom(PacketRateMonitor& prm, size_t numPackets, double durationSec) {
     const double TIME_BETWEEN_PACKETS_SEC = durationSec / numPackets;
@@ -29,20 +29,12 @@ TEST_CASE("PacketRateMonitor should return correct rate") {
     PacketRateMonitor prm;
     double elapsedSec;
 
-    elapsedSec = simulatePacketCom(prm, 15, 0.5);
-    CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 30);
+    elapsedSec = simulatePacketCom(prm, 30, 3);
+    CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 10);
 
     prm.reset();
-    elapsedSec = simulatePacketCom(prm, 250, 0.5);
-    CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 500);
-
-    prm.reset();
-    elapsedSec = simulatePacketCom(prm, 2, 0.1);
-    CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 20);
-
-    prm.reset();
-    elapsedSec = simulatePacketCom(prm, 5, 0.4);
-    CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 12.5);
+    elapsedSec = simulatePacketCom(prm, 100, 2);
+    CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 50);
 }
 
 TEST_CASE("PacketRateMonitor rate should go back to 0 after waiting long enough after receiving packets") {

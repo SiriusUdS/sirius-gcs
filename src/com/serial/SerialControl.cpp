@@ -1,7 +1,7 @@
 #include "SerialControl.h"
 
 #include "SerialCom.h"
-#include "SerialFailureMonitor.h"
+#include "SerialStateMonitor.h"
 #include "SerialTask.h"
 #include "Timer.h"
 
@@ -15,7 +15,7 @@ Timer timerSerialRead;
 } // namespace SerialControl
 
 void SerialControl::startComIfNeeded() {
-    if (SerialTask::com.comOpened() && !SerialTask::serialFailureMonitor.isComFailing()) {
+    if (SerialTask::com.comOpened() && !SerialTask::serialFailureMonitor.getState() == SerialStateMonitor::State::NOT_WORKING) {
         return;
     }
 

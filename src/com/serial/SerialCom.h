@@ -5,7 +5,7 @@
 
 class PacketRateMonitor;
 class PacketReceiver;
-class SerialFailureMonitor;
+class SerialStateMonitor;
 
 /**
  * @class SerialCom
@@ -13,7 +13,7 @@ class SerialFailureMonitor;
  */
 class SerialCom {
 public:
-    SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialFailureMonitor& sfm);
+    SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm);
     void start();
     bool read();
     bool write(uint8_t* msg, size_t size);
@@ -25,7 +25,7 @@ private:
     ceSerial com;
     PacketRateMonitor& packetRateMonitor;
     PacketReceiver& packetReceiver;
-    SerialFailureMonitor& serialFailureMonitor;
+    SerialStateMonitor& serialFailureMonitor;
 };
 
 #endif // SERIALCOM_H

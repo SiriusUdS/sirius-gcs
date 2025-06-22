@@ -9,7 +9,7 @@
 #include "PlotData.h"
 #include "SerialCom.h"
 #include "SerialControl.h"
-#include "SerialFailureMonitor.h"
+#include "SerialStateMonitor.h"
 
 #include <cmath>
 
@@ -18,7 +18,7 @@ static constexpr size_t SERIAL_TASK_LOOPS_PER_SECOND = 20;
 
 PacketRateMonitor packetRateMonitor;
 PacketReceiver packetReceiver;
-SerialFailureMonitor serialFailureMonitor;
+SerialStateMonitor serialFailureMonitor;
 SerialCom com(packetRateMonitor, packetReceiver, serialFailureMonitor);
 IntervalTimer intervalTimer(std::chrono::milliseconds(1000 / SERIAL_TASK_LOOPS_PER_SECOND));
 std::thread thread;

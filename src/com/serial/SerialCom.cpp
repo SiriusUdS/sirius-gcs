@@ -3,12 +3,12 @@
 #include "ComDiscovery.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
-#include "SerialFailureMonitor.h"
+#include "SerialStateMonitor.h"
 
 /**
  * @brief Constructs a SerialCom object with the given monitors
  */
-SerialCom::SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialFailureMonitor& sfm)
+SerialCom::SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm)
     : packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
 }
 

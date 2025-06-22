@@ -7,10 +7,10 @@ using namespace std::chrono;
  */
 void PacketRateMonitor::trackPacket() {
     std::lock_guard lock(mtx);
-    auto now = steady_clock::now();
-    timePoints.push_back(now);
 
     removeOldTimePoints();
+    auto now = steady_clock::now();
+    timePoints.push_back(now);
 }
 
 /**
@@ -20,16 +20,9 @@ void PacketRateMonitor::trackPacket() {
 double PacketRateMonitor::getRatePerSecond() {
     std::lock_guard lock(mtx);
 
-    auto now = steady_clock::now();
-
     removeOldTimePoints();
-
-    if (timePoints.empty()) {
-        return 0.0;
-    }
-
-    double durationSec = duration_cast<duration<double>>(now - timePoints.front()).count();
-    return timePoints.size() / durationSec;
+    auto now = steady_clock::now();
+    return timePoints.size() / TIME_WINDOW_SECONDS;
 }
 
 /**
@@ -37,6 +30,7 @@ double PacketRateMonitor::getRatePerSecond() {
  */
 void PacketRateMonitor::reset() {
     std::lock_guard lock(mtx);
+
     timePoints.clear();
 }
 

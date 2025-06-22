@@ -4,7 +4,7 @@
 #include <atomic>
 #include <thread>
 
-class SerialFailureMonitor;
+class SerialStateMonitor;
 class PacketRateMonitor;
 class PacketReceiver;
 class SerialCom;
@@ -18,7 +18,7 @@ void stop();
 
 extern PacketRateMonitor packetRateMonitor;
 extern PacketReceiver packetReceiver;
-extern SerialFailureMonitor serialFailureMonitor;
+extern SerialStateMonitor serialFailureMonitor;
 extern SerialCom com;
 } // namespace SerialTask
 

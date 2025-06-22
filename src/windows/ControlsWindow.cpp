@@ -3,7 +3,7 @@
 #include "CommandCenter.h"
 #include "CommandDispatch.h"
 #include "PacketRateMonitor.h"
-#include "SerialFailureMonitor.h"
+#include "SerialStateMonitor.h"
 #include "SerialTask.h"
 
 #include <imgui.h>
@@ -11,12 +11,29 @@
 namespace ControlsWindow {
 void render() {
     if (ImGui::CollapsingHeader("Serial")) {
-        ImGui::Text("COM Opened: ");
+        const char* comStateText = "Unknown";
+        if (SerialTask::com.comOpened()) {
+            comStateText = "Disconnected";
+        } else {
+            switch (SerialTask::serialFailureMonitor.getState()) {
+            case SerialStateMonitor::State::STARTING:
+                comStateText = "Starting";
+                break;
+            case SerialStateMonitor::State::RESETTING:
+                comStateText = "Resetting";
+                break;
+            case SerialStateMonitor::State::WORKING:
+                comStateText = "Working";
+                break;
+            case SerialStateMonitor::State::NOT_WORKING:
+                comStateText = "Not working";
+                break;
+            }
+        }
+
+        ImGui::Text("COM State: ");
         ImGui::SameLine();
-        ImGui::Text(SerialTask::com.comOpened() ? "Yes" : "No");
-        ImGui::Text("COM Working: ");
-        ImGui::SameLine();
-        ImGui::Text(SerialTask::com.comOpened() && !SerialTask::serialFailureMonitor.isComFailing() ? "Yes" : "No");
+        ImGui::Text(comStateText);
 
         ImGui::Text("Packets read/s: %.1f", SerialTask::packetRateMonitor.getRatePerSecond());
 
