@@ -45,7 +45,7 @@ bool PacketProcessing::processIncomingPacket() {
     TelemetryHeader* header = (TelemetryHeader*) packetBuf;
     switch (header->bits.type) {
     case TELEMETRY_TYPE_CODE:
-        return processTelemetryPacket();
+        return processEngineTelemetryPacket();
     case STATUS_TYPE_CODE:
         if (header->bits.boardId == TELEMETRY_GS_CONTROL_BOARD_ID) {
             return processGSControlPacket();
@@ -62,7 +62,7 @@ bool PacketProcessing::processIncomingPacket() {
     return false;
 }
 
-bool PacketProcessing::processTelemetryPacket() {
+bool PacketProcessing::processEngineTelemetryPacket() {
     if (!validateIncomingPacketSize(sizeof(EngineTelemetryPacket), "EngineTelemetryPacket")) {
         return false;
     }

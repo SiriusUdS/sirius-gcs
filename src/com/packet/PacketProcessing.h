@@ -4,7 +4,7 @@
 
 namespace PacketProcessing {
 bool processIncomingPacket();
-bool processTelemetryPacket();
+bool processEngineTelemetryPacket();
 bool processGSControlPacket();
 bool processEngineStatusPacket();
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
