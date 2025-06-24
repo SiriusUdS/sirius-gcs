@@ -27,12 +27,11 @@ float TemperatureSensor::adcToTemperature(float adcValue) {
     }
     const float voltage = (adcValue / ADDITIVE_FACTOR) * 3.3f;
     const float resistance = (3.3f / voltage) * CONTROL_RESISTANCE;
-    const float measuredResistance = (CONTROL_RESISTANCE * adcValue) / (ADDITIVE_FACTOR - adcValue);
 
     for (int i = 0; i < RT_TABLE_SIZE - 1; i++) {
-        if (measuredResistance <= RT_TABLE[i].resistance && measuredResistance >= RT_TABLE[i + 1].resistance) {
+        if (resistance <= RT_TABLE[i].resistance && resistance >= RT_TABLE[i + 1].resistance) {
             const float slope = (RT_TABLE[i + 1].temperature - RT_TABLE[i].temperature) / (RT_TABLE[i + 1].resistance - RT_TABLE[i].resistance);
-            const float temp = RT_TABLE[i].temperature + slope * (measuredResistance - RT_TABLE[i].resistance);
+            const float temp = RT_TABLE[i].temperature + slope * (resistance - RT_TABLE[i].resistance);
             return temp;
         }
     }
