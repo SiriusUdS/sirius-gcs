@@ -2,6 +2,7 @@
 
 #include "GSDataCenter.h"
 #include "ImGuiConfig.h"
+#include "SensorPlotData.h"
 
 namespace PlotWindowCenter {
 constexpr const char* TIMESTAMP_AXIS_NAME = "Timestamp (ms)";

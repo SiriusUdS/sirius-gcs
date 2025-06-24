@@ -3,7 +3,7 @@
 
 #include <vector>
 
-class PlotData;
+class SensorPlotData;
 struct SwitchData;
 
 namespace GSDataCenter {
@@ -11,9 +11,9 @@ constexpr size_t THERMISTOR_AMOUNT = 8;
 constexpr size_t PRESSURE_SENSOR_AMOUNT = 2;
 constexpr size_t LOAD_CELL_AMOUNT = 2;
 
-extern PlotData ThermistorPlotData[THERMISTOR_AMOUNT];
-extern PlotData PressureSensorPlotData[PRESSURE_SENSOR_AMOUNT];
-extern PlotData LoadCellPlotData[LOAD_CELL_AMOUNT];
+extern SensorPlotData ThermistorPlotData[THERMISTOR_AMOUNT];
+extern SensorPlotData PressureSensorPlotData[PRESSURE_SENSOR_AMOUNT];
+extern SensorPlotData LoadCellPlotData[LOAD_CELL_AMOUNT];
 
 extern SwitchData AllowDumpSwitchData;
 extern SwitchData AllowFillSwitchData;

@@ -4,8 +4,8 @@
 #include "LoadCell.h"
 #include "Logging.h"
 #include "PacketReceiver.h"
-#include "PlotData.h"
 #include "PressureTransducer.h"
+#include "SensorPlotData.h"
 #include "SerialCom.h"
 #include "SerialTask.h"
 #include "SwitchData.h"
@@ -68,27 +68,30 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     }
 
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
-    float timeStamp = (float) packet->fields.timestamp_ms;
+    float timestamp = (float) packet->fields.timestamp_ms;
 
     constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
     for (size_t plotIdx = 0; plotIdx < GSDataCenter::THERMISTOR_AMOUNT; plotIdx++) {
         const size_t adcIdx = plotIdx + THERMISTOR_ADC_INDEX_OFFSET;
+        const float adcValue = packet->fields.adcValues[adcIdx];
         const float temperature = TemperatureSensor::adcToTemperature(packet->fields.adcValues[adcIdx]);
-        GSDataCenter::ThermistorPlotData[plotIdx].addData(timeStamp, temperature);
+        GSDataCenter::ThermistorPlotData[plotIdx].addData(adcValue, temperature, timestamp);
     }
 
     constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
     for (size_t plotIdx = 0; plotIdx < GSDataCenter::PRESSURE_SENSOR_AMOUNT; plotIdx++) {
         const size_t adcIdx = plotIdx + PRESSURE_SENSOR_ADC_INDEX_OFFSET;
+        const float adcValue = packet->fields.adcValues[adcIdx];
         const float pressure = PressureTransducer::adcToPressure(packet->fields.adcValues[adcIdx], 3);
-        GSDataCenter::PressureSensorPlotData[plotIdx].addData(timeStamp, pressure);
+        GSDataCenter::PressureSensorPlotData[plotIdx].addData(adcValue, pressure, timestamp);
     }
 
     constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
     for (size_t plotIdx = 0; plotIdx < GSDataCenter::LOAD_CELL_AMOUNT; plotIdx++) {
         const size_t adcIdx = plotIdx + LOAD_CELL_ADC_INDEX_OFFSET;
+        const float adcValue = packet->fields.adcValues[adcIdx];
         const float force = LoadCell::adcToForce((float) packet->fields.adcValues[adcIdx]);
-        GSDataCenter::LoadCellPlotData[plotIdx].addData(timeStamp, force);
+        GSDataCenter::LoadCellPlotData[plotIdx].addData(adcValue, force, timestamp);
     }
 
     return true;
