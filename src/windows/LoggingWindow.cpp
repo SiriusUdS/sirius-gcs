@@ -8,6 +8,9 @@
 #include <ini.h>
 
 namespace LoggingWindow {
+void clear();
+void updateVisibleLines();
+
 constexpr const char* GCS_INI_LOG_WINDOW_AUTO_SCROLL = "log_window_auto_scroll";
 constexpr const char* GCS_INI_LOG_WINDOW_SHOW_DEBUG = "log_window_show_debug";
 constexpr const char* GCS_INI_LOG_WINDOW_SHOW_INFO = "log_window_show_info";
@@ -73,7 +76,6 @@ void LoggingWindow::render() {
                     case spdlog::level::info:  break;
                     case spdlog::level::warn:  color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); break;
                     case spdlog::level::err:   color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f); break;
-                    default:                   break;
                 }
                 // clang-format on
 
