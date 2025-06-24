@@ -6,11 +6,13 @@
 #include <spdlog/spdlog.h>
 
 namespace LoggingWindow {
+void init();
 void render();
 void loadState(const mINI::INIStructure& ini);
 void saveState(mINI::INIStructure& ini);
 void clear();
 void addLog(const char* str, const char* strEnd, spdlog::level::level_enum type);
+void updateVisibleLines();
 } // namespace LoggingWindow
 
 #endif // LOGGINGWINDOW_H

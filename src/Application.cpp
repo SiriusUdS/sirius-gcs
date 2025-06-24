@@ -46,7 +46,7 @@ void Application::init() {
 
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        GCS_LOG_ERROR("WSAStartup failed");
+        GCS_LOG_ERROR("WSAStartup failed.");
         return;
     }
 
@@ -54,6 +54,7 @@ void Application::init() {
 
     iniFile.read(iniStructure);
 
+    LoggingWindow::init();
     MapWindow::init();
 
     LoggingWindow::loadState(iniStructure);
