@@ -45,7 +45,8 @@ void PlotWindow::render() {
     }
 
     if (ImPlot::BeginPlot(name.c_str(), ImGui::GetContentRegionAvail(), flags)) {
-        ImPlot::SetupAxes(xLabel.c_str(), yLabel.c_str());
+        const char* actualYLabel = dataType == ADC ? "ADC Value" : yLabel.c_str();
+        ImPlot::SetupAxes(xLabel.c_str(), actualYLabel);
         for (const SensorPlotData* data : plotData) {
             if (dataType == VALUE) {
                 data->plotValue(showCompressedData);

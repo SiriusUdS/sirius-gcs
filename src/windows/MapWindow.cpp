@@ -137,8 +137,6 @@ void MapWindow::render() {
         ImGui::Unindent(20.0f);
     }
 
-    ImGui::TextUnformatted("View type: ");
-    ImGui::SameLine();
     ImGui::RadioButton("Map", &mapView, MAP_VIEW);
     ImGui::SameLine();
     ImGui::RadioButton("Satellite", &mapView, SATELLITE_VIEW);

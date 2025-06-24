@@ -14,10 +14,11 @@ class PlotData {
 public:
     PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
-    void dropOldData(size_t amount);
     void plot(bool showCompressedData) const;
 
 private:
+    void dropOldData(size_t amount);
+
     static constexpr size_t MAX_ORIGINAL_DATA_SIZE = 100'000;
     static constexpr size_t DATA_AMOUNT_TO_DROP_IF_MAX_REACHED = 10'000;
     static constexpr size_t MAX_COMPRESSED_DATA_SIZE = 20'000;
