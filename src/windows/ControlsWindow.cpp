@@ -12,7 +12,7 @@ namespace ControlsWindow {
 void render() {
     if (ImGui::CollapsingHeader("Serial")) {
         const char* comStateText = "Unknown";
-        if (SerialTask::com.comOpened()) {
+        if (!SerialTask::com.comOpened()) {
             comStateText = "Disconnected";
         } else {
             switch (SerialTask::serialFailureMonitor.getState()) {

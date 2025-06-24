@@ -70,24 +70,26 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
     float timeStamp = (float) packet->fields.timestamp_ms;
 
-    GSDataCenter::Thermistor1PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[0]));
-    GSDataCenter::Thermistor2PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[1]));
-    GSDataCenter::Thermistor3PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[2]));
-    GSDataCenter::Thermistor4PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[3]));
-    GSDataCenter::Thermistor5PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[4]));
-    GSDataCenter::Thermistor6PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[5]));
-    GSDataCenter::Thermistor7PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[6]));
-    GSDataCenter::Thermistor8PlotData.addData(timeStamp, (float) TemperatureSensor::adcToTemperature(packet->fields.adcValues[7]));
+    constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
+    for (size_t plotIdx = 0; plotIdx < GSDataCenter::THERMISTOR_AMOUNT; plotIdx++) {
+        const size_t adcIdx = plotIdx + THERMISTOR_ADC_INDEX_OFFSET;
+        const float temperature = TemperatureSensor::adcToTemperature(packet->fields.adcValues[adcIdx]);
+        GSDataCenter::ThermistorPlotData[plotIdx].addData(timeStamp, temperature);
+    }
 
-    const float PRESSURE_SENSOR_1 = PressureTransducer::adcToPressure(packet->fields.adcValues[10], 3);
-    const float PRESSURE_SENSOR_2 = PressureTransducer::adcToPressure(packet->fields.adcValues[11], 3);
-    GSDataCenter::PressureSensor1PlotData.addData(timeStamp, PRESSURE_SENSOR_1);
-    GSDataCenter::PressureSensor2PlotData.addData(timeStamp, PRESSURE_SENSOR_2);
-    // GSDataCenter::PressureSensor1PlotData.addData(timeStamp, packet->fields.adcValues[10]);
-    // GSDataCenter::PressureSensor2PlotData.addData(timeStamp, packet->fields.adcValues[11]);
+    constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
+    for (size_t plotIdx = 0; plotIdx < GSDataCenter::PRESSURE_SENSOR_AMOUNT; plotIdx++) {
+        const size_t adcIdx = plotIdx + PRESSURE_SENSOR_ADC_INDEX_OFFSET;
+        const float pressure = PressureTransducer::adcToPressure(packet->fields.adcValues[adcIdx], 3);
+        GSDataCenter::PressureSensorPlotData[plotIdx].addData(timeStamp, pressure);
+    }
 
-    GSDataCenter::LoadCell1PlotData.addData(timeStamp, LoadCell::adcToForce((float) packet->fields.adcValues[14]));
-    GSDataCenter::LoadCell2PlotData.addData(timeStamp, LoadCell::adcToForce((float) packet->fields.adcValues[15]));
+    constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
+    for (size_t plotIdx = 0; plotIdx < GSDataCenter::LOAD_CELL_AMOUNT; plotIdx++) {
+        const size_t adcIdx = plotIdx + LOAD_CELL_ADC_INDEX_OFFSET;
+        const float force = LoadCell::adcToForce((float) packet->fields.adcValues[adcIdx]);
+        GSDataCenter::LoadCellPlotData[plotIdx].addData(timeStamp, force);
+    }
 
     return true;
 }

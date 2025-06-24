@@ -5,18 +5,12 @@
 #include "SwitchData.h"
 
 namespace GSDataCenter {
-PlotData Thermistor1PlotData("Thermistor 1", PlotColors::BLUE);
-PlotData Thermistor2PlotData("Thermistor 2", PlotColors::RED);
-PlotData Thermistor3PlotData("Thermistor 3", PlotColors::GREEN);
-PlotData Thermistor4PlotData("Thermistor 4", PlotColors::YELLOW);
-PlotData Thermistor5PlotData("Thermistor 5", PlotColors::ORANGE);
-PlotData Thermistor6PlotData("Thermistor 6", PlotColors::CYAN);
-PlotData Thermistor7PlotData("Thermistor 7", PlotColors::PURPLE);
-PlotData Thermistor8PlotData("Thermistor 8", PlotColors::GRAY);
-PlotData PressureSensor1PlotData("Pressure Sensor 1", PlotColors::BLUE);
-PlotData PressureSensor2PlotData("Pressure Sensor 2", PlotColors::RED);
-PlotData LoadCell1PlotData("Load Cell 1", PlotColors::BLUE);
-PlotData LoadCell2PlotData("Load Cell 2", PlotColors::RED);
+PlotData ThermistorPlotData[THERMISTOR_AMOUNT] = {{"Thermistor 1", PlotColors::BLUE},   {"Thermistor 2", PlotColors::RED},
+                                                  {"Thermistor 3", PlotColors::GREEN},  {"Thermistor 4", PlotColors::YELLOW},
+                                                  {"Thermistor 5", PlotColors::ORANGE}, {"Thermistor 6", PlotColors::CYAN},
+                                                  {"Thermistor 7", PlotColors::PURPLE}, {"Thermistor 8", PlotColors::GRAY}};
+PlotData PressureSensorPlotData[PRESSURE_SENSOR_AMOUNT] = {{"Pressure Sensor 1", PlotColors::BLUE}, {"Pressure Sensor 2", PlotColors::RED}};
+PlotData LoadCellPlotData[LOAD_CELL_AMOUNT] = {{"Load Cell 1", PlotColors::BLUE}, {"Load Cell 2", PlotColors::RED}};
 
 SwitchData AllowDumpSwitchData("Allow Dump", false);
 SwitchData AllowFillSwitchData("Allow Fill", false);

@@ -7,12 +7,12 @@ namespace PlotWindowCenter {
 constexpr const char* TIMESTAMP_AXIS_NAME = "Timestamp (ms)";
 
 PlotWindow thermistorPlot("Thermistors", TIMESTAMP_AXIS_NAME, "Temperature (C)",
-                          {&GSDataCenter::Thermistor1PlotData, &GSDataCenter::Thermistor2PlotData, &GSDataCenter::Thermistor3PlotData,
-                           &GSDataCenter::Thermistor4PlotData, &GSDataCenter::Thermistor5PlotData, &GSDataCenter::Thermistor6PlotData,
-                           &GSDataCenter::Thermistor7PlotData, &GSDataCenter::Thermistor8PlotData});
+                          {&GSDataCenter::ThermistorPlotData[0], &GSDataCenter::ThermistorPlotData[1], &GSDataCenter::ThermistorPlotData[2],
+                           &GSDataCenter::ThermistorPlotData[3], &GSDataCenter::ThermistorPlotData[4], &GSDataCenter::ThermistorPlotData[5],
+                           &GSDataCenter::ThermistorPlotData[6], &GSDataCenter::ThermistorPlotData[7]});
 PlotWindow pressureSensorPlot("Pressure Sensors", TIMESTAMP_AXIS_NAME, "Pressure (psi)",
-                              {&GSDataCenter::PressureSensor1PlotData, &GSDataCenter::PressureSensor2PlotData});
-PlotWindow loadCellPlot("Load Cells", TIMESTAMP_AXIS_NAME, "Weight (lb)", {&GSDataCenter::LoadCell1PlotData, &GSDataCenter::LoadCell2PlotData});
+                              {&GSDataCenter::PressureSensorPlotData[0], &GSDataCenter::PressureSensorPlotData[1]});
+PlotWindow loadCellPlot("Load Cells", TIMESTAMP_AXIS_NAME, "Weight (lb)", {&GSDataCenter::LoadCellPlotData[0], &GSDataCenter::LoadCellPlotData[1]});
 } // namespace PlotWindowCenter
 
 std::vector<HelloImGui::DockableWindow> PlotWindowCenter::createDockableWindows() {

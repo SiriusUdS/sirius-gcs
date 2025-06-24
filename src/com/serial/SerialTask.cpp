@@ -36,7 +36,7 @@ void addSineWavePoint() {
     float x = t;
     float y = amplitude * std::sin(2.0f * 3.14159265f * frequency * t);
 
-    GSDataCenter::Thermistor1PlotData.addData(x, y);
+    GSDataCenter::ThermistorPlotData[0].addData(x, y);
 
     t += dt;
 }
@@ -57,7 +57,7 @@ void SerialTask::execute() {
             continue;
         }
 
-        addSineWavePoint();
+        // addSineWavePoint();
         intervalTimer.resetElapsedCount();
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();

@@ -7,18 +7,13 @@ class PlotData;
 struct SwitchData;
 
 namespace GSDataCenter {
-extern PlotData Thermistor1PlotData;
-extern PlotData Thermistor2PlotData;
-extern PlotData Thermistor3PlotData;
-extern PlotData Thermistor4PlotData;
-extern PlotData Thermistor5PlotData;
-extern PlotData Thermistor6PlotData;
-extern PlotData Thermistor7PlotData;
-extern PlotData Thermistor8PlotData;
-extern PlotData PressureSensor1PlotData;
-extern PlotData PressureSensor2PlotData;
-extern PlotData LoadCell1PlotData;
-extern PlotData LoadCell2PlotData;
+constexpr size_t THERMISTOR_AMOUNT = 8;
+constexpr size_t PRESSURE_SENSOR_AMOUNT = 2;
+constexpr size_t LOAD_CELL_AMOUNT = 2;
+
+extern PlotData ThermistorPlotData[THERMISTOR_AMOUNT];
+extern PlotData PressureSensorPlotData[PRESSURE_SENSOR_AMOUNT];
+extern PlotData LoadCellPlotData[LOAD_CELL_AMOUNT];
 
 extern SwitchData AllowDumpSwitchData;
 extern SwitchData AllowFillSwitchData;
