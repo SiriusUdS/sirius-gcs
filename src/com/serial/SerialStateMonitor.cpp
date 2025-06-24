@@ -8,6 +8,7 @@
 void SerialStateMonitor::trackRead(bool successful) {
     if (successful) {
         consecutiveReadsFailed = 0;
+        consecutiveWritesFailed = 0;
         ioSuccessSinceStart = true;
     } else {
         consecutiveReadsFailed = std::min(consecutiveReadsFailed + 1, CONSECUTIVE_FAILED_READS_BEFORE_FAILURE);
@@ -19,6 +20,7 @@ void SerialStateMonitor::trackRead(bool successful) {
  */
 void SerialStateMonitor::trackWrite(bool successful) {
     if (successful) {
+        consecutiveReadsFailed = 0;
         consecutiveWritesFailed = 0;
         ioSuccessSinceStart = true;
     } else {
