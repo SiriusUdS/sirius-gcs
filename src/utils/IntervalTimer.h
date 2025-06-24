@@ -10,10 +10,11 @@
 class IntervalTimer {
 public:
     IntervalTimer(std::chrono::steady_clock::duration interval);
-    size_t getElapsedCount() const;
-    void resetElapsedCount();
+    void waitUntilNextInterval() const;
 
 private:
+    std::chrono::steady_clock::duration getTimeUntilNextInterval() const;
+
     std::chrono::steady_clock::time_point startTime;
     std::chrono::steady_clock::duration interval;
 };

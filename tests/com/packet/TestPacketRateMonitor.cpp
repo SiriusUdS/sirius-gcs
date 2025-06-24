@@ -16,10 +16,7 @@ double simulatePacketCom(PacketRateMonitor& prm, size_t numPackets, double durat
 
     for (size_t packetIdx = 0; packetIdx < numPackets; packetIdx++) {
         prm.trackPacket();
-        while (!intervalTimer.getElapsedCount()) {
-            // do nothing
-        }
-        intervalTimer.resetElapsedCount();
+        intervalTimer.waitUntilNextInterval();
     }
 
     return prm.getRatePerSecond();

@@ -1,5 +1,8 @@
 #include "IntervalTimer.h"
 
+#include <thread>
+
+using namespace std::this_thread;
 using namespace std::chrono;
 
 /**
@@ -9,20 +12,17 @@ IntervalTimer::IntervalTimer(std::chrono::steady_clock::duration interval) : sta
 }
 
 /**
- * @brief Returns the number of elapsed intervals since the timer was started.
+ * @brief Waits until the next interval.
  */
-size_t IntervalTimer::getElapsedCount() const {
-    const auto now = steady_clock::now();
-    auto elapsed = now - startTime;
-    return elapsed / interval;
+void IntervalTimer::waitUntilNextInterval() const {
+    sleep_for(getTimeUntilNextInterval());
 }
 
 /**
- * @brief Resets the count of elapsed intervals.
+ * @brief Returns the time remaining until the next interval.
  */
-void IntervalTimer::resetElapsedCount() {
+std::chrono::steady_clock::duration IntervalTimer::getTimeUntilNextInterval() const {
     const auto now = steady_clock::now();
     const auto elapsed = now - startTime;
-    const auto startTimeAdjust = elapsed - (elapsed % interval);
-    startTime += startTimeAdjust;
+    return interval - (elapsed % interval);
 }

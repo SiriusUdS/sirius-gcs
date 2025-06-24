@@ -3,29 +3,31 @@
 #include <doctest.h>
 #include <thread>
 
+using namespace doctest;
 using namespace std::chrono;
 using namespace std::this_thread;
 
-TEST_CASE("IntervalTimer should have correct elapsed count") {
-    IntervalTimer timer(milliseconds(100));
+constexpr double TIMER_EPSILON = 0.01;
 
-    CHECK(timer.getElapsedCount() == 0);
-    sleep_for(milliseconds(250));
-    CHECK(timer.getElapsedCount() == 2);
-    sleep_for(milliseconds(150));
-    CHECK(timer.getElapsedCount() == 4);
-    sleep_for(milliseconds(100));
-    CHECK(timer.getElapsedCount() == 5);
-}
+TEST_CASE("IntervalTimer should wait until next interval") {
+    IntervalTimer timer(milliseconds(1000));
+    size_t elapsedMs;
+    steady_clock::time_point startTime;
 
-TEST_CASE("IntervalTimer should reset elapsed count") {
-    IntervalTimer timer(milliseconds(200));
+    startTime = steady_clock::now();
+    timer.waitUntilNextInterval();
+    elapsedMs = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
+    CHECK(Approx(elapsedMs).epsilon(TIMER_EPSILON) == 1000);
 
-    CHECK(timer.getElapsedCount() == 0);
-    sleep_for(milliseconds(200));
-    CHECK(timer.getElapsedCount() == 1);
-    timer.resetElapsedCount();
-    CHECK(timer.getElapsedCount() == 0);
-    sleep_for(milliseconds(200));
-    CHECK(timer.getElapsedCount() == 1);
+    sleep_for(milliseconds(500));
+    startTime = steady_clock::now();
+    timer.waitUntilNextInterval();
+    elapsedMs = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
+    CHECK(Approx(elapsedMs).epsilon(TIMER_EPSILON) == 500);
+
+    sleep_for(milliseconds(1750));
+    startTime = steady_clock::now();
+    timer.waitUntilNextInterval();
+    elapsedMs = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
+    CHECK(Approx(elapsedMs).epsilon(TIMER_EPSILON) == 250);
 }

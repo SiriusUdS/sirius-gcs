@@ -35,11 +35,7 @@ void SerialTask::start() {
 
 void SerialTask::execute() {
     while (!shouldStop) {
-        if (intervalTimer.getElapsedCount() == 0) {
-            continue;
-        }
-
-        intervalTimer.resetElapsedCount();
+        intervalTimer.waitUntilNextInterval();
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
         PacketProcessing::processIncomingPacket();
