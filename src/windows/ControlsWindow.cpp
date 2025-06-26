@@ -12,7 +12,12 @@
 #include <imgui.h>
 
 namespace ControlsWindow {
-void render() {
+void recvBufferContentModal();
+
+std::vector<char> recvBufferContentDisplay(PACKET_CIRCULAR_BUFFER_SIZE);
+} // namespace ControlsWindow
+
+void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Serial")) {
         const char* comStateText = "Unknown";
         if (!SerialTask::com.comOpened()) {
@@ -46,43 +51,54 @@ void render() {
         }
         ImGui::EndDisabled();
 
-        if (ImGui::Button("See RECV buffer content")) {
-            ImGui::OpenPopup("Recv Buffer Content");
+        if (ImGui::Button("View RECV buffer content")) {
+            ImGui::OpenPopup("RECV Buffer Content");
         }
 
-        const ImVec2 screenSize = ImGui::GetIO().DisplaySize;
-        const ImVec2 minModalSize = {400, 200};
-        const ImVec2 maxModalSize = {2000, 1200};
-        const ImVec2 modalSize = {std::clamp(screenSize.x * 0.8f, minModalSize.x, maxModalSize.x),
-                                  std::clamp(screenSize.y * 0.6f, minModalSize.y, maxModalSize.y)};
-        const ImVec2 modalPos = {(screenSize.x - modalSize.x) * 0.5f, (screenSize.y - modalSize.y) * 0.5f};
-
-        ImGui::SetNextWindowSize(modalSize, ImGuiCond_Always);
-        ImGui::SetNextWindowPos(modalPos, ImGuiCond_Always);
-
-        const ImGuiWindowFlags modalFlags =
-          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove;
-
-        if (ImGui::BeginPopupModal("Recv Buffer Content", nullptr, modalFlags)) {
-            const ImVec2 boxSize = {modalSize.x - 25.0f, modalSize.y - 125.0f};
-
-            const char* buf = (char*) SerialTask::com.getBuffer();
-
-            ImGui::BeginChild("RecvBufferBox", boxSize, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-            ImGui::PushTextWrapPos(0.0f);
-            ImGui::PushFont(FontConfig::codeFont);
-            ImGui::TextUnformatted(
-              buf, buf + PACKET_CIRCULAR_BUFFER_SIZE); // TODO: This skips all the first \0 chars, put the text to render in a std::string beforehand
-            ImGui::PopFont();
-            ImGui::PopTextWrapPos();
-            ImGui::EndChild();
-
-            if (ImGui::Button("Close", {boxSize.x, 0})) {
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::EndPopup();
-        }
+        recvBufferContentModal();
     }
 }
-} // namespace ControlsWindow
+
+void ControlsWindow::recvBufferContentModal() {
+    const char* buf = (char*) SerialTask::com.getBuffer();
+
+    for (size_t i = 0; i < PACKET_CIRCULAR_BUFFER_SIZE; i++) {
+        if (buf[i] == '\0') {
+            recvBufferContentDisplay[i] = '~';
+        } else {
+            recvBufferContentDisplay[i] = buf[i];
+        }
+    }
+
+    const ImVec2 screenSize = ImGui::GetIO().DisplaySize;
+    const ImVec2 minModalSize = {400, 200};
+    const ImVec2 maxModalSize = {2000, 1200};
+    const ImVec2 modalSize = {std::clamp(screenSize.x * 0.8f, minModalSize.x, maxModalSize.x),
+                              std::clamp(screenSize.y * 0.6f, minModalSize.y, maxModalSize.y)};
+    const ImVec2 modalPos = {(screenSize.x - modalSize.x) * 0.5f, (screenSize.y - modalSize.y) * 0.5f};
+
+    ImGui::SetNextWindowSize(modalSize, ImGuiCond_Always);
+    ImGui::SetNextWindowPos(modalPos, ImGuiCond_Always);
+
+    const ImGuiWindowFlags modalFlags =
+      ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove;
+
+    if (ImGui::BeginPopupModal("RECV Buffer Content", nullptr, modalFlags)) {
+        const ImVec2 boxSize = {modalSize.x - 25.0f, modalSize.y - 125.0f};
+        const char* displayBuf = recvBufferContentDisplay.data();
+
+        ImGui::BeginChild("RecvBufferBox", boxSize, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+        ImGui::PushTextWrapPos(0.0f);
+        ImGui::PushFont(FontConfig::codeFont);
+        ImGui::TextUnformatted(displayBuf, displayBuf + PACKET_CIRCULAR_BUFFER_SIZE);
+        ImGui::PopFont();
+        ImGui::PopTextWrapPos();
+        ImGui::EndChild();
+
+        if (ImGui::Button("Close", {boxSize.x, 0})) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+}
