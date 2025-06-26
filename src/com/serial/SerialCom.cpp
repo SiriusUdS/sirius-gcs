@@ -87,6 +87,10 @@ bool SerialCom::getPacket(uint8_t* recv) {
     return successful;
 }
 
+uint8_t* SerialCom::getBuffer() {
+    return packetReceiver.getBuffer();
+}
+
 /**
  * @brief Shuts down communication with the currently opened serial COM port
  */

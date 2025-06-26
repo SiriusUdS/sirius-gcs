@@ -12,6 +12,7 @@ class PacketReceiver {
 public:
     bool receiveByte(uint8_t byte);
     bool getPacket(uint8_t* recv);
+    uint8_t* getBuffer();
     bool dumpNextPacket();
     size_t nextPacketSize() const;
 

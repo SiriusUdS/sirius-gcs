@@ -42,6 +42,10 @@ bool PacketReceiver::getPacket(uint8_t* recv) {
     return true;
 }
 
+uint8_t* PacketReceiver::getBuffer() {
+    return buf.getBuffer();
+}
+
 /**
  * @brief Dumps the next packet, ignoring it completely
  * @returns True if a packet was successfully dumped, else false

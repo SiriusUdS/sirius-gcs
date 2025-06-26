@@ -19,6 +19,7 @@ public:
     bool write(uint8_t* msg, size_t size);
     bool comOpened();
     bool getPacket(uint8_t* recv);
+    uint8_t* getBuffer();
     void shutdown();
 
 private:

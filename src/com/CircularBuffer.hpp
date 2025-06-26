@@ -14,6 +14,7 @@ public:
     bool isFull() const;
     size_t readAvailable() const;
     size_t writeAvailable() const;
+    uint8_t* getBuffer();
 
 private:
     size_t nextIndex(size_t idx, size_t increment = 1) const;
@@ -116,6 +117,11 @@ inline size_t CircularBuffer<BUFSIZE>::writeAvailable() const {
     } else {
         return BUFSIZE;
     }
+}
+
+template <size_t BUFSIZE>
+inline uint8_t* CircularBuffer<BUFSIZE>::getBuffer() {
+    return buf;
 }
 
 template <size_t BUFSIZE>

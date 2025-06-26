@@ -5,6 +5,7 @@
 // clang-format on
 
 #include "ControlsWindow.h"
+#include "FontConfig.h"
 #include "ImGuiConfig.h"
 #include "Logging.h"
 #include "LoggingWindow.h"
@@ -27,12 +28,15 @@ void Application::loadFonts() {
     static constexpr ImWchar ICONS_RANGES[] = {0xf000, 0xf8ff, 0};
 
     constexpr const char* MAIN_FONT = "assets/fonts/Nunito-Regular.ttf";
+    constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
     constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
     constexpr float MAIN_FONT_SIZE = 28;
+    constexpr float CODE_SIZE = 20;
     constexpr float ICONS_SIZE = 22;
 
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF(MAIN_FONT, MAIN_FONT_SIZE);
+    FontConfig::codeFont = io.Fonts->AddFontFromFileTTF(CODE_FONT, CODE_SIZE);
 
     ImFontConfig iconsConfig;
     iconsConfig.MergeMode = true;
