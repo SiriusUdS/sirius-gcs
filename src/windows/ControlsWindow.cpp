@@ -5,6 +5,7 @@
 #include "FontConfig.h"
 #include "PacketCircularBuffer.h"
 #include "PacketRateMonitor.h"
+#include "SerialConfig.h"
 #include "SerialStateMonitor.h"
 #include "SerialTask.h"
 
@@ -14,7 +15,7 @@
 namespace ControlsWindow {
 void recvBufferContentModal();
 
-std::vector<char> recvBufferContentDisplay(PACKET_CIRCULAR_BUFFER_SIZE);
+std::vector<char> recvBufferContentDisplay(SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE);
 float valveValues[3] = {0.0f, 0.0f, 0.0f};
 } // namespace ControlsWindow
 
@@ -71,7 +72,7 @@ void ControlsWindow::render() {
 void ControlsWindow::recvBufferContentModal() {
     const char* buf = (char*) SerialTask::com.getBuffer();
 
-    for (size_t i = 0; i < PACKET_CIRCULAR_BUFFER_SIZE; i++) {
+    for (size_t i = 0; i < SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE; i++) {
         if (buf[i] == '\0') {
             recvBufferContentDisplay[i] = '~';
         } else {
@@ -96,7 +97,7 @@ void ControlsWindow::recvBufferContentModal() {
         ImGui::BeginChild("RecvBufferBox", boxSize, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
         ImGui::PushTextWrapPos(0.0f);
         ImGui::PushFont(FontConfig::codeFont);
-        ImGui::TextUnformatted(displayBuf, displayBuf + PACKET_CIRCULAR_BUFFER_SIZE);
+        ImGui::TextUnformatted(displayBuf, displayBuf + SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE);
         ImGui::PopFont();
         ImGui::PopTextWrapPos();
         ImGui::EndChild();

@@ -8,7 +8,7 @@ using namespace doctest;
 using namespace std::chrono;
 using namespace std::this_thread;
 
-constexpr double PRM_EPSILON = 0.1;
+constexpr double PRM_EPSILON = 0.05;
 
 double simulatePacketCom(PacketRateMonitor& prm, size_t numPackets, double durationSec) {
     const double TIME_BETWEEN_PACKETS_SEC = durationSec / numPackets;

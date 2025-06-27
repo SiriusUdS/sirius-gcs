@@ -2,9 +2,8 @@
 #define PACKETCIRCULARBUFFER_H
 
 #include "CircularBuffer.hpp"
+#include "SerialConfig.h"
 
-constexpr size_t PACKET_CIRCULAR_BUFFER_SIZE = 10'000;
-
-using PacketCircularBuffer = CircularBuffer<PACKET_CIRCULAR_BUFFER_SIZE>;
+using PacketCircularBuffer = CircularBuffer<SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE>;
 
 #endif // PACKETCIRCULARBUFFER_H

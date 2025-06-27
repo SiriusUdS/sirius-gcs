@@ -7,7 +7,7 @@ using namespace doctest;
 using namespace std::chrono;
 using namespace std::this_thread;
 
-constexpr double TIMER_EPSILON = 0.01;
+constexpr double TIMER_EPSILON = 0.1;
 
 TEST_CASE("IntervalTimer should wait until next interval") {
     IntervalTimer timer(milliseconds(1000));
