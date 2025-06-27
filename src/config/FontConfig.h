@@ -5,6 +5,6 @@
 
 namespace FontConfig {
 inline ImFont* codeFont = nullptr;
-}
+} // namespace FontConfig
 
 #endif // FONTCONFIG_H

@@ -1,5 +1,6 @@
 #include "ControlsWindow.h"
 
+#include "Command.h"
 #include "CommandCenter.h"
 #include "CommandDispatch.h"
 #include "FontConfig.h"
@@ -27,7 +28,7 @@ void ControlsWindow::render() {
     }
 
     if (ImGui::CollapsingHeader("Commands")) {
-        ImGui::BeginDisabled(!CommandCenter::available());
+        ImGui::BeginDisabled(!CommandCenter::command.available());
         if (ImGui::Button("Send test command")) {
             CommandDispatch::test();
         }

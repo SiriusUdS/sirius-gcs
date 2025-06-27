@@ -28,21 +28,24 @@ void Application::loadFonts() {
     static constexpr ImWchar ICONS_RANGES[] = {0xf000, 0xf8ff, 0};
 
     constexpr const char* MAIN_FONT = "assets/fonts/Nunito-Regular.ttf";
-    constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
     constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
+    constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
     constexpr float MAIN_FONT_SIZE = 28;
-    constexpr float CODE_SIZE = 20;
     constexpr float ICONS_SIZE = 22;
+    constexpr float CODE_SIZE = 20;
 
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF(MAIN_FONT, MAIN_FONT_SIZE);
-    FontConfig::codeFont = io.Fonts->AddFontFromFileTTF(CODE_FONT, CODE_SIZE);
+
+    ImFont* mainFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, MAIN_FONT_SIZE);
 
     ImFontConfig iconsConfig;
     iconsConfig.MergeMode = true;
     iconsConfig.PixelSnapH = true;
-
     io.Fonts->AddFontFromFileTTF(ICONS_FONT, ICONS_SIZE, &iconsConfig, ICONS_RANGES);
+
+    io.FontDefault = mainFont;
+
+    FontConfig::codeFont = io.Fonts->AddFontFromFileTTF(CODE_FONT, CODE_SIZE);
 }
 
 void Application::init() {
