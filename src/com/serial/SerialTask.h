@@ -18,7 +18,7 @@ void stop();
 
 extern PacketRateMonitor packetRateMonitor;
 extern PacketReceiver packetReceiver;
-extern SerialStateMonitor serialFailureMonitor;
+extern SerialStateMonitor serialStateMonitor;
 extern SerialCom com;
 } // namespace SerialTask
 

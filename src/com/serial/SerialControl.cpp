@@ -15,7 +15,7 @@ Timer timerSerialRead;
 } // namespace SerialControl
 
 void SerialControl::startComIfNeeded() {
-    if (SerialTask::com.comOpened() && SerialTask::serialFailureMonitor.getState() != SerialStateMonitor::State::NOT_WORKING) {
+    if (SerialTask::com.comOpened() && SerialTask::serialStateMonitor.getState() != SerialStateMonitor::State::NOT_WORKING) {
         return;
     }
 

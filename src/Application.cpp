@@ -11,6 +11,7 @@
 #include "LoggingWindow.h"
 #include "MapWindow.h"
 #include "PlotWindowCenter.h"
+#include "SerialComWindow.h"
 #include "SerialTask.h"
 #include "SwitchesWindow.h"
 
@@ -109,12 +110,14 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow loggingDockWin("Logs", ImGuiConfig::Dockspace::LOGGING, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin("Map", ImGuiConfig::Dockspace::MAP, []() { MapWindow::render(); });
     HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::MAP, []() { ControlsWindow::render(); });
+    HelloImGui::DockableWindow serialComDockWin("Serial COM", ImGuiConfig::Dockspace::MAP, []() { SerialComWindow::render(); });
     HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
     dockableWindows.push_back(loggingDockWin);
     dockableWindows.push_back(mapDockWin);
     dockableWindows.push_back(controlsDockWin);
+    dockableWindows.push_back(serialComDockWin);
     dockableWindows.push_back(switchesDockWin);
 
     return dockableWindows;
