@@ -42,6 +42,10 @@ bool PacketReceiver::getPacket(uint8_t* recv) {
     return true;
 }
 
+/**
+ * @brief Gets a pointer to the internal buffer used for receiving data.
+ * @returns Pointer to the internal buffer.
+ */
 uint8_t* PacketReceiver::getBuffer() {
     return buf.getBuffer();
 }

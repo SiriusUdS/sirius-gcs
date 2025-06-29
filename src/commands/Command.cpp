@@ -4,10 +4,18 @@
 #include "SerialCom.h"
 #include "SerialTask.h"
 
+/**
+ * @brief Determines if the command is available to be initialised.
+ * @returns True if the command is available, false otherwise.
+ */
 bool Command::available() {
     return state == Command::State::NONE && SerialTask::com.comOpened();
 }
 
+/**
+ * @brief Mark the command as ready to be sent.
+ * @returns True if the command was successfully marked as ready, false otherwise.
+ */
 bool Command::ready(size_t dataSize) {
     if (state != Command::State::NONE) {
         GCS_LOG_WARN("CommandCenter: Couldn't mark command as ready, another command is already being processed.");
@@ -18,11 +26,18 @@ bool Command::ready(size_t dataSize) {
     return true;
 }
 
+/**
+ * @brief Process an acknowledgment packet.
+ * @returns True if the acknowledgment was successfully processed, false otherwise.
+ */
 bool Command::ack() {
     // TODO: Write ack function
     return true;
 }
 
+/**
+ * @brief Process the command based on its current state.
+ */
 void Command::process() {
     if (state == Command::State::READY) {
         if (SerialTask::com.write(data, size)) {

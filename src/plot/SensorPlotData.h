@@ -3,6 +3,10 @@
 
 #include "PlotData.h"
 
+/**
+ * @class SensorPlotData
+ * @brief Plot data for sensor that includes ADC and value data.
+ */
 class SensorPlotData {
 public:
     SensorPlotData(const char* name, ImVec4 color);

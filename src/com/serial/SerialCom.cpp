@@ -6,14 +6,14 @@
 #include "SerialStateMonitor.h"
 
 /**
- * @brief Constructs a SerialCom object with the given monitors
+ * @brief Constructs a SerialCom object with the given monitors.
  */
 SerialCom::SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm)
     : packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
 }
 
 /**
- * @brief Initializes communication on the first COM port found
+ * @brief Initializes communication on the first COM port found.
  */
 void SerialCom::start() {
     com.Close();
@@ -33,8 +33,8 @@ void SerialCom::start() {
 }
 
 /**
- * @brief Reads a single byte from the COM port into an internal buffer
- * @returns True if a byte was successfully read, else false
+ * @brief Reads a single byte from the COM port into an internal buffer.
+ * @returns True if a byte was successfully read, otherwise false.
  */
 bool SerialCom::read() {
     if (!com.IsOpened()) {
@@ -51,10 +51,10 @@ bool SerialCom::read() {
 }
 
 /**
- * @brief Send data through the opened COM port
- * @param msg The char buffer that contains the data to send
- * @param size The size of the data to send
- * @returns True if the data was successfully sent, else false
+ * @brief Send data through the opened COM port.
+ * @param msg The char buffer that contains the data to send.
+ * @param size The size of the data to send.
+ * @returns True if the data was successfully sent, otherwise false.
  */
 bool SerialCom::write(uint8_t* msg, size_t size) {
     if (!com.IsOpened()) {
@@ -67,17 +67,17 @@ bool SerialCom::write(uint8_t* msg, size_t size) {
 }
 
 /**
- * @brief Checks if a COM port is opened
- * @returns True if a COM port is opened, else false
+ * @brief Checks if a COM port is opened.
+ * @returns True if a COM port is opened, otherwise false.
  */
 bool SerialCom::comOpened() {
     return com.IsOpened();
 }
 
 /**
- * @brief Fetches a packet from the internal buffer if one is available
- * @param recv The char buffer to receive the bytes into
- * @returns True if a packet was successfully received, else false
+ * @brief Fetches a packet from the internal buffer if one is available.
+ * @param recv The char buffer to receive the bytes into.
+ * @returns True if a packet was successfully received, otherwise false.
  */
 bool SerialCom::getPacket(uint8_t* recv) {
     bool successful = packetReceiver.getPacket(recv);
@@ -87,12 +87,16 @@ bool SerialCom::getPacket(uint8_t* recv) {
     return successful;
 }
 
+/**
+ * @brief Gets a pointer to the internal buffer used for receiving data.
+ * @returns Pointer to the internal buffer.
+ */
 uint8_t* SerialCom::getBuffer() {
     return packetReceiver.getBuffer();
 }
 
 /**
- * @brief Shuts down communication with the currently opened serial COM port
+ * @brief Shuts down communication with the currently opened serial COM port.
  */
 void SerialCom::shutdown() {
     com.Close();
