@@ -17,17 +17,17 @@ TEST_CASE("IntervalTimer should wait until next interval") {
     startTime = steady_clock::now();
     timer.waitUntilNextInterval();
     elapsedMs = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
-    CHECK(Approx(elapsedMs).epsilon(TIMER_EPSILON) == 1000);
+    CHECK(Approx((double) elapsedMs).epsilon(TIMER_EPSILON) == 1000);
 
     sleep_for(milliseconds(500));
     startTime = steady_clock::now();
     timer.waitUntilNextInterval();
     elapsedMs = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
-    CHECK(Approx(elapsedMs).epsilon(TIMER_EPSILON) == 500);
+    CHECK(Approx((double) elapsedMs).epsilon(TIMER_EPSILON) == 500);
 
     sleep_for(milliseconds(1750));
     startTime = steady_clock::now();
     timer.waitUntilNextInterval();
     elapsedMs = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
-    CHECK(Approx(elapsedMs).epsilon(TIMER_EPSILON) == 250);
+    CHECK(Approx((double) elapsedMs).epsilon(TIMER_EPSILON) == 250);
 }

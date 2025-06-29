@@ -11,7 +11,7 @@ call vcpkg\bootstrap-vcpkg.bat
 .\vcpkg\vcpkg integrate install
 
 REM Generate project files
-call setup\premake.bat
+call setup\generate_vs_solution.bat
 
 REM Go back to current directory and exit
 popd

@@ -14,13 +14,13 @@ void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
         // clang-format off
         if (ImGui::SliderInt("Valve 1", &valveValues[0], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp) && CommandCenter::valve1Command.available()) {
-            CommandDispatch::valve(CommandCenter::valve1Command);
+            CommandDispatch::valve(CommandCenter::valve1Command, valveValues[0]);
         }
         if (ImGui::SliderInt("Valve 2", &valveValues[1], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp) && CommandCenter::valve2Command.available()) {
-            CommandDispatch::valve(CommandCenter::valve2Command);
+            CommandDispatch::valve(CommandCenter::valve2Command, valveValues[1]);
         }
         if (ImGui::SliderInt("Valve 3", &valveValues[2], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp) && CommandCenter::valve3Command.available()) {
-            CommandDispatch::valve(CommandCenter::valve3Command);
+            CommandDispatch::valve(CommandCenter::valve3Command, valveValues[2]);
         }
         // clang-format on
     }
