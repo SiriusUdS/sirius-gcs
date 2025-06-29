@@ -30,10 +30,11 @@ float PressureTransducer::adcToPressure(float adcValue, uint8_t sensorIndex) {
         return PlotConfig::INVALID_VALUE;
     }
 
-    else if (adcValue < ADC_MIN_PRESSURE || adcValue > ADC_MAX_PRESSURE) {
-        GCS_LOG_DEBUG("LoadCell:: ADC value out of range.");
-        return PlotConfig::INVALID_VALUE;
-    }
+    // TODO: UNCOMMENT LATER
+    // else if (adcValue < ADC_MIN_PRESSURE || adcValue > ADC_MAX_PRESSURE) {
+    //    GCS_LOG_DEBUG("LoadCell:: ADC value out of range.");
+    //    return PlotConfig::INVALID_VALUE;
+    //}
 
     const float voltage = (adcValue / PRESSURE_SENSOR_ADC_RANGE_BIT) * PRESSURE_SENSOR_VOLTAGE_RANGE_V;
     return (float) ((PRESSURE_SENSOR_ARRAY_SLOPE[sensorIndex] * voltage) + PRESSURE_SENSOR_ARRAY_CONST[sensorIndex]);

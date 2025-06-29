@@ -6,8 +6,10 @@
 #include "ToggleButton.h"
 
 #include <ini.h>
+#include <mutex>
 
 namespace LoggingWindow {
+void renderLogs();
 void clear();
 void updateVisibleLines();
 
@@ -23,6 +25,7 @@ ImGuiTextFilter filter;
 ImVector<int> lineOffsets;
 ImVector<spdlog::level::level_enum> logLevels;
 ImVector<int> visibleLines;
+std::mutex mtx;
 } // namespace LoggingWindow
 
 void LoggingWindow::init() {
@@ -30,19 +33,19 @@ void LoggingWindow::init() {
 }
 
 void LoggingWindow::render() {
-    if (ToggleButton(ICON_FA_BUG " Debug", &showDebug, ImVec4(0.0f, 0.5f, 1.0f, 1.0f))) {
+    if (ToggleButton(ICON_FA_BUG " Debug", &showDebug, ImVec4(0.0f, 0.6f, 1.0f, 1.0f))) {
         updateVisibleLines();
     }
     ImGui::SameLine();
-    if (ToggleButton(ICON_FA_INFO_CIRCLE " Info", &showInfo, ImVec4(0.0f, 0.6f, 0.15f, 1.0f))) {
+    if (ToggleButton(ICON_FA_INFO_CIRCLE " Info", &showInfo, ImVec4(0.0f, 0.7f, 0.2f, 1.0f))) {
         updateVisibleLines();
     }
     ImGui::SameLine();
-    if (ToggleButton(ICON_FA_EXCLAMATION_TRIANGLE " Warn", &showWarn, ImVec4(0.7f, 0.55f, 0.0f, 1.0f))) {
+    if (ToggleButton(ICON_FA_EXCLAMATION_TRIANGLE " Warn", &showWarn, ImVec4(0.85f, 0.75f, 0.0f, 1.0f))) {
         updateVisibleLines();
     }
     ImGui::SameLine();
-    if (ToggleButton(ICON_FA_BOMB " Error", &showError, ImVec4(0.7f, 0.1f, 0.1f, 1.0f))) {
+    if (ToggleButton(ICON_FA_BOMB " Error", &showError, ImVec4(0.9f, 0.0f, 0.0f, 1.0f))) {
         updateVisibleLines();
     }
     ImGui::SameLine();
@@ -57,40 +60,7 @@ void LoggingWindow::render() {
     ImGui::Separator();
 
     if (ImGui::BeginChild("scrolling", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar)) {
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-        const char* bufBegin = buf.begin();
-        const char* bufEnd = buf.end();
-
-        ImGuiListClipper clipper;
-        clipper.Begin(visibleLines.size());
-        while (clipper.Step()) {
-            for (int lineNo = clipper.DisplayStart; lineNo < clipper.DisplayEnd; lineNo++) {
-                const int lineIdx = visibleLines[lineNo];
-                const char* lineStart = bufBegin + lineOffsets[lineIdx];
-                const char* lineEnd = (lineIdx + 1 < lineOffsets.size()) ? (bufBegin + lineOffsets[lineIdx + 1]) : bufEnd;
-                ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);
-
-                // clang-format off
-                switch (logLevels[lineIdx]) {
-                    case spdlog::level::debug: color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
-                    case spdlog::level::info:  break;
-                    case spdlog::level::warn:  color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); break;
-                    case spdlog::level::err:   color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f); break;
-                }
-                // clang-format on
-
-                ImGui::PushStyleColor(ImGuiCol_Text, color);
-                ImGui::TextUnformatted(lineStart, lineEnd);
-                ImGui::PopStyleColor();
-            }
-        }
-        clipper.End();
-
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
-            ImGui::SetScrollHereY(1.0f);
-        }
-
-        ImGui::PopStyleVar();
+        renderLogs();
     }
     ImGui::EndChild();
 }
@@ -119,14 +89,9 @@ void LoggingWindow::saveState(mINI::INIStructure& ini) {
     ini[IniConfig::GCS_SECTION].set(GCS_INI_LOG_WINDOW_SHOW_ERROR, std::to_string(showError));
 }
 
-void LoggingWindow::clear() {
-    buf.clear();
-    lineOffsets.clear();
-    lineOffsets.push_back(0);
-    updateVisibleLines();
-}
-
 void LoggingWindow::addLog(const char* str, const char* strEnd, spdlog::level::level_enum type) {
+    std::lock_guard<std::mutex> lock(mtx);
+
     int oldSize = buf.size();
     buf.append(str, strEnd);
     for (const int newSize = buf.size(); oldSize < newSize; oldSize++) {
@@ -135,6 +100,54 @@ void LoggingWindow::addLog(const char* str, const char* strEnd, spdlog::level::l
             logLevels.push_back(type);
         }
     }
+    updateVisibleLines();
+}
+
+void LoggingWindow::renderLogs() {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+    const char* bufBegin = buf.begin();
+    const char* bufEnd = buf.end();
+
+    ImGuiListClipper clipper;
+    clipper.Begin(visibleLines.size());
+    while (clipper.Step()) {
+        for (int lineNo = clipper.DisplayStart; lineNo < clipper.DisplayEnd; lineNo++) {
+            const int lineIdx = visibleLines[lineNo];
+            const char* lineStart = bufBegin + lineOffsets[lineIdx];
+            const char* lineEnd = (lineIdx + 1 < lineOffsets.size()) ? (bufBegin + lineOffsets[lineIdx + 1]) : bufEnd;
+            ImVec4 color(1.0f, 1.0f, 1.0f, 1.0f);
+
+            // clang-format off
+            switch (logLevels[lineIdx]) {
+                case spdlog::level::debug: color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
+                case spdlog::level::info:  color = ImVec4(0.0f, 0.8f, 0.0f, 1.0f); break;
+                case spdlog::level::warn:  color = ImVec4(0.7f, 0.7f, 0.0f, 1.0f); break;
+                case spdlog::level::err:   color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f); break;
+            }
+            // clang-format on
+
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
+            ImGui::TextUnformatted(lineStart, lineEnd);
+            ImGui::PopStyleColor();
+        }
+    }
+    clipper.End();
+
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+        ImGui::SetScrollHereY(1.0f);
+    }
+
+    ImGui::PopStyleVar();
+}
+
+void LoggingWindow::clear() {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    buf.clear();
+    lineOffsets.clear();
+    lineOffsets.push_back(0);
     updateVisibleLines();
 }
 

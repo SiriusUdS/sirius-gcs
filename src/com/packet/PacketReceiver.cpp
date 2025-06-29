@@ -8,16 +8,15 @@
  * @returns True if packet successfully received, else false
  */
 bool PacketReceiver::receiveByte(uint8_t byte) {
-    if (!buf.writeByte(byte)) {
-        GCS_LOG_WARN("PacketReceiver: Unable to write byte in circular buffer.");
-        return false;
-    }
-
     if (buf.isFull() && !pf.packetAvailable()) {
         GCS_LOG_WARN("PacketReceiver: Circular buffer full, but no packet available. Clearing buffer.");
         buf.clear();
         pf.clear();
-        return true;
+    }
+
+    if (!buf.writeByte(byte)) {
+        GCS_LOG_WARN("PacketReceiver: Unable to write byte in circular buffer.");
+        return false;
     }
 
     pf.byteWritten();

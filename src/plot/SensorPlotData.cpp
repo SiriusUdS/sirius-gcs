@@ -10,8 +10,8 @@ SensorPlotData::SensorPlotData(const char* name, ImVec4 color) : adcPlotData(nam
  * @brief Add ADC and value data to the sensor plot.
  */
 void SensorPlotData::addData(float adc, float value, float timestamp) {
-    adcPlotData.addData(adc, timestamp);
-    valuePlotData.addData(value, timestamp);
+    adcPlotData.addData(timestamp, adc);
+    valuePlotData.addData(timestamp, value);
 }
 
 /**

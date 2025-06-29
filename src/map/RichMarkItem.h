@@ -26,7 +26,7 @@ public:
         ImPlotMarker markerType{ImPlotMarker_Circle}; ///< The marker type.
         float markerSize{10.f};                       ///< The size of the marker.
         float markerWeight{};                         ///< The weight of the marker.
-        ImVec4 markerFill{0.f, 1.f, 1.f, 1.f};        ///< Fill color of the marker.
+        ImVec4 markerFill{1.f, 1.f, 1.f, 1.f};        ///< Fill color of the marker.
         ImVec4 markerOutline{};                       ///< Outline color of the marker.
         float radiusWeight{2.f};                      ///< The weight of the radius.
     };

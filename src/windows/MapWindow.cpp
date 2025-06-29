@@ -2,6 +2,7 @@
 
 #include "IniConfig.h"
 #include "Logging.h"
+#include "RichMarkItem.h"
 #include "TileLoaderImpl.h"
 #include "TileSaver.h"
 #include "TileSourceUrlImpl.h"
@@ -9,6 +10,11 @@
 #include <sstream>
 
 namespace MapWindow {
+void addMark(const GeoCoords& coords, const std::string& name);
+std::string getFsPathFromMapView(int mapView);
+void startTileProviderConnectivityTest();
+void updateMarkStyle();
+
 constexpr const char* INI_MAP_WINDOW_MAP_VIEW = "map_window_map_view";
 
 int mapView{};
@@ -44,6 +50,8 @@ void MapWindow::init() {
                                                          std::make_shared<TileSaverSubDir>(satelliteTileDir));
 
     addMark({46.14665264871996, -70.66861153239353}, "Tapis Venture");
+
+    updateMarkStyle();
 }
 
 void MapWindow::loadState(const mINI::INIStructure& ini) {
@@ -163,6 +171,7 @@ void MapWindow::render() {
     }
 
     if (hasSwitchedSource) {
+        updateMarkStyle();
         if (sourceIsFs) {
             mapPlot->setTileLoader(std::make_shared<TileLoaderFsMap>(getFsPathFromMapView(mapView)));
         } else {
@@ -201,4 +210,22 @@ void MapWindow::startTileProviderConnectivityTest() {
         urlmaker << TileSourceUrlArcImagery::makeSourceUrl(0, 0, 0);
     }
     urlConnectionTest->startConnectivityTest(urlmaker.str());
+}
+
+void MapWindow::updateMarkStyle() {
+    MarkItem::Style style;
+
+    style.markerWeight = 1.f;
+
+    if (mapView == MAP_VIEW) {
+        style.markerFill = ImVec4(0.f, 0.f, 0.f, 1.f);
+        style.markerOutline = ImVec4(1.f, 1.f, 1.f, 1.f);
+    } else if (mapView == SATELLITE_VIEW) {
+        style.markerFill = ImVec4(1.f, 1.f, 1.f, 1.f);
+        style.markerOutline = ImVec4(0.f, 0.f, 0.f, 1.f);
+    }
+
+    for (auto& item : storage->markItems()) {
+        item.ptr->setStyle(style);
+    }
 }

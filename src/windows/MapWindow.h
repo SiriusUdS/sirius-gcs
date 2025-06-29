@@ -16,9 +16,6 @@ void init();
 void loadState(const mINI::INIStructure& ini);
 void saveState(mINI::INIStructure& ini);
 void render();
-void addMark(const GeoCoords& coords, const std::string& name);
-std::string getFsPathFromMapView(int mapView);
-void startTileProviderConnectivityTest();
 } // namespace MapWindow
 
 #endif // MAPWINDOW_H
