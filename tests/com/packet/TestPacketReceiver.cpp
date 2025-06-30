@@ -1,4 +1,5 @@
 #include "PacketReceiver.h"
+#include "SerialConfig.h"
 #include "Telecommunication/TelemetryPacket.h"
 
 #include <doctest.h>
@@ -57,4 +58,29 @@ TEST_CASE("PacketReceiver should dump next packet") {
     CHECK(pr.dumpNextPacket());
     CHECK(pr.nextPacketSize() == 0);
     CHECK_FALSE(pr.dumpNextPacket());
+}
+
+TEST_CASE("PacketReceiver internal buffer reset") {
+    PacketReceiver pr;
+
+    SUBCASE("PacketReceiver should reset when the internal buffer is full and no packets are available") {
+        fill(pr, SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE);
+        writeTelemetryPacket(pr);
+        writeTelemetryPacket(pr);
+        CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
+    }
+
+    SUBCASE("PacketReceiver should not reset when the interval buffer is full and packet are available") {
+        uint8_t recv[sizeof(EngineTelemetryPacket)] = {0};
+
+        writeTelemetryPacket(pr);
+        writeTelemetryPacket(pr);
+        fill(pr, SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE - sizeof(EngineTelemetryPacket));
+        writeTelemetryPacket(pr);
+        writeTelemetryPacket(pr);
+        writeTelemetryPacket(pr);
+        CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
+        pr.getPacket(recv);
+        CHECK(pr.nextPacketSize() == 0);
+    }
 }
