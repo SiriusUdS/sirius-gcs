@@ -10,7 +10,7 @@ SensorPlotData ThermistorPlotData[THERMISTOR_AMOUNT] = {{"Thermistor 1", PlotCol
                                                         {"Thermistor 5", PlotColors::ORANGE}, {"Thermistor 6", PlotColors::CYAN},
                                                         {"Thermistor 7", PlotColors::PURPLE}, {"Thermistor 8", PlotColors::GRAY}};
 SensorPlotData PressureSensorPlotData[PRESSURE_SENSOR_AMOUNT] = {{"Pressure Sensor 1", PlotColors::BLUE}, {"Pressure Sensor 2", PlotColors::RED}};
-SensorPlotData LoadCellPlotData[LOAD_CELL_AMOUNT] = {{"Load Cell 1", PlotColors::BLUE}, {"Load Cell 2", PlotColors::RED}};
+SensorPlotData LoadCellPlotData[LOAD_CELL_AMOUNT] = {{"Motor Load Cell", PlotColors::BLUE}, {"Tank Load Cell", PlotColors::RED}};
 
 SwitchData AllowDumpSwitchData("Allow Dump", false);
 SwitchData AllowFillSwitchData("Allow Fill", false);

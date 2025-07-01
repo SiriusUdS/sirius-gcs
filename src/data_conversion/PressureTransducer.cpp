@@ -3,7 +3,7 @@
 #include "Logging.h"
 #include "PlotConfig.h"
 
-float PressureTransducer::adcToPressure(float adcValue, uint8_t sensorIndex) {
+float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
     constexpr float PRESSURE_SENSOR_VOLTAGE_RANGE_V = 3.3f;
     constexpr float PRESSURE_SENSOR_ADC_RANGE_BIT = 4095.f;
 
@@ -26,7 +26,8 @@ float PressureTransducer::adcToPressure(float adcValue, uint8_t sensorIndex) {
     constexpr float ADC_MAX_PRESSURE = 4095; // TODO: Remove if redundant
 
     if (sensorIndex >= PRESSURE_SENSOR_COUNT) {
-        GCS_LOG_ERROR("PressureTransducer: Sensor index out of range.");
+        // TODO: UNCOMMENT LATER
+        // GCS_LOG_ERROR("PressureTransducer: Sensor index out of range.");
         return PlotConfig::INVALID_VALUE;
     }
 

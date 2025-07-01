@@ -71,27 +71,37 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     float timestamp = (float) packet->fields.timestamp_ms;
 
     constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
-    for (size_t plotIdx = 0; plotIdx < GSDataCenter::THERMISTOR_AMOUNT; plotIdx++) {
-        const size_t adcIdx = plotIdx + THERMISTOR_ADC_INDEX_OFFSET;
+    constexpr size_t PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET = 8;
+    constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
+    constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
+
+    // Thermistors
+    for (size_t i = 0; i < GSDataCenter::THERMISTOR_AMOUNT; i++) {
+        const size_t adcIdx = i + THERMISTOR_ADC_INDEX_OFFSET;
         const float adcValue = packet->fields.adcValues[adcIdx];
         const float temperature = TemperatureSensor::adcToTemperature(packet->fields.adcValues[adcIdx]);
-        GSDataCenter::ThermistorPlotData[plotIdx].addData(adcValue, temperature, timestamp);
+
+        GSDataCenter::ThermistorPlotData[i].addData(adcValue, temperature, timestamp);
     }
 
-    constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
-    for (size_t plotIdx = 0; plotIdx < GSDataCenter::PRESSURE_SENSOR_AMOUNT; plotIdx++) {
-        const size_t adcIdx = plotIdx + PRESSURE_SENSOR_ADC_INDEX_OFFSET;
-        const float adcValue = packet->fields.adcValues[adcIdx];
-        const float pressure = PressureTransducer::adcToPressure(packet->fields.adcValues[adcIdx], 3);
-        GSDataCenter::PressureSensorPlotData[plotIdx].addData(adcValue, pressure, timestamp);
+    // Pressure sensors
+    for (size_t i = 0; i < GSDataCenter::PRESSURE_SENSOR_AMOUNT; i++) {
+        const size_t sensorIdxAdcIdx = i + PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET;
+        const uint16_t sensorIdx = packet->fields.adcValues[sensorIdxAdcIdx];
+        const size_t pressureSensorAdcIdx = i + PRESSURE_SENSOR_ADC_INDEX_OFFSET;
+        const float adcValue = packet->fields.adcValues[pressureSensorAdcIdx];
+        const float pressure = PressureTransducer::adcToPressure(packet->fields.adcValues[pressureSensorAdcIdx], sensorIdx);
+
+        GSDataCenter::PressureSensorPlotData[i].addData(adcValue, pressure, timestamp);
     }
 
-    constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
-    for (size_t plotIdx = 0; plotIdx < GSDataCenter::LOAD_CELL_AMOUNT; plotIdx++) {
-        const size_t adcIdx = plotIdx + LOAD_CELL_ADC_INDEX_OFFSET;
+    // Load cells
+    for (size_t i = 0; i < GSDataCenter::LOAD_CELL_AMOUNT; i++) {
+        const size_t adcIdx = i + LOAD_CELL_ADC_INDEX_OFFSET;
         const float adcValue = packet->fields.adcValues[adcIdx];
-        const float force = LoadCell::adcToForce((float) packet->fields.adcValues[adcIdx]);
-        GSDataCenter::LoadCellPlotData[plotIdx].addData(adcValue, force, timestamp);
+        const float force = LoadCell::adcToForce((float) packet->fields.adcValues[adcIdx], 0);
+
+        GSDataCenter::LoadCellPlotData[i].addData(adcValue, force, timestamp);
     }
 
     return true;

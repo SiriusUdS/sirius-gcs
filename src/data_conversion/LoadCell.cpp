@@ -3,18 +3,28 @@
 #include "Logging.h"
 #include "PlotConfig.h"
 
-float LoadCell::adcToForce(float adcValue) {
-    constexpr float ADC_MIN_LOADCELL = 0;
-    constexpr float ADC_MAX_LOADCELL = 4095;
-    constexpr float LOADCELL_SCALE_FACTOR = 0.01f;
+namespace LoadCell {
+struct LoadCellParams {
+    double capacity{};
+    double additiveFactor{};
+};
 
-    // TODO: UNCOMMENT LATER
-    // if (adcValue < ADC_MIN_LOADCELL || adcValue > ADC_MAX_LOADCELL) {
-    //    GCS_LOG_DEBUG("LoadCell:: ADC value out of range.");
-    //    return PlotConfig::INVALID_VALUE;
-    //}
+constexpr size_t LOAD_CELL_AMOUNT = 4;
 
-    // TODO - Make sure this is correct formula (volts to lb)
-    // float force = adcValue * LOADCELL_SCALE_FACTOR;
-    return 200 * ((adcValue * 3.3f / 4096.f) / 209.f) / 0.015f;
+// clang-format off
+constexpr LoadCellParams LOAD_CELL_PARAMS_TABLE[LOAD_CELL_AMOUNT] = {
+    {5000.0, 0.0},
+    {5000.0, 0.0},
+    {200.0,  0.0},
+    {200.0,  286.5}
+};
+// clang-format on
+} // namespace LoadCell
+
+float LoadCell::adcToForce(float adcValue, size_t loadCellIndex) {
+    const LoadCellParams& params = LOAD_CELL_PARAMS_TABLE[loadCellIndex];
+    const double adjustedAdcValue = adcValue - params.additiveFactor;
+    const double voltage = (adjustedAdcValue * 3.3) / 4096.0;
+
+    return params.capacity * (voltage / 209.f) / 0.015f;
 }

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 namespace PressureTransducer {
-float adcToPressure(float adcValue, uint8_t sensorIndex);
+float adcToPressure(float adcValue, uint16_t sensorIndex);
 } // namespace PressureTransducer
 
 #endif // PRESSURETRANSDUCER_H
