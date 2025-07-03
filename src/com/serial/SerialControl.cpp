@@ -26,7 +26,7 @@ void SerialControl::startComIfNeeded() {
 }
 
 void SerialControl::readIncomingBytesAtSetRate() {
-    constexpr size_t BYTES_TO_READ_PER_SECOND = 19'200;
+    static constexpr size_t BYTES_TO_READ_PER_SECOND = 19'200;
 
     double elapsedSeconds = timerSerialRead.getElapsedTimeInSeconds();
     timerSerialRead.reset();

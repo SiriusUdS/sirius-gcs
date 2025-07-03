@@ -27,13 +27,12 @@ mINI::INIStructure iniStructure;
 
 void Application::loadFonts() {
     static constexpr ImWchar ICONS_RANGES[] = {0xf000, 0xf8ff, 0};
-
-    constexpr const char* MAIN_FONT = "assets/fonts/Nunito-Regular.ttf";
-    constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
-    constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
-    constexpr float MAIN_FONT_SIZE = 28;
-    constexpr float ICONS_SIZE = 22;
-    constexpr float CODE_SIZE = 20;
+    static constexpr const char* MAIN_FONT = "assets/fonts/Nunito-Regular.ttf";
+    static constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
+    static constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
+    static constexpr float MAIN_FONT_SIZE = 28;
+    static constexpr float ICONS_SIZE = 22;
+    static constexpr float CODE_SIZE = 20;
 
     ImGuiIO& io = ImGui::GetIO();
 

@@ -5,7 +5,7 @@ std::string wcharToString(const WCHAR* wstr);
 }
 
 void ComDiscovery::getAvailableComPorts(std::vector<std::string>& comPortVec) {
-    constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
+    static constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
 
     comPortVec.clear();
     HKEY hKey;

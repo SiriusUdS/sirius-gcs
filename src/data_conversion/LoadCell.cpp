@@ -26,5 +26,5 @@ float LoadCell::adcToForce(float adcValue, size_t loadCellIndex) {
     const double adjustedAdcValue = adcValue - params.additiveFactor;
     const double voltage = (adjustedAdcValue * 3.3) / 4096.0;
 
-    return params.capacity * (voltage / 209.f) / 0.015f;
+    return (float) (params.capacity * (voltage / 209) / 0.015);
 }

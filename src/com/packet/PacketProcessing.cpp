@@ -70,10 +70,10 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
     float timestamp = (float) packet->fields.timestamp_ms;
 
-    constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
-    constexpr size_t PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET = 8;
-    constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
-    constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
+    static constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
+    static constexpr size_t PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET = 8;
+    static constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
+    static constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
 
     // Thermistors
     for (size_t i = 0; i < GSDataCenter::THERMISTOR_AMOUNT; i++) {

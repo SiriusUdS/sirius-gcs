@@ -13,19 +13,21 @@ typedef struct {
 } RT_Point;
 
 float TemperatureSensor::adcToTemperature(float adcValue) {
-    constexpr float MIN_VALID_ADC = 10;
-    constexpr float MAX_VALID_ADC = 4090;
-    constexpr float CONTROL_RESISTANCE = 10'000;
-    constexpr float ADDITIVE_FACTOR = 4096;
-    constexpr RT_Point RT_TABLE[] = {{-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990}, {20, 125250}, {25, 100000}, {30, 81000},
-                                     {40, 53500},    {50, 35900},   {60, 25000},   {70, 17550}, {80, 12540},  {90, 9100},   {100, 6710}};
-    constexpr int RT_TABLE_SIZE = sizeof(RT_TABLE) / sizeof(RT_TABLE[0]);
+    static constexpr float MIN_VALID_ADC = 10;
+    static constexpr float MAX_VALID_ADC = 4090;
+    static constexpr float CONTROL_RESISTANCE = 10'000;
+    static constexpr float ADDITIVE_FACTOR = 4096;
+    static constexpr RT_Point RT_TABLE[] = {{-30, 1733200}, {-20, 959000}, {-10, 551410}, {0, 327240}, {10, 199990},
+                                            {20, 125250},   {25, 100000},  {30, 81000},   {40, 53500}, {50, 35900},
+                                            {60, 25000},    {70, 17550},   {80, 12540},   {90, 9100},  {100, 6710}};
+    static constexpr int RT_TABLE_SIZE = sizeof(RT_TABLE) / sizeof(RT_TABLE[0]);
 
     // TODO: UNCOMMENT LATER
     // if (adcValue < MIN_VALID_ADC || adcValue > MAX_VALID_ADC) {
     //    GCS_LOG_DEBUG("TemperatureSensor: Invalid ADC value.");
     //    return PlotConfig::INVALID_VALUE;
     //}
+
     const float voltage = (adcValue / ADDITIVE_FACTOR) * 3.3f;
     const float resistance = (3.3f / voltage) * CONTROL_RESISTANCE;
 
