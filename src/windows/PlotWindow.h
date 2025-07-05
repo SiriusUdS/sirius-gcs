@@ -22,11 +22,14 @@ public:
 private:
     enum DataType { VALUE = 0, ADC = 1 };
 
-    std::string name, xLabel, yLabel, autofitIniId, showCompressedDataIniId, dataTypeIniId;
+    void showAvgRecentValue(const char* name, float value, size_t idx);
+
+    std::string name, xLabel, yLabel, autofitIniId, showCompressedDataIniId, showAvgValuesId, dataTypeIniId;
     std::vector<SensorPlotData*> plotData;
     ImPlotFlags flags{};
     bool autofit{};
     bool showCompressedData{};
+    bool showAvgValues{};
     int dataType{};
 }; // namespace PlotWindow
 

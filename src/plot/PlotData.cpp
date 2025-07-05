@@ -67,12 +67,26 @@ float PlotData::recentAverageValue(size_t durationMs) const {
     }
 
     const float lastTimestamp = data.lastX();
-    float sum = data.lastY();
-    for (size_t i = dataSize - 2; i >= 0 && (lastTimestamp - data.getXAt(i)) < durationMs; i--) {
+    float sum = 0.f;
+    size_t count = 0;
+
+    for (size_t i = dataSize; i-- > 0;) {
+        if ((lastTimestamp - data.getXAt(i)) > durationMs) {
+            break;
+        }
         sum += data.getYAt(i);
+        count++;
     }
 
-    return sum / dataSize;
+    if (count == 0) {
+        return 0.f;
+    }
+
+    return sum / count;
+}
+
+const char* PlotData::getName() const {
+    return style.name;
 }
 
 /**

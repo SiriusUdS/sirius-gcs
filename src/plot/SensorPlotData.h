@@ -15,6 +15,7 @@ public:
     void plotValue(bool showCompressedData) const;
     float averageRecentAdc(size_t durationMs) const;
     float averageRecentValue(size_t durationMs) const;
+    const char* getName() const;
 
 private:
     PlotData adcPlotData;
