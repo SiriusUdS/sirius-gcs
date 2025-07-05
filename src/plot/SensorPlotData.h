@@ -13,6 +13,8 @@ public:
     void addData(float adc, float value, float timestamp);
     void plotAdc(bool showCompressedData) const;
     void plotValue(bool showCompressedData) const;
+    float averageRecentAdc(size_t durationMs) const;
+    float averageRecentValue(size_t durationMs) const;
 
 private:
     PlotData adcPlotData;

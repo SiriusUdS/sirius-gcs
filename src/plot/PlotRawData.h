@@ -14,6 +14,7 @@ public:
     void eraseOld(size_t count);
     size_t size() const;
     float lastX() const;
+    float lastY() const;
     float getXAt(size_t index) const;
     float getYAt(size_t index) const;
     const float* getRawX() const;

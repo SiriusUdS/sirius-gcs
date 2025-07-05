@@ -44,6 +44,14 @@ float PlotRawData::lastX() const {
 }
 
 /**
+ * @brief The y value of the latest data point
+ * @returns Last y value
+ */
+float PlotRawData::lastY() const {
+    return vy.back();
+}
+
+/**
  * @brief Returns the x value of a specific data point
  * @param index Index of the data point to get the x value from
  * @returns The data point's x value

@@ -15,6 +15,7 @@ public:
     PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
     void plot(bool showCompressedData) const;
+    float recentAverageValue(size_t durationMs) const;
 
 private:
     void dropOldData(size_t amount);

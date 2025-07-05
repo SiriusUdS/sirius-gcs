@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <implot.h>
 #include <ini.h>
+#include <iomanip>
 
 /**
  * @brief Constructs a plot window
@@ -47,13 +48,35 @@ void PlotWindow::render() {
     if (ImPlot::BeginPlot(name.c_str(), ImGui::GetContentRegionAvail(), flags)) {
         const char* actualYLabel = dataType == ADC ? "ADC Value" : yLabel.c_str();
         ImPlot::SetupAxes(xLabel.c_str(), actualYLabel);
+
+        float recentAvgValue = 0.f;
+        constexpr size_t recentAvgValueDurationMs = 2000;
+
+        // Plot data
         for (const SensorPlotData* data : plotData) {
             if (dataType == VALUE) {
                 data->plotValue(showCompressedData);
+                recentAvgValue = data->averageRecentValue(recentAvgValueDurationMs);
             } else {
                 data->plotAdc(showCompressedData);
+                recentAvgValue = data->averageRecentAdc(recentAvgValueDurationMs);
             }
         }
+
+        // Show recent average value text
+        std::ostringstream oss;
+        oss << "Average Value: " << std::fixed << std::setprecision(1) << recentAvgValue;
+        const std::string avgValueStr = oss.str();
+        const char* avgValueText = avgValueStr.c_str();
+
+        ImDrawList* drawList = ImPlot::GetPlotDrawList();
+        const ImVec2 plotPos = ImPlot::GetPlotPos();
+        const ImVec2 plotSize = ImPlot::GetPlotSize();
+        const ImVec2 textSize = ImGui::CalcTextSize(avgValueText);
+        const ImVec2 textPos = {plotPos.x + plotSize.x - textSize.x - 10.f, plotPos.y + 15.f};
+        const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
+        drawList->AddText(textPos, textColor, avgValueText);
+
         ImPlot::EndPlot();
     }
 }

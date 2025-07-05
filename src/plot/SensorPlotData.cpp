@@ -27,3 +27,21 @@ void SensorPlotData::plotAdc(bool showCompressedData) const {
 void SensorPlotData::plotValue(bool showCompressedData) const {
     valuePlotData.plot(showCompressedData);
 }
+
+/**
+ * @brief Compute the average adc value of the data in the last x milliseconds.
+ * @param durationSec The duration in milliseconds in which we measure the recent average adc value.
+ * @returns The recent average adc value.
+ */
+float SensorPlotData::averageRecentAdc(size_t durationMs) const {
+    return adcPlotData.recentAverageValue(durationMs);
+}
+
+/**
+ * @brief Compute the average value of the data in the last x milliseconds.
+ * @param durationSec The duration in milliseconds in which we measure the recent average value.
+ * @returns The recent average value.
+ */
+float SensorPlotData::averageRecentValue(size_t durationMs) const {
+    return valuePlotData.recentAverageValue(durationMs);
+}

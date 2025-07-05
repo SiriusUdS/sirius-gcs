@@ -53,6 +53,29 @@ void PlotData::plot(bool showCompressedData) const {
 }
 
 /**
+ * @brief Compute the average value of the data in the last x milliseconds.
+ * @param durationSec The duration in milliseconds in which we measure the recent average value.
+ * @returns The recent average value.
+ */
+float PlotData::recentAverageValue(size_t durationMs) const {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    const size_t dataSize = data.size();
+
+    if (dataSize == 0) {
+        return 0.f;
+    }
+
+    const float lastTimestamp = data.lastX();
+    float sum = data.lastY();
+    for (size_t i = dataSize - 2; i >= 0 && (lastTimestamp - data.getXAt(i)) < durationMs; i--) {
+        sum += data.getYAt(i);
+    }
+
+    return sum / dataSize;
+}
+
+/**
  * @brief Drops a fixed amount of data points, starting from the oldest data.
  * @param amount Amount of data to drop.
  */
