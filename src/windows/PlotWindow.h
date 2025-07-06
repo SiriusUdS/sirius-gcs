@@ -22,6 +22,7 @@ public:
 private:
     enum DataType { VALUE = 0, ADC = 1 };
 
+    void showAvgRecentLabel(const size_t durationSec);
     void showAvgRecentValue(const char* name, float value, size_t idx);
 
     std::string name, xLabel, yLabel, autofitIniId, showCompressedDataIniId, showAvgValuesId, dataTypeIniId;

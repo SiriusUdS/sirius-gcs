@@ -27,11 +27,12 @@ void SerialControl::startComIfNeeded() {
 
 void SerialControl::readIncomingBytesAtSetRate() {
     static constexpr size_t BYTES_TO_READ_PER_SECOND = 19'200;
+    static constexpr size_t MAX_BYTES_TO_READ = 1'000;
 
     double elapsedSeconds = timerSerialRead.getElapsedTimeInSeconds();
     timerSerialRead.reset();
 
-    size_t bytesToRead = (size_t) (BYTES_TO_READ_PER_SECOND * elapsedSeconds);
+    size_t bytesToRead = std::min<size_t>(MAX_BYTES_TO_READ, (size_t) (BYTES_TO_READ_PER_SECOND * elapsedSeconds));
     while (bytesToRead--) {
         if (!SerialTask::com.read()) {
             break;

@@ -66,6 +66,7 @@ public:
     bool Write(const char* data);  // write null terminated string and return success flag
     bool Write(const char* data, long n);
     bool WriteArr(const uint8_t* data, long n);
+    bool WriteArr(const uint8_t* data, long n, unsigned long timeoutMs);
     bool SetRTS(bool value); // return success flag
     bool SetDTR(bool value); // return success flag
     bool GetCTS(bool& success);
@@ -358,7 +359,7 @@ inline bool ceSerial::Write(const char* data) {
         if (GetLastError() != ERROR_IO_PENDING) {
             fRes = FALSE;
         } else { // Write is pending.
-            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, FALSE))
+            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, TRUE))
                 fRes = FALSE;
             else
                 fRes = TRUE; // Write operation completed successfully.
@@ -385,7 +386,7 @@ inline bool ceSerial::Write(const char* data, long n) {
         if (GetLastError() != ERROR_IO_PENDING) {
             fRes = FALSE;
         } else { // Write is pending.
-            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, FALSE))
+            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, TRUE))
                 fRes = FALSE;
             else
                 fRes = TRUE; // Write operation completed successfully.
@@ -412,7 +413,7 @@ inline bool ceSerial::WriteArr(const uint8_t* data, long n) {
         if (GetLastError() != ERROR_IO_PENDING) {
             fRes = FALSE;
         } else { // Write is pending.
-            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, FALSE))
+            if (!GetOverlappedResult(hComm, &osWrite, &dwWritten, TRUE))
                 fRes = FALSE;
             else
                 fRes = TRUE; // Write operation completed successfully.
@@ -420,6 +421,37 @@ inline bool ceSerial::WriteArr(const uint8_t* data, long n) {
     } else
         fRes = TRUE; // WriteFile completed immediately.
     return fRes;
+}
+
+inline bool ceSerial::WriteArr(const uint8_t* data, long n, unsigned long timeoutMs) {
+    if (!IsOpened()) {
+        return false;
+    }
+    OVERLAPPED overlapped = {0};
+    overlapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    DWORD dwWritten = 0;
+    bool success = false;
+
+    if (WriteFile(hComm, data, n, &dwWritten, &overlapped)) {
+        success = true; // Write completed synchronously.
+    } else if (GetLastError() != ERROR_IO_PENDING) {
+        success = false; // Failed to start.
+    } else if (!overlapped.hEvent) {
+        success = false; // Event handler missing.
+    } else {
+        DWORD waitRes = WaitForSingleObject(overlapped.hEvent, timeoutMs); // Wait for write to complete.
+        if (waitRes != WAIT_OBJECT_0) {
+            success = false; // Timeout or error.
+        } else {
+            DWORD bytesTransferred = 0;
+            success = GetOverlappedResult(hComm, &overlapped, &bytesTransferred, FALSE);
+        }
+    }
+
+    if (overlapped.hEvent) {
+        CloseHandle(overlapped.hEvent);
+    }
+    return success; // Write completed successfully.
 }
 
 inline bool ceSerial::WriteChar(const char ch) {

@@ -1,6 +1,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include "Timer.h"
+
 #include <atomic>
 #include <chrono>
 #include <stdint.h>
@@ -25,14 +27,15 @@ private:
      * @brief Represents the state of the command.
      */
     enum class State {
-        NONE,  ///< No state, command not initialized
-        READY, ///< Command is ready to be sent
-        SENT,  ///< Command has been sent, waiting for acknowledgment
+        NONE,    ///< No state, command not initialized
+        SENDING, ///< Command is ready to be sent
+        SENT,    ///< Command has been sent, waiting for acknowledgment
     };
 
-    std::atomic<State> state = State::NONE;             ///< Current state of the command
-    size_t size{};                                      ///< Size of the command's data
-    std::chrono::steady_clock::time_point lastTimeSent; ///< Last time the command was sent (used for ACK)
+    std::atomic<State> state = State::NONE; ///< Current state of the command
+    size_t size{};                          ///< Size of the command's data
+    size_t timesSent{};                     ///< Number of times the same command has been sent
+    Timer lastTimeSentTimer;                ///< Timer for the last time the command was sent
 };
 
 #endif // COMMAND_H

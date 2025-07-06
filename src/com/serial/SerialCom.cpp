@@ -37,14 +37,10 @@ void SerialCom::start() {
  * @returns True if a byte was successfully read, otherwise false.
  */
 bool SerialCom::read() {
-    if (!com.IsOpened()) {
-        return false;
-    }
-
     bool successful;
     char c = com.ReadChar(successful);
     if (successful) {
-        packetReceiver.receiveByte(c);
+        successful = packetReceiver.receiveByte(c);
     }
     serialFailureMonitor.trackRead(successful);
     return successful;
@@ -57,11 +53,8 @@ bool SerialCom::read() {
  * @returns True if the data was successfully sent, otherwise false.
  */
 bool SerialCom::write(uint8_t* msg, size_t size) {
-    if (!com.IsOpened()) {
-        return false;
-    }
-
-    bool successful = com.WriteArr(msg, (long) size);
+    static constexpr size_t WRITE_TIMEOUT_MS = 100;
+    bool successful = com.WriteArr(msg, (long) size, WRITE_TIMEOUT_MS);
     serialFailureMonitor.trackWrite(successful);
     return successful;
 }

@@ -123,7 +123,7 @@ void LoggingWindow::renderLogs() {
             switch (logLevels[lineIdx]) {
                 case spdlog::level::debug: color = ImVec4(0.2f, 0.6f, 1.0f, 1.0f); break;
                 case spdlog::level::info:  color = ImVec4(0.0f, 0.8f, 0.0f, 1.0f); break;
-                case spdlog::level::warn:  color = ImVec4(0.7f, 0.7f, 0.0f, 1.0f); break;
+                case spdlog::level::warn:  color = ImVec4(0.65f, 0.65f, 0.0f, 1.0f); break;
                 case spdlog::level::err:   color = ImVec4(1.0f, 0.3f, 0.3f, 1.0f); break;
             }
             // clang-format on

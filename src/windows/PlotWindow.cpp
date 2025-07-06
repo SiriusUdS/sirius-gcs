@@ -1,5 +1,6 @@
 #include "PlotWindow.h"
 
+#include "FontConfig.h"
 #include "IniConfig.h"
 #include "SensorPlotData.h"
 #include "Utils.h"
@@ -53,8 +54,12 @@ void PlotWindow::render() {
         const char* actualYLabel = dataType == ADC ? "ADC Value" : yLabel.c_str();
         ImPlot::SetupAxes(xLabel.c_str(), actualYLabel);
 
-        float recentAvgValue = 0.f;
-        constexpr size_t recentAvgValueDurationMs = 2000;
+        static constexpr size_t recentAvgValueDurationMs = 2000;
+        static constexpr size_t recentAvgValueDurationSec = recentAvgValueDurationMs / 1000;
+
+        if (showAvgValues) {
+            showAvgRecentLabel(recentAvgValueDurationSec);
+        }
 
         for (size_t i = 0; i < plotData.size(); i++) {
             const SensorPlotData* data = plotData[i];
@@ -115,17 +120,39 @@ std::string PlotWindow::getWindowId() {
     return "Plot - " + name;
 }
 
-void PlotWindow::showAvgRecentValue(const char* name, float value, size_t idx) {
-    std::ostringstream oss;
-    oss << name << " Avg. Value: " << std::fixed << std::setprecision(1) << value;
-    const std::string avgValueStr = oss.str();
-    const char* avgValueText = avgValueStr.c_str();
+void PlotWindow::showAvgRecentLabel(const size_t durationSec) {
+    const std::string avgValueLabelStr = "Avg. values in the last " + std::to_string(durationSec) + "s";
+    const char* avgValueLabelText = avgValueLabelStr.c_str();
 
     ImDrawList* drawList = ImPlot::GetPlotDrawList();
     const ImVec2 plotPos = ImPlot::GetPlotPos();
     const ImVec2 plotSize = ImPlot::GetPlotSize();
-    const ImVec2 textSize = ImGui::CalcTextSize(avgValueText);
-    const ImVec2 textPos = {plotPos.x + plotSize.x - textSize.x - 10.f, plotPos.y + (textSize.y + 5.f) * idx + 15.f};
+    const ImVec2 textSize = ImGui::CalcTextSize(avgValueLabelText);
+    const ImVec2 textPos = {plotPos.x + plotSize.x - textSize.x - 10.f, plotPos.y + 10.f};
     const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
-    drawList->AddText(textPos, textColor, avgValueText);
+    drawList->AddText(textPos, textColor, avgValueLabelText);
+
+    constexpr float underlineThickness = 1.0f;
+    constexpr float underlineOffsetY = -3.0f;
+    ImVec2 underlineStart = {textPos.x, textPos.y + textSize.y + underlineOffsetY};
+    ImVec2 underlineEnd = {textPos.x + textSize.x, textPos.y + textSize.y + underlineOffsetY};
+    drawList->AddLine(underlineStart, underlineEnd, textColor, underlineThickness);
+}
+
+void PlotWindow::showAvgRecentValue(const char* name, float value, size_t idx) {
+    std::ostringstream oss;
+    oss << name << ": " << std::fixed << std::setprecision(1) << value;
+    const std::string avgValueStr = oss.str();
+    const char* avgValueText = avgValueStr.c_str();
+
+    constexpr float fontSize = 25.f;
+    constexpr float spacingBetweenLines = 2.f;
+
+    ImDrawList* drawList = ImPlot::GetPlotDrawList();
+    const ImVec2 plotPos = ImPlot::GetPlotPos();
+    const ImVec2 plotSize = ImPlot::GetPlotSize();
+    const ImVec2 textSize = FontConfig::defaultFont->CalcTextSizeA(fontSize, FLT_MAX, -1.0f, avgValueText);
+    const ImVec2 textPos = {plotPos.x + plotSize.x - textSize.x - 10.f, plotPos.y + (textSize.y + spacingBetweenLines) * (idx + 1) + 20.f};
+    const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
+    drawList->AddText(FontConfig::defaultFont, fontSize, textPos, textColor, avgValueText);
 }

@@ -19,6 +19,11 @@ size_t packetSize{};
 uint8_t packetBuf[MAX_PACKET_SIZE];
 } // namespace PacketProcessing
 
+void PacketProcessing::processIncomingPackets() {
+    while (processIncomingPacket()) {
+    }
+}
+
 bool PacketProcessing::processIncomingPacket() {
     packetSize = SerialTask::packetReceiver.nextPacketSize();
 

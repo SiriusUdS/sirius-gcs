@@ -18,11 +18,12 @@ bool Command::available() {
  */
 bool Command::ready(size_t dataSize) {
     if (state != Command::State::NONE) {
-        GCS_LOG_WARN("CommandCenter: Couldn't mark command as ready, another command is already being processed.");
+        GCS_LOG_WARN("Command: Couldn't mark command as ready, another command is already being processed.");
         return false;
     }
     size = dataSize;
-    state = Command::State::READY;
+    state = Command::State::SENDING;
+    lastTimeSentTimer.reset();
     return true;
 }
 
@@ -39,14 +40,26 @@ bool Command::ack() {
  * @brief Process the command based on its current state.
  */
 void Command::process() {
-    if (state == Command::State::READY) {
-        if (SerialTask::com.write(data, size)) {
-            state = Command::State::SENT;
-            lastTimeSent = std::chrono::steady_clock::now();
-        } else {
-            GCS_LOG_ERROR("CommandCenter: Couldn't send command over serial communication.");
+    static constexpr size_t NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND = 5;
+    static constexpr double TIME_BETWEEN_COMMAND_SENDS_SEC = 0.03;
+
+    switch (state) {
+    case Command::State::SENDING:
+        if (lastTimeSentTimer.getElapsedTimeInSeconds() < TIME_BETWEEN_COMMAND_SENDS_SEC) {
+            break;
         }
-    } else if (state == Command::State::SENT) {
+        if (!SerialTask::com.write(data, size)) {
+            GCS_LOG_ERROR("Command: Couldn't send command over serial communication.");
+            break;
+        }
+        timesSent++;
+        if (NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND <= timesSent) {
+            state = Command::State::SENT;
+        }
+        break;
+    case Command::State::SENT:
+        timesSent = 0;
         state = Command::State::NONE; // TODO: Implement ack
+        break;
     }
 }

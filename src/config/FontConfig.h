@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 namespace FontConfig {
+inline ImFont* defaultFont = nullptr;
 inline ImFont* codeFont = nullptr;
 } // namespace FontConfig
 

@@ -38,7 +38,7 @@ void SerialTask::execute() {
         intervalTimer.waitUntilNextInterval();
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
-        PacketProcessing::processIncomingPacket();
+        PacketProcessing::processIncomingPackets();
         CommandCenter::processCommands();
     }
 }

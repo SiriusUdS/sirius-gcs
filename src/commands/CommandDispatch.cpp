@@ -24,8 +24,10 @@ void CommandDispatch::test() {
 
 void CommandDispatch::valve(Command& command, size_t percentageOpen) {
     if (!command.available()) {
-        GCS_LOG_WARN("CommandDispatch: Couldn't send valve command, another one is already being processed.");
+        GCS_LOG_DEBUG("CommandDispatch: Couldn't send valve command, another one is already being processed.");
         return;
+    } else {
+        GCS_LOG_DEBUG("AVAILABLE WITH VALUE {}", percentageOpen);
     }
 
     if (percentageOpen > 100) {
@@ -40,7 +42,7 @@ void CommandDispatch::valve(Command& command, size_t percentageOpen) {
     boardCommand->fields.header.bits.type = BOARD_COMMAND_TYPE_CODE;
 
     boardCommand->fields.crc = 0;
-    boardCommand->fields.value = 0;
+    boardCommand->fields.value = percentageOpen;
 
     command.ready(sizeof(BoardCommand));
 }

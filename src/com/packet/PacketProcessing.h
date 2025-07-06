@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 namespace PacketProcessing {
+void processIncomingPackets();
 bool processIncomingPacket();
 bool processEngineTelemetryPacket();
 bool processGSControlPacket();
