@@ -148,6 +148,7 @@ void LoggingWindow::clear() {
     buf.clear();
     lineOffsets.clear();
     lineOffsets.push_back(0);
+    logLevels.clear();
     updateVisibleLines();
 }
 
