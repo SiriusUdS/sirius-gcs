@@ -4,7 +4,7 @@
 #include "CommandCenter.h"
 #include "Logging.h"
 #include "Telecommunication/BoardCommand.h"
-#include "Telecommunication/TelemetryHeader.h"
+#include "Telecommunication/PacketHeaderVariable.h"
 
 void CommandDispatch::test() {
     Command& command = CommandCenter::command;
@@ -36,13 +36,13 @@ void CommandDispatch::valve(Command& command, size_t percentageOpen) {
     }
 
     BoardCommand* boardCommand = (BoardCommand*) command.data;
-    boardCommand->fields.header.bits.boardId = TELEMETRY_ENGINE_BOARD_ID;
+    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
     boardCommand->fields.header.bits.commandCode = ENGINE_COMMAND_CODE_OPEN_VALVE;
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_TYPE_CODE;
 
     boardCommand->fields.crc = 0;
-    boardCommand->fields.value = percentageOpen;
+    boardCommand->fields.value = (uint32_t) percentageOpen;
 
     command.ready(sizeof(BoardCommand));
 }

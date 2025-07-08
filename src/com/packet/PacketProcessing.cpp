@@ -9,11 +9,18 @@
 #include "SerialCom.h"
 #include "SerialTask.h"
 #include "SwitchData.h"
+#include "Telecommunication/PacketHeaderVariable.h"
 #include "Telecommunication/TelemetryPacket.h"
 #include "TemperatureSensor.h"
 
 namespace PacketProcessing {
 constexpr size_t MAX_PACKET_SIZE = 64;
+
+bool processIncomingPacket();
+bool processEngineTelemetryPacket();
+bool processGSControlPacket();
+bool processEngineStatusPacket();
+bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
 
 size_t packetSize{};
 uint8_t packetBuf[MAX_PACKET_SIZE];
@@ -33,12 +40,12 @@ bool PacketProcessing::processIncomingPacket() {
     } else if (packetSize < sizeof(TelemetryHeader)) {
         GCS_LOG_WARN("PacketProcessing: Received packet size ({}) too small to fit header ({}), ignoring packet.", packetSize,
                      sizeof(TelemetryHeader));
-        dumpNextPacket("IncomingPacket");
+        SerialTask::packetReceiver.dumpNextPacket();
         return false;
     } else if (packetSize > MAX_PACKET_SIZE) {
         GCS_LOG_WARN("PacketProcessing: Received packet size ({}) too big to fit in packet buffer ({}), ignoring packet", packetSize,
                      MAX_PACKET_SIZE);
-        dumpNextPacket("IncomingPacket");
+        SerialTask::packetReceiver.dumpNextPacket();
         return false;
     }
 
@@ -52,13 +59,12 @@ bool PacketProcessing::processIncomingPacket() {
     case TELEMETRY_TYPE_CODE:
         return processEngineTelemetryPacket();
     case STATUS_TYPE_CODE:
-        if (header->bits.boardId == TELEMETRY_GS_CONTROL_BOARD_ID) {
+        if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
             return processGSControlPacket();
-        } else if (header->bits.boardId == TELEMETRY_ENGINE_BOARD_ID) {
+        } else if (header->bits.boardId == ENGINE_BOARD_ID) {
             return processEngineStatusPacket();
         } else {
             GCS_LOG_WARN("PacketProcessing: Status packet contains invalid boardId, ignoring packet.");
-            dumpNextPacket("IncomingPacket");
             return false;
         }
     }
@@ -142,18 +148,7 @@ bool PacketProcessing::processEngineStatusPacket() {
 
 bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
     if (packetSize != targetPacketSize) {
-        if (dumpNextPacket(packetName)) {
-            return false;
-        }
         GCS_LOG_WARN("PacketProcessing: Invalid {} size, ignoring packet.", packetName);
-        return false;
-    }
-    return true;
-}
-
-bool PacketProcessing::dumpNextPacket(const char* packetName) {
-    if (!SerialTask::packetReceiver.dumpNextPacket()) {
-        GCS_LOG_WARN("PacketProcessing: process{}() called, but there's no packet to process.", packetName);
         return false;
     }
     return true;
