@@ -67,6 +67,7 @@ void Application::init() {
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);
     PlotWindowCenter::loadState(iniStructure);
+    SerialComWindow::loadState(iniStructure);
 
     SerialTask::start();
 }
@@ -80,6 +81,7 @@ void Application::shutdown() {
     LoggingWindow::saveState(iniStructure);
     MapWindow::saveState(iniStructure);
     PlotWindowCenter::saveState(iniStructure);
+    SerialComWindow::saveState(iniStructure);
 
     iniFile.write(iniStructure);
 
