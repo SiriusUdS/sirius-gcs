@@ -57,10 +57,6 @@ void PlotWindow::render() {
         static constexpr size_t recentAvgValueDurationMs = 2000;
         static constexpr size_t recentAvgValueDurationSec = recentAvgValueDurationMs / 1000;
 
-        if (showAvgValues) {
-            showAvgRecentLabel(recentAvgValueDurationSec);
-        }
-
         for (size_t i = 0; i < plotData.size(); i++) {
             const SensorPlotData* data = plotData[i];
             if (dataType == VALUE) {
@@ -74,6 +70,10 @@ void PlotWindow::render() {
                     showAvgRecentValue(data->getName(), data->averageRecentAdc(recentAvgValueDurationMs), i);
                 }
             }
+        }
+
+        if (showAvgValues) {
+            showAvgRecentLabel(recentAvgValueDurationSec);
         }
 
         ImPlot::EndPlot();
