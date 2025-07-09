@@ -10,9 +10,11 @@ std::vector<HelloImGui::DockableWindow> createDockableWindows();
 void loadState(const mINI::INIStructure& iniStructure);
 void saveState(mINI::INIStructure& iniStructure);
 
-extern PlotWindow thermistorPlot;
-extern PlotWindow pressureSensorPlot;
-extern PlotWindow loadCellPlot;
+extern PlotWindow thermistorMotorPlot;
+extern PlotWindow pressureSensorMotorPlot;
+extern PlotWindow thermistorFillingStationPlot;
+extern PlotWindow pressureSensorFillingStationPlot;
+extern PlotWindow loadCellFillingStationPlot;
 } // namespace PlotWindowCenter
 
 #endif // PLOTWINDOWCENTER_H

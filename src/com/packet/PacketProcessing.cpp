@@ -12,14 +12,22 @@
 #include "Telecommunication/PacketHeaderVariable.h"
 #include "Telecommunication/TelemetryPacket.h"
 #include "TemperatureSensor.h"
+#include "ValveData.h"
 
 namespace PacketProcessing {
 constexpr size_t MAX_PACKET_SIZE = 64;
 
 bool processIncomingPacket();
 bool processEngineTelemetryPacket();
+bool processFillingStationTelemetryPacket();
 bool processGSControlPacket();
 bool processEngineStatusPacket();
+bool processFillingStationStatusPacket();
+void addThermistorPlotData(SensorPlotData plotData[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD], uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT],
+                           float timestamp);
+void addPressureSensorPlotData(SensorPlotData plotData[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD], uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT],
+                               float timestamp);
+void addLoadCellPlotData(SensorPlotData plotData[GSDataCenter::LOAD_CELL_AMOUNT], uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT], float timestamp);
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
 
 size_t packetSize{};
@@ -55,14 +63,27 @@ bool PacketProcessing::processIncomingPacket() {
     }
 
     TelemetryHeader* header = (TelemetryHeader*) packetBuf;
+
     switch (header->bits.type) {
     case TELEMETRY_TYPE_CODE:
-        return processEngineTelemetryPacket();
+        if (header->bits.boardId == ENGINE_BOARD_ID) {
+            return processEngineTelemetryPacket();
+        } else if (header->bits.boardId == FILLING_STATION_BOARD_ID) {
+            return processFillingStationTelemetryPacket();
+        } else if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
+            GCS_LOG_WARN("PacketProcessing: Tried processing GS control telemetry packet, but that doesn't exist.");
+            return false;
+        } else {
+            GCS_LOG_WARN("PacketProcessing: Telemetry packet contains invalid boardId, ignoring packet.");
+            return false;
+        }
     case STATUS_TYPE_CODE:
-        if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
-            return processGSControlPacket();
-        } else if (header->bits.boardId == ENGINE_BOARD_ID) {
+        if (header->bits.boardId == ENGINE_BOARD_ID) {
             return processEngineStatusPacket();
+        } else if (header->bits.boardId == FILLING_STATION_BOARD_ID) {
+            return processFillingStationStatusPacket();
+        } else if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
+            return processGSControlPacket();
         } else {
             GCS_LOG_WARN("PacketProcessing: Status packet contains invalid boardId, ignoring packet.");
             return false;
@@ -81,39 +102,23 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
     float timestamp = (float) packet->fields.timestamp_ms;
 
-    static constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
-    static constexpr size_t PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET = 8;
-    static constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
-    static constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
+    addThermistorPlotData(GSDataCenter::Thermistor_Motor_PlotData, packet->fields.adcValues, timestamp);
+    addPressureSensorPlotData(GSDataCenter::PressureSensor_Motor_PlotData, packet->fields.adcValues, timestamp);
 
-    // Thermistors
-    for (size_t i = 0; i < GSDataCenter::THERMISTOR_AMOUNT; i++) {
-        const size_t adcIdx = i + THERMISTOR_ADC_INDEX_OFFSET;
-        const float adcValue = packet->fields.adcValues[adcIdx];
-        const float temperature = TemperatureSensor::adcToTemperature(packet->fields.adcValues[adcIdx]);
+    return true;
+}
 
-        GSDataCenter::ThermistorPlotData[i].addData(adcValue, temperature, timestamp);
+bool PacketProcessing::processFillingStationTelemetryPacket() {
+    if (!validateIncomingPacketSize(sizeof(FillingStationTelemetryPacket), "FillingStationTelemetryPacket")) {
+        return false;
     }
 
-    // Pressure sensors
-    for (size_t i = 0; i < GSDataCenter::PRESSURE_SENSOR_AMOUNT; i++) {
-        const size_t sensorIdxAdcIdx = i + PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET;
-        const uint16_t sensorIdx = packet->fields.adcValues[sensorIdxAdcIdx];
-        const size_t pressureSensorAdcIdx = i + PRESSURE_SENSOR_ADC_INDEX_OFFSET;
-        const float adcValue = packet->fields.adcValues[pressureSensorAdcIdx];
-        const float pressure = PressureTransducer::adcToPressure(packet->fields.adcValues[pressureSensorAdcIdx], sensorIdx);
+    FillingStationTelemetryPacket* packet = (FillingStationTelemetryPacket*) packetBuf;
+    float timestamp = (float) packet->fields.timestamp_ms;
 
-        GSDataCenter::PressureSensorPlotData[i].addData(adcValue, pressure, timestamp);
-    }
-
-    // Load cells
-    for (size_t i = 0; i < GSDataCenter::LOAD_CELL_AMOUNT; i++) {
-        const size_t adcIdx = i + LOAD_CELL_ADC_INDEX_OFFSET;
-        const float adcValue = packet->fields.adcValues[adcIdx];
-        const float force = LoadCell::adcToForce((float) packet->fields.adcValues[adcIdx], 0);
-
-        GSDataCenter::LoadCellPlotData[i].addData(adcValue, force, timestamp);
-    }
+    addThermistorPlotData(GSDataCenter::Thermistor_FillingStation_PlotData, packet->fields.adcValues, timestamp);
+    addPressureSensorPlotData(GSDataCenter::PressureSensor_FillingStation_PlotData, packet->fields.adcValues, timestamp);
+    addLoadCellPlotData(GSDataCenter::LoadCell_FillingStation_PlotData, packet->fields.adcValues, timestamp);
 
     return true;
 }
@@ -124,15 +129,16 @@ bool PacketProcessing::processGSControlPacket() {
     }
 
     GSControlStatusPacket* packet = (GSControlStatusPacket*) packetBuf;
+    GSControlStatus status = packet->fields.status;
 
-    GSDataCenter::AllowDumpSwitchData.isOn = packet->fields.status.bits.isAllowDumpSwitchOn;
-    GSDataCenter::AllowFillSwitchData.isOn = packet->fields.status.bits.isAllowFillSwitchOn;
-    GSDataCenter::ArmIgniterSwitchData.isOn = packet->fields.status.bits.isArmIgniterSwitchOn;
-    GSDataCenter::ArmServoSwitchData.isOn = packet->fields.status.bits.isArmServoSwitchOn;
-    GSDataCenter::EmergencyStopButtonData.isOn = packet->fields.status.bits.isEmergencyStopButtonPressed;
-    GSDataCenter::FireIgniterButtonData.isOn = packet->fields.status.bits.isFireIgniterButtonPressed;
-    GSDataCenter::UnsafeKeySwitchData.isOn = packet->fields.status.bits.isUnsafeKeySwitchPressed;
-    GSDataCenter::ValveStartButtonData.isOn = packet->fields.status.bits.isValveStartButtonPressed;
+    GSDataCenter::AllowDumpSwitchData.isOn = status.bits.isAllowDumpSwitchOn;
+    GSDataCenter::AllowFillSwitchData.isOn = status.bits.isAllowFillSwitchOn;
+    GSDataCenter::ArmIgniterSwitchData.isOn = status.bits.isArmIgniterSwitchOn;
+    GSDataCenter::ArmServoSwitchData.isOn = status.bits.isArmServoSwitchOn;
+    GSDataCenter::EmergencyStopButtonData.isOn = status.bits.isEmergencyStopButtonPressed;
+    GSDataCenter::FireIgniterButtonData.isOn = status.bits.isFireIgniterButtonPressed;
+    GSDataCenter::UnsafeKeySwitchData.isOn = status.bits.isUnsafeKeySwitchPressed;
+    GSDataCenter::ValveStartButtonData.isOn = status.bits.isValveStartButtonPressed;
 
     return true;
 }
@@ -142,8 +148,80 @@ bool PacketProcessing::processEngineStatusPacket() {
         return false;
     }
 
+    constexpr size_t NOS_VALVE_STATUS_INDEX = 0;
+    constexpr size_t IPA_VALVE_STATUS_INDEX = 1;
+
     EngineStatusPacket* packet = (EngineStatusPacket*) packetBuf;
+
+    GSDataCenter::NosValveData.isIdle = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.isIdle;
+    GSDataCenter::NosValveData.closedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::NosValveData.openedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+
+    GSDataCenter::IpaValveData.isIdle = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.isIdle;
+    GSDataCenter::IpaValveData.closedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::IpaValveData.openedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+
     return true;
+}
+
+bool PacketProcessing::processFillingStationStatusPacket() {
+    if (!validateIncomingPacketSize(sizeof(FillingStationStatusPacket), "FillingStationStatusPacket")) {
+        return false;
+    }
+
+    constexpr size_t FILL_VALVE_STATUS_INDEX = 0;
+    constexpr size_t DUMP_VALVE_STATUS_INDEX = 1;
+
+    FillingStationStatusPacket* packet = (FillingStationStatusPacket*) packetBuf;
+
+    GSDataCenter::FillValveData.isIdle = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.isIdle;
+    GSDataCenter::FillValveData.closedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::FillValveData.openedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+
+    GSDataCenter::DumpValveData.isIdle = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.isIdle;
+    GSDataCenter::DumpValveData.closedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::DumpValveData.openedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+
+    return true;
+}
+
+void PacketProcessing::addThermistorPlotData(SensorPlotData plotData[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD],
+                                             uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT], float timestamp) {
+    static constexpr size_t THERMISTOR_ADC_INDEX_OFFSET = 0;
+
+    for (size_t i = 0; i < GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD; i++) {
+        const size_t adcIdx = i + THERMISTOR_ADC_INDEX_OFFSET;
+        const float adcValue = adcValues[adcIdx];
+        const float temperature = TemperatureSensor::adcToTemperature(adcValue);
+        plotData[i].addData(adcValue, temperature, timestamp);
+    }
+}
+
+void PacketProcessing::addPressureSensorPlotData(SensorPlotData plotData[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD],
+                                                 uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT], float timestamp) {
+    static constexpr size_t PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET = 8;
+    static constexpr size_t PRESSURE_SENSOR_ADC_INDEX_OFFSET = 10;
+
+    for (size_t i = 0; i < GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD; i++) {
+        const size_t sensorIdxAdcIdx = i + PRESSURE_SENSOR_INDEX_ADC_INDEX_OFFSET;
+        const uint16_t sensorIdx = adcValues[sensorIdxAdcIdx];
+        const size_t pressureSensorAdcIdx = i + PRESSURE_SENSOR_ADC_INDEX_OFFSET;
+        const float adcValue = adcValues[pressureSensorAdcIdx];
+        const float pressure = PressureTransducer::adcToPressure(adcValue, sensorIdx);
+        plotData[i].addData(adcValue, pressure, timestamp);
+    }
+}
+
+void PacketProcessing::addLoadCellPlotData(SensorPlotData plotData[GSDataCenter::LOAD_CELL_AMOUNT], uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT],
+                                           float timestamp) {
+    static constexpr size_t LOAD_CELL_ADC_INDEX_OFFSET = 14;
+
+    for (size_t i = 0; i < GSDataCenter::LOAD_CELL_AMOUNT; i++) {
+        const size_t adcIdx = i + LOAD_CELL_ADC_INDEX_OFFSET;
+        const float adcValue = adcValues[adcIdx];
+        const float force = LoadCell::adcToForce((float) adcValues[adcIdx], 0);
+        plotData[i].addData(adcValue, force, timestamp);
+    }
 }
 
 bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {

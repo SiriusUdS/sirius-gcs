@@ -3,40 +3,22 @@
 #include "Command.h"
 #include "CommandCenter.h"
 #include "CommandDispatch.h"
+#include "GSDataCenter.h"
+#include "ValveData.h"
 
 #include <imgui.h>
 
 namespace ControlsWindow {
-int valveValues[3] = {0, 0, 0};
-int valveValuesLastSent[3] = {0, 0, 0};
+int valveValues[GSDataCenter::VALVE_AMOUNT] = {0, 0, 0, 0};
+int valveValuesLastSent[GSDataCenter::VALVE_AMOUNT] = {0, 0, 0, 0};
+
+void renderValve(ValveData& valveData, size_t idx);
 } // namespace ControlsWindow
 
 void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
-        bool sliderChanged, commandAvailable, needToSynchronize;
-
-        commandAvailable = CommandCenter::valve1Command.available();
-        sliderChanged = ImGui::SliderInt("Valve 1", &valveValues[0], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
-        needToSynchronize = valveValues[0] != valveValuesLastSent[0];
-        if (commandAvailable && (sliderChanged || needToSynchronize)) {
-            valveValuesLastSent[0] = valveValues[0];
-            CommandDispatch::valve(CommandCenter::valve1Command, valveValues[0]);
-        }
-
-        commandAvailable = CommandCenter::valve2Command.available();
-        sliderChanged = ImGui::SliderInt("Valve 2", &valveValues[1], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
-        needToSynchronize = valveValues[1] != valveValuesLastSent[1];
-        if (commandAvailable && (sliderChanged || needToSynchronize)) {
-            valveValuesLastSent[1] = valveValues[1];
-            CommandDispatch::valve(CommandCenter::valve2Command, valveValues[1]);
-        }
-
-        commandAvailable = CommandCenter::valve3Command.available();
-        sliderChanged = ImGui::SliderInt("Valve 3", &valveValues[2], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
-        needToSynchronize = valveValues[2] != valveValuesLastSent[2];
-        if (commandAvailable && (sliderChanged || needToSynchronize)) {
-            valveValuesLastSent[2] = valveValues[2];
-            CommandDispatch::valve(CommandCenter::valve3Command, valveValues[2]);
+        for (size_t i = 0; i < GSDataCenter::VALVE_AMOUNT; i++) {
+            renderValve(*GSDataCenter::ValveDataVec[i], i);
         }
     }
 
@@ -46,5 +28,16 @@ void ControlsWindow::render() {
             CommandDispatch::test();
         }
         ImGui::EndDisabled();
+    }
+}
+
+void ControlsWindow::renderValve(ValveData& valveData, size_t idx) {
+    const bool commandAvailable = CommandCenter::valve1Command.available();
+    const bool sliderChanged = ImGui::SliderInt(valveData.name, &valveValues[idx], 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+    const bool needToSynchronize = valveValues[idx] != valveValuesLastSent[idx];
+
+    if (commandAvailable && (sliderChanged || needToSynchronize)) {
+        valveValuesLastSent[idx] = valveValues[idx];
+        CommandDispatch::valve(CommandCenter::valve1Command, valveValues[idx]);
     }
 }
