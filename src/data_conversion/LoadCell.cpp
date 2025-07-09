@@ -5,26 +5,22 @@
 
 namespace LoadCell {
 struct LoadCellParams {
-    double capacity{};
     double additiveFactor{};
+    double functionRateOfChange{};
+    double functionOffset{};
 };
 
 constexpr size_t LOAD_CELL_AMOUNT = 4;
 
 // clang-format off
 constexpr LoadCellParams LOAD_CELL_PARAMS_TABLE[LOAD_CELL_AMOUNT] = {
-    {5000.0, 0.0},
-    {5000.0, 0.0},
-    {200.0,  0.0},
-    {200.0,  286.5}
+    {.additiveFactor=0.0, .functionRateOfChange=0.0231, .functionOffset=0.0838}, // Tank load cell
+    {.additiveFactor=0.0, .functionRateOfChange=0.0,    .functionOffset=0.0}     // Combustion chamber load cell
 };
 // clang-format on
 } // namespace LoadCell
 
 float LoadCell::adcToForce(float adcValue, size_t loadCellIndex) {
     const LoadCellParams& params = LOAD_CELL_PARAMS_TABLE[loadCellIndex];
-    const double adjustedAdcValue = adcValue - params.additiveFactor;
-    const double voltage = (adjustedAdcValue * 3.3) / 4096.0;
-
-    return (float) (params.capacity * (voltage / 209) / 0.015);
+    return static_cast<float>(params.functionRateOfChange * adcValue) - static_cast<float>(params.functionOffset - params.additiveFactor);
 }
