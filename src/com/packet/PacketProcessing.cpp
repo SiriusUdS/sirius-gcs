@@ -1,5 +1,6 @@
 #include "PacketProcessing.h"
 
+#include "CRC/CRCConstants.h"
 #include "GSDataCenter.h"
 #include "LoadCell.h"
 #include "Logging.h"
@@ -29,6 +30,7 @@ void addPressureSensorPlotData(SensorPlotData plotData[GSDataCenter::PRESSURE_SE
                                float timestamp);
 void addLoadCellPlotData(SensorPlotData plotData[GSDataCenter::LOAD_CELL_AMOUNT], uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT], float timestamp);
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
+uint32_t computeCrc(uint8_t* data, size_t sizeInBytes);
 
 size_t packetSize{};
 uint8_t packetBuf[MAX_PACKET_SIZE];
@@ -129,6 +131,14 @@ bool PacketProcessing::processGSControlPacket() {
     }
 
     GSControlStatusPacket* packet = (GSControlStatusPacket*) packetBuf;
+
+    uint32_t computedCrc = computeCrc(packetBuf, sizeof(GSControlStatusPacket) - sizeof(packet->fields.crc));
+    if (computedCrc == packet->fields.crc) {
+        GCS_LOG_DEBUG("HOLY MOTHER OF GOD PRAISE JESUS LORD ALMIGHTY CHRISTIAN LOVE (crc works)");
+    } else {
+        GCS_LOG_DEBUG("CRC not the same, computed is {}, what we got is {}", computedCrc, packet->fields.crc);
+    }
+
     GSControlStatus status = packet->fields.status;
 
     GSDataCenter::AllowDumpSwitchData.isOn = status.bits.isAllowDumpSwitchOn;
@@ -230,4 +240,35 @@ bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const
         return false;
     }
     return true;
+}
+uint32_t PacketProcessing::computeCrc(uint8_t* data, size_t sizeInBytes) {
+    constexpr uint32_t POLY = 0x04C11DB7;
+    uint32_t crc = 0xFFFFFFFF;
+
+    size_t i = 0;
+
+    // Process full 32-bit words (little-endian packing)
+    while (i + 3 < sizeInBytes) {
+        uint32_t word = (uint32_t) data[i] | ((uint32_t) data[i + 1] << 8) | ((uint32_t) data[i + 2] << 16) | ((uint32_t) data[i + 3] << 24);
+
+        crc ^= word;
+        for (int j = 0; j < 32; ++j)
+            crc = (crc & 0x80000000) ? (crc << 1) ^ POLY : (crc << 1);
+
+        i += 4;
+    }
+
+    // Handle any remaining bytes (0 to 3), padded with zero
+    if (i < sizeInBytes) {
+        uint32_t word = 0;
+        for (int k = 0; k < sizeInBytes - i; ++k) {
+            word |= (uint32_t) data[i + k] << (8 * k); // still little-endian
+        }
+
+        crc ^= word;
+        for (int j = 0; j < 32; ++j)
+            crc = (crc & 0x80000000) ? (crc << 1) ^ POLY : (crc << 1);
+    }
+
+    return crc;
 }
