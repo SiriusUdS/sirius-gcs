@@ -99,6 +99,12 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     }
 
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(EngineTelemetryPacket));
+    if (!isPacketValid) {
+        return false;
+    }
+
     float timestamp = (float) packet->fields.timestamp_ms;
 
     addThermistorPlotData(GSDataCenter::Thermistor_Motor_PlotData, packet->fields.adcValues, timestamp);
@@ -113,6 +119,12 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     }
 
     FillingStationTelemetryPacket* packet = (FillingStationTelemetryPacket*) packetBuf;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(FillingStationTelemetryPacket));
+    if (!isPacketValid) {
+        return false;
+    }
+
     float timestamp = (float) packet->fields.timestamp_ms;
 
     addThermistorPlotData(GSDataCenter::Thermistor_FillingStation_PlotData, packet->fields.adcValues, timestamp);
@@ -157,6 +169,11 @@ bool PacketProcessing::processEngineStatusPacket() {
 
     EngineStatusPacket* packet = (EngineStatusPacket*) packetBuf;
 
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(EngineStatusPacket));
+    if (!isPacketValid) {
+        return false;
+    }
+
     GSDataCenter::NosValveData.isIdle = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.isIdle;
     GSDataCenter::NosValveData.closedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
     GSDataCenter::NosValveData.openedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
@@ -177,6 +194,11 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     constexpr size_t DUMP_VALVE_STATUS_INDEX = 1;
 
     FillingStationStatusPacket* packet = (FillingStationStatusPacket*) packetBuf;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(FillingStationStatusPacket));
+    if (!isPacketValid) {
+        return false;
+    }
 
     GSDataCenter::FillValveData.isIdle = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.isIdle;
     GSDataCenter::FillValveData.closedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
