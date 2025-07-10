@@ -39,13 +39,19 @@ void ControlsWindow::render() {
 
 void ControlsWindow::renderEngineValve(ValveData& data) {
     const bool commandAvailable = CommandCenter::valve1Command.available();
-    const bool sliderChanged = ImGui::SliderInt(data.name, &data.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
-    const bool needToSynchronize = data.openedValue_perc != data.lastOpenedValue_perc;
+    bool sliderChanged;
+    bool needToSynchronize;
+    {
+        std::lock_guard<std::mutex> lock(data.mtx);
+        sliderChanged = ImGui::SliderInt(data.name, &data.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+        needToSynchronize = data.openedValue_perc != data.lastOpenedValue_perc;
+    }
 
     if (!commandAvailable)
         return;
 
     if (sliderChanged || needToSynchronize) {
+        std::lock_guard<std::mutex> lock(data.mtx);
         data.lastOpenedValue_perc = data.openedValue_perc;
         CommandDispatch::valve(CommandCenter::valve1Command, data.openedValue_perc);
     }
@@ -67,15 +73,24 @@ void ControlsWindow::renderFillStationValve(ValveData& data) {
       isDumpSelectedAndOff ||
       isFillSelectedAndOff
     );
-    const bool sliderChanged = ImGui::SliderInt(data.name, &data.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+    bool sliderChanged;
+    {
+        std::lock_guard<std::mutex> lock(data.mtx);
+        sliderChanged = ImGui::SliderInt(data.name, &data.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+    }
     ImGui::EndDisabled();
 
     if (isDumpSelectedAndOff || isFillSelectedAndOff)
       return;
 
-    const bool needToSynchronize = data.openedValue_perc != data.lastOpenedValue_perc;
+    bool needToSynchronize;
+    {
+        std::lock_guard<std::mutex> lock(data.mtx);
+        needToSynchronize = data.openedValue_perc != data.lastOpenedValue_perc;
+    }
 
     if (sliderChanged || needToSynchronize) {
+        std::lock_guard<std::mutex> lock(data.mtx);
         data.lastOpenedValue_perc = data.openedValue_perc;
         CommandDispatch::valve(CommandCenter::valve1Command, data.openedValue_perc);
     }
