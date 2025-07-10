@@ -133,23 +133,6 @@ bool PacketProcessing::processGSControlPacket() {
     if (!isPacketValid) {
         return false;
     }
-
-    //uint32_t computedCrc = CRC::computeCrc(packetBuf, sizeof(GSControlStatusPacket) - sizeof(packet->fields.crc));
-    //if (computedCrc != packet->fields.crc) {
-    //    GCS_LOG_WARN(
-    //      "PacketProcessing: CRC mismatch in GSControlStatusPacket, computed: {}, received: {}. Ignoring packet.",
-    //      computedCrc, packet->fields.crc
-    //    );
-    //    return false;
-    //}
-
-    //uint32_t computedCrc = computeCrc(packetBuf, sizeof(GSControlStatusPacket) - sizeof(packet->fields.crc));
-    //if (computedCrc == packet->fields.crc) {
-    //    GCS_LOG_DEBUG("HOLY MOTHER OF GOD PRAISE JESUS LORD ALMIGHTY CHRISTIAN LOVE (crc works)");
-    //} else {
-    //    GCS_LOG_DEBUG("CRC not the same, computed is {}, what we got is {}", computedCrc, packet->fields.crc);
-    //}
-
     GSControlStatus status = packet->fields.status;
 
     GSDataCenter::AllowDumpSwitchData.isOn = status.bits.isAllowDumpSwitchOn;
