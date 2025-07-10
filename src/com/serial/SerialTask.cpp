@@ -12,6 +12,11 @@
 
 namespace SerialTask {
 PacketRateMonitor packetRateMonitor;
+PacketRateMonitor engineTelemetryPacketRateMonitor;
+PacketRateMonitor fillingStationTelemetryPacketRateMonitor;
+PacketRateMonitor gsControlPacketRateMonitor;
+PacketRateMonitor engineStatusPacketRateMonitor;
+PacketRateMonitor fillingStationStatusPacketRateMonitor;
 PacketReceiver packetReceiver;
 SerialStateMonitor serialStateMonitor;
 SerialCom com(packetRateMonitor, packetReceiver, serialStateMonitor);

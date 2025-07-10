@@ -16,6 +16,7 @@ enum RecvBufferDisplayMode { TEXT = 0, HEXA = 1 };
 
 constexpr const char* INI_RECV_BUFFER_DISPLAY_MODE = "recv_buffer_display_mode";
 
+void renderPacketRateTableRow(const char* packetName, double rate);
 void recvBufferContentModal();
 void updateRecvBufferContentDisplay(bool syncToCurrentBuffer);
 
@@ -49,7 +50,23 @@ void SerialComWindow::render() {
     ImGui::SameLine();
     ImGui::Text(comStateText);
 
-    ImGui::Text("Packets read/s: %.1f", SerialTask::packetRateMonitor.getRatePerSecond());
+    if (ImGui::CollapsingHeader("Packet rates")) {
+        if (ImGui::BeginTable("PacketRatesTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+            ImGui::TableSetupColumn("Packet Type");
+            ImGui::TableSetupColumn("Packets/s");
+            ImGui::TableHeadersRow();
+
+            renderPacketRateTableRow("Engine telemetry", SerialTask::engineTelemetryPacketRateMonitor.getRatePerSecond());
+            renderPacketRateTableRow("Filling station telemetry", SerialTask::fillingStationTelemetryPacketRateMonitor.getRatePerSecond());
+            renderPacketRateTableRow("GS control", SerialTask::gsControlPacketRateMonitor.getRatePerSecond());
+            renderPacketRateTableRow("Engine status", SerialTask::engineStatusPacketRateMonitor.getRatePerSecond());
+            renderPacketRateTableRow("Filling station status", SerialTask::fillingStationStatusPacketRateMonitor.getRatePerSecond());
+            ImGui::TableNextRow(); // Separator row for total
+            renderPacketRateTableRow("Total", SerialTask::packetRateMonitor.getRatePerSecond());
+
+            ImGui::EndTable();
+        }
+    }
 
     if (ImGui::Button("View RECV buffer content")) {
         ImGui::OpenPopup("RECV Buffer Content");
@@ -68,6 +85,14 @@ void SerialComWindow::loadState(const mINI::INIStructure& ini) {
 
 void SerialComWindow::saveState(mINI::INIStructure& ini) {
     ini[IniConfig::GCS_SECTION].set(INI_RECV_BUFFER_DISPLAY_MODE, std::to_string(recvBufferDisplayMode));
+}
+
+void SerialComWindow::renderPacketRateTableRow(const char* packetName, double rate) {
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(0);
+    ImGui::Text(packetName);
+    ImGui::TableSetColumnIndex(1);
+    ImGui::Text("%.1f", rate);
 }
 
 void SerialComWindow::recvBufferContentModal() {
