@@ -6,7 +6,7 @@
 
 class ComPortSelector {
 public:
-    const std::string& current() const;
+    std::string current() const;
     void next();
 
 private:

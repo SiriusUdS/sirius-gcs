@@ -2,7 +2,7 @@
 
 #include "ComDiscovery.h"
 
-const std::string& ComPortSelector::current() const {
+std::string ComPortSelector::current() const {
     if (currentComPortIdx >= comPorts.size()) {
         return "";
     }
