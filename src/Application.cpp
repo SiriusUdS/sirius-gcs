@@ -38,7 +38,6 @@ void Application::loadFonts() {
     ImGuiIO& io = ImGui::GetIO();
 
     FontConfig::defaultFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, MAIN_FONT_SIZE);
-    FontConfig::smallerDefaultFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, SMALLER_MAIN_FONT_SIZE);
 
     ImFontConfig iconsConfig;
     iconsConfig.MergeMode = true;
@@ -47,6 +46,8 @@ void Application::loadFonts() {
 
     io.FontDefault = FontConfig::defaultFont;
 
+    // All other fonts need to be added below this comment to avoid interference with merge between main font and icons font
+    FontConfig::smallerDefaultFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, SMALLER_MAIN_FONT_SIZE);
     FontConfig::codeFont = io.Fonts->AddFontFromFileTTF(CODE_FONT, CODE_SIZE);
 }
 
