@@ -13,7 +13,7 @@ class SensorPlotData;
  */
 class PlotWindow {
 public:
-    PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<SensorPlotData*> plotData);
+    PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<SensorPlotData*> sensorPlotDataVec);
     void render();
     void loadState(const mINI::INIStructure& ini);
     void saveState(mINI::INIStructure& ini);
@@ -26,7 +26,7 @@ private:
     void showAvgRecentValue(const char* name, float value, size_t idx);
 
     std::string name, xLabel, yLabel, autofitIniId, showCompressedDataIniId, showAvgValuesId, dataTypeIniId;
-    std::vector<SensorPlotData*> plotData;
+    std::vector<SensorPlotData*> sensorPlotDataVec;
     ImPlotFlags flags{};
     bool autofit{};
     bool showCompressedData{};

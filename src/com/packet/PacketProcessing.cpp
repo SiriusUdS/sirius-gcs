@@ -4,6 +4,7 @@
 #include "GSDataCenter.h"
 #include "LoadCell.h"
 #include "Logging.h"
+#include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
 #include "PressureTransducer.h"
 #include "SensorPlotData.h"
@@ -107,6 +108,7 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     addThermistorPlotData(GSDataCenter::Thermistor_Motor_PlotData, packet->fields.adcValues, timestamp);
     addPressureSensorPlotData(GSDataCenter::PressureSensor_Motor_PlotData, packet->fields.adcValues, timestamp);
 
+    SerialTask::engineTelemetryPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -122,6 +124,7 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     addPressureSensorPlotData(GSDataCenter::PressureSensor_FillingStation_PlotData, packet->fields.adcValues, timestamp);
     addLoadCellPlotData(GSDataCenter::LoadCell_FillingStation_PlotData, packet->fields.adcValues, timestamp);
 
+    SerialTask::fillingStationTelemetryPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -150,6 +153,7 @@ bool PacketProcessing::processGSControlPacket() {
     GSDataCenter::UnsafeKeySwitchData.isOn = status.bits.isUnsafeKeySwitchPressed;
     GSDataCenter::ValveStartButtonData.isOn = status.bits.isValveStartButtonPressed;
 
+    SerialTask::gsControlPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -171,6 +175,7 @@ bool PacketProcessing::processEngineStatusPacket() {
     GSDataCenter::IpaValveData.closedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
     GSDataCenter::IpaValveData.openedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
+    SerialTask::engineStatusPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -192,6 +197,7 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     GSDataCenter::DumpValveData.closedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
     GSDataCenter::DumpValveData.openedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
+    SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
     return true;
 }
 
