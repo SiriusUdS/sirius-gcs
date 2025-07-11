@@ -1,5 +1,6 @@
 #include "SerialComWindow.h"
 
+#include "ComPortSelector.h"
 #include "FontConfig.h"
 #include "IniConfig.h"
 #include "PacketRateMonitor.h"

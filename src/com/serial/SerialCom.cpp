@@ -1,5 +1,6 @@
 #include "SerialCom.h"
 
+#include "ComPortSelector.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
 #include "SerialStateMonitor.h"
@@ -7,8 +8,8 @@
 /**
  * @brief Constructs a SerialCom object with the given monitors.
  */
-SerialCom::SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm)
-    : packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
+SerialCom::SerialCom(ComPortSelector& cps, PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm)
+    : comPortSelector(cps), packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
 }
 
 /**
@@ -20,7 +21,7 @@ void SerialCom::start() {
     serialFailureMonitor.reset();
     comPortSelector.next();
 
-    com.SetPortName(comPortSelector.current());
+    com.SetPortName("\\\\.\\" + comPortSelector.current());
     com.SetBaudRate(CBR_19200);
     com.Open();
 }

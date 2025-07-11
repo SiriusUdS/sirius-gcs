@@ -4,11 +4,12 @@
 #include <atomic>
 #include <thread>
 
-class SerialStateMonitor;
+class ComPortSelector;
+class IntervalTimer;
 class PacketRateMonitor;
 class PacketReceiver;
 class SerialCom;
-class IntervalTimer;
+class SerialStateMonitor;
 
 namespace SerialTask {
 void start();
@@ -24,6 +25,7 @@ extern PacketRateMonitor engineStatusPacketRateMonitor;
 extern PacketRateMonitor fillingStationStatusPacketRateMonitor;
 extern PacketReceiver packetReceiver;
 extern SerialStateMonitor serialStateMonitor;
+extern ComPortSelector comPortSelector;
 extern SerialCom com;
 } // namespace SerialTask
 

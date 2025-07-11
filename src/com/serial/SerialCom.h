@@ -1,10 +1,9 @@
 #ifndef SERIALCOM_H
 #define SERIALCOM_H
 
-#include "ComPortSelector.h"
-
 #include <ceserial.h>
 
+class ComPortSelector;
 class PacketRateMonitor;
 class PacketReceiver;
 class SerialStateMonitor;
@@ -15,7 +14,7 @@ class SerialStateMonitor;
  */
 class SerialCom {
 public:
-    SerialCom(PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm);
+    SerialCom(ComPortSelector& cps, PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm);
     void start();
     bool read();
     bool write(uint8_t* msg, size_t size);
@@ -26,7 +25,7 @@ public:
 
 private:
     ceSerial com;
-    ComPortSelector comPortSelector;
+    ComPortSelector& comPortSelector;
     PacketRateMonitor& packetRateMonitor;
     PacketReceiver& packetReceiver;
     SerialStateMonitor& serialFailureMonitor;

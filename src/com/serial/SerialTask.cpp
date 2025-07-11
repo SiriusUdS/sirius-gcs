@@ -1,5 +1,6 @@
 #include "SerialTask.h"
 
+#include "ComPortSelector.h"
 #include "CommandCenter.h"
 #include "IntervalTimer.h"
 #include "PacketProcessing.h"
@@ -19,7 +20,9 @@ PacketRateMonitor engineStatusPacketRateMonitor;
 PacketRateMonitor fillingStationStatusPacketRateMonitor;
 PacketReceiver packetReceiver;
 SerialStateMonitor serialStateMonitor;
-SerialCom com(packetRateMonitor, packetReceiver, serialStateMonitor);
+ComPortSelector comPortSelector;
+SerialCom com(comPortSelector, packetRateMonitor, packetReceiver, serialStateMonitor);
+
 IntervalTimer intervalTimer(std::chrono::milliseconds(1000 / SerialConfig::SERIAL_TASK_LOOPS_PER_SECOND));
 std::thread thread;
 std::chrono::steady_clock::time_point timeLastUpdate = std::chrono::steady_clock::now();

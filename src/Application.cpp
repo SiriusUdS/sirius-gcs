@@ -31,12 +31,14 @@ void Application::loadFonts() {
     static constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
     static constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
     static constexpr float MAIN_FONT_SIZE = 24.f;
+    static constexpr float SMALLER_MAIN_FONT_SIZE = 20.f;
     static constexpr float ICONS_SIZE = 20.f;
     static constexpr float CODE_SIZE = 20.f;
 
     ImGuiIO& io = ImGui::GetIO();
 
     FontConfig::defaultFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, MAIN_FONT_SIZE);
+    FontConfig::smallerDefaultFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, SMALLER_MAIN_FONT_SIZE);
 
     ImFontConfig iconsConfig;
     iconsConfig.MergeMode = true;

@@ -19,7 +19,7 @@ void ComDiscovery::getAvailableComPorts(std::vector<std::string>& comPortVec) {
                 break;
             }
 
-            comPortVec.push_back("\\\\.\\" + wcharToString(comPort));
+            comPortVec.push_back(wcharToString(comPort));
         }
         RegCloseKey(hKey);
     }
