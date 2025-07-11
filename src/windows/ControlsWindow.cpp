@@ -15,6 +15,14 @@ int valveValuesLastSent[GSDataCenter::VALVE_AMOUNT] = {0, 0, 0, 0};
 void renderValve(ValveData& valveData, size_t idx);
 } // namespace ControlsWindow
 
+void tempShowValve(ValveData& data) {
+    ImGui::Text(data.name);
+    ImGui::Text("Is Idle: %s", data.isIdle ? "Yes" : "No");
+    ImGui::Text("Is Opened Switch High: %s", data.openedSwitchHigh ? "Yes" : "No");
+    ImGui::Text("Is Closed Switch High: %s", data.closedSwitchHigh ? "Yes" : "No");
+    ImGui::Separator();
+}
+
 void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
         for (size_t i = 0; i < GSDataCenter::VALVE_AMOUNT; i++) {
@@ -43,6 +51,13 @@ void ControlsWindow::render() {
             CommandDispatch::test();
         }
         ImGui::EndDisabled();
+    }
+
+    if (ImGui::CollapsingHeader("Temp valves")) {
+        tempShowValve(GSDataCenter::NosValveData);
+        tempShowValve(GSDataCenter::IpaValveData);
+        tempShowValve(GSDataCenter::FillValveData);
+        tempShowValve(GSDataCenter::DumpValveData);
     }
 }
 
