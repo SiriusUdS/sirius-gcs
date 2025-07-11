@@ -413,6 +413,3 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 imgui.ini
-
-# vcpackage
-/vcpkg_installed*/
