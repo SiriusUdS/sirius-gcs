@@ -1,6 +1,5 @@
 #include "SerialCom.h"
 
-#include "ComDiscovery.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
 #include "SerialStateMonitor.h"
@@ -19,15 +18,9 @@ void SerialCom::start() {
     com.Close();
     packetRateMonitor.reset();
     serialFailureMonitor.reset();
+    comPortSelector.next();
 
-    std::vector<std::string> availableComPorts;
-    ComDiscovery::getAvailableComPorts(availableComPorts);
-    if (availableComPorts.empty()) {
-        return;
-    }
-
-    std::string comPath = std::string("\\\\.\\") + availableComPorts[0];
-    com.SetPortName(comPath);
+    com.SetPortName(comPortSelector.current());
     com.SetBaudRate(CBR_19200);
     com.Open();
 }

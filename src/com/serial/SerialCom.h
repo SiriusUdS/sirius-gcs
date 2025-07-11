@@ -1,6 +1,8 @@
 #ifndef SERIALCOM_H
 #define SERIALCOM_H
 
+#include "ComPortSelector.h"
+
 #include <ceserial.h>
 
 class PacketRateMonitor;
@@ -24,6 +26,7 @@ public:
 
 private:
     ceSerial com;
+    ComPortSelector comPortSelector;
     PacketRateMonitor& packetRateMonitor;
     PacketReceiver& packetReceiver;
     SerialStateMonitor& serialFailureMonitor;
