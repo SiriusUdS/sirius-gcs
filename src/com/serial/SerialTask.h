@@ -4,6 +4,7 @@
 #include <atomic>
 #include <thread>
 
+class ComDiscoveryWindows;
 class ComPortSelector;
 class IntervalTimer;
 class PacketRateMonitor;
@@ -25,6 +26,7 @@ extern PacketRateMonitor engineStatusPacketRateMonitor;
 extern PacketRateMonitor fillingStationStatusPacketRateMonitor;
 extern PacketReceiver packetReceiver;
 extern SerialStateMonitor serialStateMonitor;
+extern ComDiscoveryWindows comDiscovery;
 extern ComPortSelector comPortSelector;
 extern SerialCom com;
 } // namespace SerialTask

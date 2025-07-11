@@ -2,6 +2,9 @@
 
 #include "ComDiscovery.h"
 
+ComPortSelector::ComPortSelector(ComDiscovery& comDiscovery) : comDiscovery(comDiscovery) {
+}
+
 std::string ComPortSelector::current() const {
     if (currentComPortIdx >= comPorts.size()) {
         return "";
@@ -11,7 +14,7 @@ std::string ComPortSelector::current() const {
 
 void ComPortSelector::next() {
     if (currentComPortIdx >= comPorts.size()) {
-        ComDiscovery::getAvailableComPorts(comPorts);
+        comDiscovery.getAvailableComPorts(comPorts);
         currentComPortIdx = 0;
     } else {
         currentComPortIdx++;
