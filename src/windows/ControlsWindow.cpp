@@ -22,6 +22,21 @@ void ControlsWindow::render() {
         }
     }
 
+    if (ImGui::CollapsingHeader("Heat pads")) {
+        if (ImGui::Button("NOS valve heat pad")) {
+            CommandDispatch::heatPad(CommandDispatch::HeatPadCommandType::NOS, 50);
+        }
+        if (ImGui::Button("IPA valve heat pad")) {
+            CommandDispatch::heatPad(CommandDispatch::HeatPadCommandType::IPA, 50);
+        }
+        if (ImGui::Button("Fill valve heat pad")) {
+            CommandDispatch::heatPad(CommandDispatch::HeatPadCommandType::FILL, 50);
+        }
+        if (ImGui::Button("Dump valve heat pad")) {
+            CommandDispatch::heatPad(CommandDispatch::HeatPadCommandType::DUMP, 50);
+        }
+    }
+
     if (ImGui::CollapsingHeader("Commands")) {
         ImGui::BeginDisabled(!CommandCenter::command.available());
         if (ImGui::Button("Send test command")) {

@@ -14,6 +14,7 @@ class PlotData {
 public:
     PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
+    void clear();
     void plot(bool showCompressedData) const;
     float recentAverageValue(size_t durationMs) const;
     const char* getName() const;
