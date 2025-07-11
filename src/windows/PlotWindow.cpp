@@ -17,8 +17,8 @@
  * @param yLabel Text to display along the Y axis
  * @param plotData The plot data object to render the data from on the plot
  */
-PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<SensorPlotData*> plotData)
-    : name(name), xLabel(xLabel), yLabel(yLabel), plotData(plotData) {
+PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<SensorPlotData*> sensorPlotDataVec)
+    : name(name), xLabel(xLabel), yLabel(yLabel), sensorPlotDataVec(sensorPlotDataVec) {
     autofitIniId = std::string(name) + "_plot_window_auto_fit";
     showCompressedDataIniId = std::string(name) + "_plot_window_show_compressed_data";
     showAvgValuesId = std::string(name) + "_plot_window_show_avg_values";
@@ -35,13 +35,20 @@ PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel,
 void PlotWindow::render() {
     ImGui::Checkbox("Auto-fit", &autofit);
     ImGui::SameLine();
-    ImGui::Checkbox("Show compressed data", &showCompressedData);
+    ImGui::Checkbox("Compressed", &showCompressedData);
     ImGui::SameLine();
     ImGui::Checkbox("Show avg. values", &showAvgValues);
     ImGui::SameLine();
     ImGui::RadioButton("Value", &dataType, VALUE);
     ImGui::SameLine();
     ImGui::RadioButton("ADC", &dataType, ADC);
+    ImGui::SameLine();
+
+    if (ImGui::Button("Clear data")) {
+        for (SensorPlotData* sensorPlotData : sensorPlotDataVec) {
+            sensorPlotData->clear();
+        }
+    }
 
     if (autofit) {
         flags = ImPlotFlags_NoInputs;
@@ -57,8 +64,8 @@ void PlotWindow::render() {
         static constexpr size_t recentAvgValueDurationMs = 2000;
         static constexpr size_t recentAvgValueDurationSec = recentAvgValueDurationMs / 1000;
 
-        for (size_t i = 0; i < plotData.size(); i++) {
-            const SensorPlotData* data = plotData[i];
+        for (size_t i = 0; i < sensorPlotDataVec.size(); i++) {
+            const SensorPlotData* data = sensorPlotDataVec[i];
             if (dataType == VALUE) {
                 data->plotValue(showCompressedData);
                 if (showAvgValues) {

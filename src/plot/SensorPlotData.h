@@ -11,6 +11,7 @@ class SensorPlotData {
 public:
     SensorPlotData(const char* name, ImVec4 color);
     void addData(float adc, float value, float timestamp);
+    void clear();
     void plotAdc(bool showCompressedData) const;
     void plotValue(bool showCompressedData) const;
     float averageRecentAdc(size_t durationMs) const;
