@@ -6,6 +6,8 @@ ComPortSelector::ComPortSelector(ComDiscovery& comDiscovery) : comDiscovery(comD
 }
 
 std::string ComPortSelector::current() const {
+    std::lock_guard<std::mutex> lock(mtx);
+
     if (currentComPortIdx >= comPorts.size()) {
         return "";
     }
@@ -13,10 +15,11 @@ std::string ComPortSelector::current() const {
 }
 
 void ComPortSelector::next() {
+    std::lock_guard<std::mutex> lock(mtx);
+
+    currentComPortIdx++;
     if (currentComPortIdx >= comPorts.size()) {
         comDiscovery.getAvailableComPorts(comPorts);
         currentComPortIdx = 0;
-    } else {
-        currentComPortIdx++;
     }
 }

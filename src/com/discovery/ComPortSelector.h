@@ -3,6 +3,7 @@
 
 #include "ComDiscovery.h"
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,7 @@ private:
     ComDiscovery& comDiscovery;
     size_t currentComPortIdx{};
     std::vector<std::string> comPorts;
+    mutable std::mutex mtx;
 };
 
 #endif // COMPORTSELECTOR_H
