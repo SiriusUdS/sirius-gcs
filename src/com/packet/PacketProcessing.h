@@ -15,7 +15,7 @@ bool isPacketIntegrityValid(uint8_t* packetBuffer, PacketType packet, size_t siz
     if (computedCrc != packet->fields.crc) {
         GCS_LOG_WARN(
           "PacketProcessing: CRC mismatch in {}, computed: {}, received: {}. Ignoring packet.",
-          typeid(PacketType).name(), computedCrc, packet->fields.crc
+          typeid(*packet).name(), computedCrc, packet->fields.crc
         );
         return false;
     }
