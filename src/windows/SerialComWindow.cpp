@@ -35,9 +35,6 @@ void SerialComWindow::render() {
         case SerialStateMonitor::State::STARTING:
             comStateText = "Starting";
             break;
-        case SerialStateMonitor::State::RESETTING:
-            comStateText = "Resetting";
-            break;
         case SerialStateMonitor::State::WORKING:
             comStateText = "Working";
             break;

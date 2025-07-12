@@ -8,6 +8,7 @@
 #include "PressureTransducer.h"
 #include "SensorPlotData.h"
 #include "SerialCom.h"
+#include "SerialStateMonitor.h"
 #include "SerialTask.h"
 #include "SwitchData.h"
 #include "Telecommunication/PacketHeaderVariable.h"
@@ -37,6 +38,7 @@ uint8_t packetBuf[MAX_PACKET_SIZE];
 
 void PacketProcessing::processIncomingPackets() {
     while (processIncomingPacket()) {
+        SerialTask::serialStateMonitor.trackSuccessfulPacketRead();
     }
 }
 

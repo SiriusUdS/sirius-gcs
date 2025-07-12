@@ -1,6 +1,9 @@
 #include "SerialStateMonitor.h"
 
 #include <doctest.h>
+#include <thread>
+
+using namespace std::this_thread;
 
 void consecutiveFailedReads(SerialStateMonitor& monitor, size_t num) {
     for (size_t i = 0; i < num; i++) {
@@ -34,20 +37,10 @@ TEST_CASE("SerialStateMonitor initial state should be \"STARTING\"") {
         consecutiveFailedWrites(monitor, SerialStateMonitor::CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE - 1);
         CHECK(monitor.getState() == SerialStateMonitor::State::STARTING);
     }
-}
 
-TEST_CASE("SerialStateMonitor state should be \"RESETTING\"") {
-    SerialStateMonitor monitor;
-    monitor.reset();
-
-    SUBCASE("After reset") {
-        CHECK(monitor.getState() == SerialStateMonitor::State::RESETTING);
-    }
-
-    SUBCASE("After reset with no successful io but not enough consecutive failed io") {
-        consecutiveFailedReads(monitor, SerialStateMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE - 1);
-        consecutiveFailedWrites(monitor, SerialStateMonitor::CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE - 1);
-        CHECK(monitor.getState() == SerialStateMonitor::State::RESETTING);
+    SUBCASE("After not having done a successful packet read for some time but not long enough to trigger failure") {
+        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE / 2);
+        CHECK(monitor.getState() == SerialStateMonitor::State::STARTING);
     }
 }
 
@@ -96,6 +89,19 @@ TEST_CASE("SerialStateMonitor state should be \"WORKING\"") {
     SUBCASE("After reset followed by successful write") {
         monitor.reset();
         successfulWrite(monitor);
+        CHECK(monitor.getState() == SerialStateMonitor::State::WORKING);
+    }
+
+    SUBCASE("After not having done a successful packet read for some time but not long enough to trigger failure") {
+        successfulRead(monitor);
+        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE / 2);
+        CHECK(monitor.getState() == SerialStateMonitor::State::WORKING);
+    }
+
+    SUBCASE("After having done a successful packet read after some time") {
+        successfulWrite(monitor);
+        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE);
+        monitor.trackSuccessfulPacketRead();
         CHECK(monitor.getState() == SerialStateMonitor::State::WORKING);
     }
 }
@@ -156,6 +162,11 @@ TEST_CASE("SerialStateMonitor state should be \"NOT_WORKING\"") {
     SUBCASE("After successful write followed by too many consecutive failed writes") {
         successfulWrite(monitor);
         consecutiveFailedReads(monitor, SerialStateMonitor::CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE);
+        CHECK(monitor.getState() == SerialStateMonitor::State::NOT_WORKING);
+    }
+
+    SUBCASE("After waiting too long since last successful packet read") {
+        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE);
         CHECK(monitor.getState() == SerialStateMonitor::State::NOT_WORKING);
     }
 }
