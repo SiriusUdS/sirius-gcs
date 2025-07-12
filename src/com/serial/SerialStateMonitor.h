@@ -29,14 +29,15 @@ public:
     // clang-format off
     static constexpr size_t CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 10; ///< Number of consecutive failed reads before considering communication as failing.
     static constexpr size_t CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE = 10; ///< Number of consecutive failed writes before considering communication as failing.
-    static constexpr auto TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE = std::chrono::seconds(3); ///< Amount of time without packet received before considering communication as failing.
+    static constexpr size_t TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC = 3; ///< Amount of time without packet received before considering communication as failing.
+    static constexpr size_t TIME_WITHOUT_INITIAL_PACKET_READ_BEFORE_FAILURE_SEC = 5; ///< Amount of time without first packet received since connection before considering communication as failing.
     // clang-format on
 
 private:
     bool ioSuccessSinceStart{};
     size_t consecutiveReadsFailed{};
     size_t consecutiveWritesFailed{};
-    Timer lastSuccessfulPacketReadTimer{TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE};
+    Timer lastSuccessfulPacketReadTimer;
 };
 
 #endif // SERIALSTATEMONITOR_H

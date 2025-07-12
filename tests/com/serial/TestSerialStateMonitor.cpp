@@ -5,6 +5,10 @@
 
 using namespace std::this_thread;
 
+void sleep_sec(size_t sec) {
+    sleep_for(std::chrono::seconds(sec));
+}
+
 void consecutiveFailedReads(SerialStateMonitor& monitor, size_t num) {
     for (size_t i = 0; i < num; i++) {
         monitor.trackRead(false);
@@ -39,7 +43,7 @@ TEST_CASE("SerialStateMonitor initial state should be \"STARTING\"") {
     }
 
     SUBCASE("After not having done a successful packet read for some time but not long enough to trigger failure") {
-        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE / 2);
+        sleep_sec(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC);
         CHECK(monitor.getState() == SerialStateMonitor::State::STARTING);
     }
 }
@@ -94,13 +98,13 @@ TEST_CASE("SerialStateMonitor state should be \"WORKING\"") {
 
     SUBCASE("After not having done a successful packet read for some time but not long enough to trigger failure") {
         successfulRead(monitor);
-        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE / 2);
+        sleep_sec(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC / 2);
         CHECK(monitor.getState() == SerialStateMonitor::State::WORKING);
     }
 
     SUBCASE("After having done a successful packet read after some time") {
         successfulWrite(monitor);
-        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE);
+        sleep_sec(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC);
         monitor.trackSuccessfulPacketRead();
         CHECK(monitor.getState() == SerialStateMonitor::State::WORKING);
     }
@@ -165,8 +169,20 @@ TEST_CASE("SerialStateMonitor state should be \"NOT_WORKING\"") {
         CHECK(monitor.getState() == SerialStateMonitor::State::NOT_WORKING);
     }
 
-    SUBCASE("After waiting too long since last successful packet read") {
-        sleep_for(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE);
+    SUBCASE("After successful read followed by no packet reads for too long") {
+        successfulRead(monitor);
+        sleep_sec(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC);
+        CHECK(monitor.getState() == SerialStateMonitor::State::NOT_WORKING);
+    }
+
+    SUBCASE("After successful write followed by no packet reads for too long") {
+        successfulWrite(monitor);
+        sleep_sec(SerialStateMonitor::TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC);
+        CHECK(monitor.getState() == SerialStateMonitor::State::NOT_WORKING);
+    }
+
+    SUBCASE("After waiting long enough with no successful io at all since connection initialized") {
+        sleep_sec(SerialStateMonitor::TIME_WITHOUT_INITIAL_PACKET_READ_BEFORE_FAILURE_SEC);
         CHECK(monitor.getState() == SerialStateMonitor::State::NOT_WORKING);
     }
 }

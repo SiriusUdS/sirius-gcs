@@ -49,8 +49,11 @@ void SerialStateMonitor::reset() {
  * @brief Checks if the serial communication is failing based on the number of consecutive failed reads or writes.
  */
 SerialStateMonitor::State SerialStateMonitor::getState() const {
+    const double secondsSinceLastPacketRead = lastSuccessfulPacketReadTimer.getElapsedTimeInSeconds();
+    const bool tooLongSinceLastPacketRead = ioSuccessSinceStart ? secondsSinceLastPacketRead > TIME_WITHOUT_SUCCESSFUL_PACKET_READ_BEFORE_FAILURE_SEC
+                                                                : secondsSinceLastPacketRead > TIME_WITHOUT_INITIAL_PACKET_READ_BEFORE_FAILURE_SEC;
     if (consecutiveReadsFailed >= CONSECUTIVE_FAILED_READS_BEFORE_FAILURE || consecutiveWritesFailed >= CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE
-        || lastSuccessfulPacketReadTimer.hasElapsed()) {
+        || tooLongSinceLastPacketRead) {
         return State::NOT_WORKING;
     } else if (!ioSuccessSinceStart) {
         return State::STARTING;
