@@ -12,6 +12,7 @@ public:
     ComPortSelector(ComDiscovery& comDiscovery);
     std::string current() const;
     void next();
+    bool available() const;
 
 private:
     ComDiscovery& comDiscovery;

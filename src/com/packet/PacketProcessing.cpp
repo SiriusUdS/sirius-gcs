@@ -1,5 +1,6 @@
 #include "PacketProcessing.h"
 
+#include "BoardComStateMonitor.h"
 #include "GSDataCenter.h"
 #include "LoadCell.h"
 #include "Logging.h"
@@ -8,7 +9,6 @@
 #include "PressureTransducer.h"
 #include "SensorPlotData.h"
 #include "SerialCom.h"
-#include "SerialStateMonitor.h"
 #include "SerialTask.h"
 #include "SwitchData.h"
 #include "Telecommunication/PacketHeaderVariable.h"
@@ -38,7 +38,6 @@ uint8_t packetBuf[MAX_PACKET_SIZE];
 
 void PacketProcessing::processIncomingPackets() {
     while (processIncomingPacket()) {
-        SerialTask::serialStateMonitor.trackSuccessfulPacketRead();
     }
 }
 
@@ -115,6 +114,7 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     addPressureSensorPlotData(GSDataCenter::PressureSensor_Motor_PlotData, packet->fields.adcValues, timestamp);
 
     SerialTask::engineTelemetryPacketRateMonitor.trackPacket();
+    SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
     return true;
 }
 
@@ -137,6 +137,7 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     addLoadCellPlotData(GSDataCenter::LoadCell_FillingStation_PlotData, packet->fields.adcValues, timestamp);
 
     SerialTask::fillingStationTelemetryPacketRateMonitor.trackPacket();
+    SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
     return true;
 }
 
@@ -163,6 +164,7 @@ bool PacketProcessing::processGSControlPacket() {
     GSDataCenter::ValveStartButtonData.isOn = status.bits.isValveStartButtonPressed;
 
     SerialTask::gsControlPacketRateMonitor.trackPacket();
+    SerialTask::gsControlBoardComStateMonitor.trackSuccessfulPacketRead();
     return true;
 }
 
@@ -190,6 +192,7 @@ bool PacketProcessing::processEngineStatusPacket() {
     GSDataCenter::IpaValveData.openedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
+    SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
     return true;
 }
 
@@ -217,6 +220,7 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     GSDataCenter::DumpValveData.openedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
+    SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
     return true;
 }
 

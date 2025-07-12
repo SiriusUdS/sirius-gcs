@@ -1,8 +1,8 @@
 #include "SerialControl.h"
 
+#include "BoardComStateMonitor.h"
 #include "SerialCom.h"
 #include "SerialConfig.h"
-#include "SerialStateMonitor.h"
 #include "SerialTask.h"
 #include "Timer.h"
 
@@ -16,7 +16,11 @@ Timer timerSerialRead;
 } // namespace SerialControl
 
 void SerialControl::startComIfNeeded() {
-    if (SerialTask::com.comOpened() && SerialTask::serialStateMonitor.getState() != SerialStateMonitor::State::NOT_WORKING) {
+    const bool anyBoardHasCom = SerialTask::motorBoardComStateMonitor.getState() != BoardComStateMonitor::State::NOT_WORKING
+                                || SerialTask::fillingStationBoardComStateMonitor.getState() != BoardComStateMonitor::State::NOT_WORKING
+                                || SerialTask::gsControlBoardComStateMonitor.getState() != BoardComStateMonitor::State::NOT_WORKING;
+
+    if (anyBoardHasCom) {
         return;
     }
 

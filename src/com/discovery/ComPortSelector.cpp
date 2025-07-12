@@ -23,3 +23,7 @@ void ComPortSelector::next() {
         currentComPortIdx = 0;
     }
 }
+
+bool ComPortSelector::available() const {
+    return comPorts.size();
+}

@@ -1,27 +1,22 @@
 #include "SerialCom.h"
 
+#include "BoardComStateMonitor.h"
 #include "ComPortSelector.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
-#include "SerialStateMonitor.h"
-
-/**
- * @brief Constructs a SerialCom object with the given monitors.
- */
-SerialCom::SerialCom(ComPortSelector& cps, PacketRateMonitor& prm, PacketReceiver& pr, SerialStateMonitor& sfm)
-    : comPortSelector(cps), packetRateMonitor(prm), packetReceiver(pr), serialFailureMonitor(sfm) {
-}
+#include "SerialTask.h"
 
 /**
  * @brief Initializes communication on the first COM port found.
  */
 void SerialCom::start() {
     com.Close();
-    packetRateMonitor.reset();
-    serialFailureMonitor.reset();
-    comPortSelector.next();
+    SerialTask::packetRateMonitor.reset();
+    SerialTask::motorBoardComStateMonitor.reset();
+    SerialTask::fillingStationBoardComStateMonitor.reset();
+    SerialTask::comPortSelector.next();
 
-    com.SetPortName("\\\\.\\" + comPortSelector.current());
+    com.SetPortName("\\\\.\\" + SerialTask::comPortSelector.current());
     com.SetBaudRate(CBR_19200);
     com.Open();
 }
@@ -34,9 +29,8 @@ bool SerialCom::read() {
     bool successful;
     char c = com.ReadChar(successful);
     if (successful) {
-        successful = packetReceiver.receiveByte(c);
+        successful = SerialTask::packetReceiver.receiveByte(c);
     }
-    serialFailureMonitor.trackRead(successful);
     return successful;
 }
 
@@ -49,7 +43,6 @@ bool SerialCom::read() {
 bool SerialCom::write(uint8_t* msg, size_t size) {
     static constexpr size_t WRITE_TIMEOUT_MS = 100;
     bool successful = com.WriteArr(msg, (long) size, WRITE_TIMEOUT_MS);
-    serialFailureMonitor.trackWrite(successful);
     return successful;
 }
 
@@ -67,9 +60,9 @@ bool SerialCom::comOpened() {
  * @returns True if a packet was successfully received, otherwise false.
  */
 bool SerialCom::getPacket(uint8_t* recv) {
-    bool successful = packetReceiver.getPacket(recv);
+    bool successful = SerialTask::packetReceiver.getPacket(recv);
     if (successful) {
-        packetRateMonitor.trackPacket();
+        SerialTask::packetRateMonitor.trackPacket();
     }
     return successful;
 }
@@ -79,7 +72,7 @@ bool SerialCom::getPacket(uint8_t* recv) {
  * @returns Pointer to the internal buffer.
  */
 uint8_t* SerialCom::getBuffer() {
-    return packetReceiver.getBuffer();
+    return SerialTask::packetReceiver.getBuffer();
 }
 
 /**
