@@ -4,6 +4,7 @@
 #include "IniConfig.h"
 #include "Logging.h"
 #include "ToggleButton.h"
+#include "UIConfig.h"
 
 #include <ini.h>
 #include <mutex>
@@ -33,19 +34,19 @@ void LoggingWindow::init() {
 }
 
 void LoggingWindow::render() {
-    if (ToggleButton(ICON_FA_BUG " Debug", &showDebug, ImVec4(0.0f, 0.6f, 1.0f, 1.0f))) {
+    if (ToggleButton(ICON_FA_BUG " Debug", &showDebug, UIConfig::BLUE_BUTTON_COLOR)) {
         updateVisibleLines();
     }
     ImGui::SameLine();
-    if (ToggleButton(ICON_FA_INFO_CIRCLE " Info", &showInfo, ImVec4(0.0f, 0.7f, 0.2f, 1.0f))) {
+    if (ToggleButton(ICON_FA_INFO_CIRCLE " Info", &showInfo, UIConfig::GREEN_BUTTON_COLOR)) {
         updateVisibleLines();
     }
     ImGui::SameLine();
-    if (ToggleButton(ICON_FA_EXCLAMATION_TRIANGLE " Warn", &showWarn, ImVec4(0.85f, 0.75f, 0.0f, 1.0f))) {
+    if (ToggleButton(ICON_FA_EXCLAMATION_TRIANGLE " Warn", &showWarn, UIConfig::YELLOW_BUTTON_COLOR)) {
         updateVisibleLines();
     }
     ImGui::SameLine();
-    if (ToggleButton(ICON_FA_BOMB " Error", &showError, ImVec4(0.9f, 0.0f, 0.0f, 1.0f))) {
+    if (ToggleButton(ICON_FA_BOMB " Error", &showError, UIConfig::RED_BUTTON_COLOR)) {
         updateVisibleLines();
     }
     ImGui::SameLine();

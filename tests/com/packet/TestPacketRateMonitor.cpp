@@ -26,11 +26,11 @@ TEST_CASE("PacketRateMonitor should return correct rate") {
     PacketRateMonitor prm;
     double elapsedSec;
 
-    elapsedSec = simulatePacketCom(prm, 30, 3);
+    elapsedSec = simulatePacketCom(prm, 50, 5);
     CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 10);
 
     prm.reset();
-    elapsedSec = simulatePacketCom(prm, 100, 2);
+    elapsedSec = simulatePacketCom(prm, 200, 4);
     CHECK(Approx(elapsedSec).epsilon(PRM_EPSILON) == 50);
 }
 
