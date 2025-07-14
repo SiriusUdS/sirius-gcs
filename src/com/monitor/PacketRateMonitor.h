@@ -15,7 +15,7 @@ public:
     double getRatePerSecond();
     void reset();
 
-    static constexpr double TIME_WINDOW_SECONDS = 3.0; ///< Time window in seconds for calculating the packet rate.
+    static constexpr double TIME_WINDOW_SECONDS = 5.0; ///< Time window in seconds for calculating the packet rate.
 
 private:
     void removeOldTimePoints();
