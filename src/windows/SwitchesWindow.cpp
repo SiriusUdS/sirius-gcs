@@ -2,6 +2,7 @@
 
 #include "GSDataCenter.h"
 #include "SwitchData.h"
+#include "UIConfig.h"
 
 #include <imgui.h>
 #include <string>
@@ -18,8 +19,7 @@ void SwitchesWindow::render() {
 void SwitchesWindow::showSwitchState(const SwitchData* data) {
     std::string label = data->isOn ? "ON###" : "OFF###";
     label += data->name;
-    ImVec4 color = data->isOn ? ImVec4(0.0f, 0.7f, 0.2f, 1.0f)   // Green
-                              : ImVec4(0.85f, 0.0f, 0.0f, 1.0f); // Red
+    ImVec4 color = data->isOn ? UIConfig::GREEN_BUTTON_COLOR : UIConfig::RED_BUTTON_COLOR;
 
     ImGui::PushStyleColor(ImGuiCol_Button, color);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);

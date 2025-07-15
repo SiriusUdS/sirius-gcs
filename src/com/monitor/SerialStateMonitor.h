@@ -1,6 +1,10 @@
 #ifndef SERIALSTATEMONITOR_H
 #define SERIALSTATEMONITOR_H
 
+#include "Timer.h"
+
+#include <chrono>
+
 /**
  * @class SerialStateMonitor
  * @brief Monitors the state of the serial communication.
@@ -13,14 +17,13 @@ public:
      */
     enum State {
         STARTING,    ///< Communication is starting
-        RESETTING,   ///< Communication is being reset
         WORKING,     ///< Communication is working
         NOT_WORKING, ///< Communication is not working
     };
     void trackRead(bool successful);
     void trackWrite(bool successful);
-    State getState();
     void reset();
+    State getState() const;
 
     // clang-format off
     static constexpr size_t CONSECUTIVE_FAILED_READS_BEFORE_FAILURE = 10; ///< Number of consecutive failed reads before considering communication as failing.
@@ -29,7 +32,6 @@ public:
 
 private:
     bool ioSuccessSinceStart{};
-    bool hasReset{};
     size_t consecutiveReadsFailed{};
     size_t consecutiveWritesFailed{};
 };

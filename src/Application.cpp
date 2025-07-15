@@ -28,9 +28,11 @@ mINI::INIStructure iniStructure;
 void Application::loadFonts() {
     static constexpr ImWchar ICONS_RANGES[] = {0xf000, 0xf8ff, 0};
     static constexpr const char* MAIN_FONT = "assets/fonts/Nunito-Regular.ttf";
+    static constexpr const char* BOLD_MAIN_FONT = "assets/fonts/Nunito-Bold.ttf";
     static constexpr const char* ICONS_FONT = "assets/fonts/fa-solid-900.ttf";
     static constexpr const char* CODE_FONT = "assets/fonts/Consolas-Regular.ttf";
     static constexpr float MAIN_FONT_SIZE = 24.f;
+    static constexpr float SMALLER_MAIN_FONT_SIZE = 20.f;
     static constexpr float ICONS_SIZE = 20.f;
     static constexpr float CODE_SIZE = 20.f;
 
@@ -45,6 +47,9 @@ void Application::loadFonts() {
 
     io.FontDefault = FontConfig::defaultFont;
 
+    // All other fonts need to be added below this comment to avoid interference with merge between main font and icons font
+    FontConfig::boldDefaultFont = io.Fonts->AddFontFromFileTTF(BOLD_MAIN_FONT, MAIN_FONT_SIZE);
+    FontConfig::smallerDefaultFont = io.Fonts->AddFontFromFileTTF(MAIN_FONT, SMALLER_MAIN_FONT_SIZE);
     FontConfig::codeFont = io.Fonts->AddFontFromFileTTF(CODE_FONT, CODE_SIZE);
 }
 

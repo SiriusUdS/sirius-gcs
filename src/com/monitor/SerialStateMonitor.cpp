@@ -29,24 +29,23 @@ void SerialStateMonitor::trackWrite(bool successful) {
 }
 
 /**
- * @brief Checks if the serial communication is failing based on the number of consecutive failed reads or writes.
- */
-SerialStateMonitor::State SerialStateMonitor::getState() {
-    if (consecutiveReadsFailed >= CONSECUTIVE_FAILED_READS_BEFORE_FAILURE || consecutiveWritesFailed >= CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE) {
-        return State::NOT_WORKING;
-    } else if (!ioSuccessSinceStart) {
-        return hasReset ? State::RESETTING : State::STARTING;
-    } else {
-        return State::WORKING;
-    }
-}
-
-/**
  * @brief Resets the counters for consecutive failed reads and writes.
  */
 void SerialStateMonitor::reset() {
-    hasReset = true;
     ioSuccessSinceStart = false;
     consecutiveReadsFailed = 0;
     consecutiveWritesFailed = 0;
+}
+
+/**
+ * @brief Checks if the serial communication is failing based on the number of consecutive failed reads or writes.
+ */
+SerialStateMonitor::State SerialStateMonitor::getState() const {
+    if (consecutiveReadsFailed >= CONSECUTIVE_FAILED_READS_BEFORE_FAILURE || consecutiveWritesFailed >= CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE) {
+        return State::NOT_WORKING;
+    } else if (!ioSuccessSinceStart) {
+        return State::STARTING;
+    } else {
+        return State::WORKING;
+    }
 }

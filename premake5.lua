@@ -12,6 +12,8 @@ workspace "sirius-gcs"
     includedirs {
         "src",
         "src/com",
+        "src/com/discovery",
+        "src/com/monitor",
         "src/com/packet",
         "src/com/serial",
         "src/commands",

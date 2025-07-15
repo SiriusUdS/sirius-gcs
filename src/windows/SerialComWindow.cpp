@@ -1,11 +1,12 @@
 #include "SerialComWindow.h"
 
+#include "BoardComStateMonitor.h"
+#include "ComPortSelector.h"
 #include "FontConfig.h"
 #include "IniConfig.h"
 #include "PacketRateMonitor.h"
 #include "SerialCom.h"
 #include "SerialConfig.h"
-#include "SerialStateMonitor.h"
 #include "SerialTask.h"
 
 #include <algorithm>
@@ -16,6 +17,7 @@ enum RecvBufferDisplayMode { TEXT = 0, HEXA = 1 };
 
 constexpr const char* INI_RECV_BUFFER_DISPLAY_MODE = "recv_buffer_display_mode";
 
+void renderBoardComStateTableRow(const char* boardName, BoardComStateMonitor::State state);
 void renderPacketRateTableRow(const char* packetName, double rate);
 void recvBufferContentModal();
 void updateRecvBufferContentDisplay(bool syncToCurrentBuffer);
@@ -26,29 +28,21 @@ std::vector<char> recvBufferContentDisplay(SerialConfig::PACKET_CIRCULAR_BUFFER_
 } // namespace SerialComWindow
 
 void SerialComWindow::render() {
-    const char* comStateText = "Unknown";
-    if (!SerialTask::com.comOpened()) {
-        comStateText = "Disconnected";
-    } else {
-        switch (SerialTask::serialStateMonitor.getState()) {
-        case SerialStateMonitor::State::STARTING:
-            comStateText = "Starting";
-            break;
-        case SerialStateMonitor::State::RESETTING:
-            comStateText = "Resetting";
-            break;
-        case SerialStateMonitor::State::WORKING:
-            comStateText = "Working";
-            break;
-        case SerialStateMonitor::State::NOT_WORKING:
-            comStateText = "Not working";
-            break;
+    if (ImGui::CollapsingHeader("Board COM")) {
+        std::string comPortStr = SerialTask::comPortSelector.available() ? SerialTask::comPortSelector.current() : "None available";
+        ImGui::Text("COM port: %s", comPortStr.c_str());
+
+        if (ImGui::BeginTable("BoardComStatesTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+            ImGui::TableSetupColumn("Board");
+            ImGui::TableSetupColumn("COM State");
+            ImGui::TableHeadersRow();
+
+            renderBoardComStateTableRow("Motor Board", SerialTask::motorBoardComStateMonitor.getState());
+            renderBoardComStateTableRow("Filling Station Board", SerialTask::fillingStationBoardComStateMonitor.getState());
+            renderBoardComStateTableRow("GS Control Board", SerialTask::gsControlBoardComStateMonitor.getState());
+            ImGui::EndTable();
         }
     }
-
-    ImGui::Text("COM State: ");
-    ImGui::SameLine();
-    ImGui::Text(comStateText);
 
     if (ImGui::CollapsingHeader("Packet rates")) {
         if (ImGui::BeginTable("PacketRatesTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
@@ -61,15 +55,18 @@ void SerialComWindow::render() {
             renderPacketRateTableRow("GS control", SerialTask::gsControlPacketRateMonitor.getRatePerSecond());
             renderPacketRateTableRow("Engine status", SerialTask::engineStatusPacketRateMonitor.getRatePerSecond());
             renderPacketRateTableRow("Filling station status", SerialTask::fillingStationStatusPacketRateMonitor.getRatePerSecond());
-            ImGui::TableNextRow(); // Separator row for total
+            ImGui::PushFont(FontConfig::boldDefaultFont);
             renderPacketRateTableRow("Total", SerialTask::packetRateMonitor.getRatePerSecond());
+            ImGui::PopFont();
 
             ImGui::EndTable();
         }
     }
 
-    if (ImGui::Button("View RECV buffer content")) {
-        ImGui::OpenPopup("RECV Buffer Content");
+    if (ImGui::CollapsingHeader("RECV Buffer")) {
+        if (ImGui::Button("View RECV buffer content")) {
+            ImGui::OpenPopup("RECV Buffer Content");
+        }
     }
 
     recvBufferContentModal();
@@ -85,6 +82,31 @@ void SerialComWindow::loadState(const mINI::INIStructure& ini) {
 
 void SerialComWindow::saveState(mINI::INIStructure& ini) {
     ini[IniConfig::GCS_SECTION].set(INI_RECV_BUFFER_DISPLAY_MODE, std::to_string(recvBufferDisplayMode));
+}
+
+void SerialComWindow::renderBoardComStateTableRow(const char* boardName, BoardComStateMonitor::State state) {
+    const char* comStateText = "Unknown";
+    if (!SerialTask::com.comOpened()) {
+        comStateText = "Disconnected";
+    } else {
+        switch (state) {
+        case BoardComStateMonitor::State::STARTING:
+            comStateText = "Starting";
+            break;
+        case BoardComStateMonitor::State::WORKING:
+            comStateText = "Working";
+            break;
+        case BoardComStateMonitor::State::NOT_WORKING:
+            comStateText = "Not working";
+            break;
+        }
+    }
+
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(0);
+    ImGui::Text(boardName);
+    ImGui::TableSetColumnIndex(1);
+    ImGui::Text(comStateText);
 }
 
 void SerialComWindow::renderPacketRateTableRow(const char* packetName, double rate) {

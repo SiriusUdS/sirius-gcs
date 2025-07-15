@@ -1,10 +1,6 @@
-#include "ComDiscovery.h"
+#include "ComDiscoveryWindows.h"
 
-namespace ComDiscovery {
-std::string wcharToString(const WCHAR* wstr);
-}
-
-void ComDiscovery::getAvailableComPorts(std::vector<std::string>& comPortVec) {
+void ComDiscoveryWindows::getAvailableComPorts(std::vector<std::string>& comPortVec) {
     static constexpr size_t WIN_REG_VAL_BUF_SIZE = 256;
 
     comPortVec.clear();
@@ -25,7 +21,7 @@ void ComDiscovery::getAvailableComPorts(std::vector<std::string>& comPortVec) {
     }
 }
 
-std::string ComDiscovery::wcharToString(const WCHAR* wstr) {
+std::string ComDiscoveryWindows::wcharToString(const WCHAR* wstr) {
     if (wstr == nullptr)
         return {};
 

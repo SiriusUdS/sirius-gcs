@@ -5,6 +5,8 @@
 
 namespace FontConfig {
 inline ImFont* defaultFont = nullptr;
+inline ImFont* boldDefaultFont = nullptr;
+inline ImFont* smallerDefaultFont = nullptr;
 inline ImFont* codeFont = nullptr;
 } // namespace FontConfig
 

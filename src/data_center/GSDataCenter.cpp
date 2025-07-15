@@ -35,13 +35,18 @@ std::vector<SwitchData*> SwitchDataVec({&AllowDumpSwitchData, &AllowFillSwitchDa
                                         &EmergencyStopButtonData, &FireIgniterButtonData, &UnsafeKeySwitchData, &ValveStartButtonData});
 
 ValveData ValveEngineData[GSDataCenter::VALVE_AMOUNT] = {
-    {.valveStateData = ValveStateData{}, .id = ENGINE_IPA_VALVE_INDEX, .name = "IPA Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0},
-    {.valveStateData = ValveStateData{}, .id = ENGINE_NOS_VALVE_INDEX, .name = "NOS Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0}
-};
+  {.valveStateData = ValveStateData{}, .id = ENGINE_IPA_VALVE_INDEX, .name = "IPA Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0},
+  {.valveStateData = ValveStateData{}, .id = ENGINE_NOS_VALVE_INDEX, .name = "NOS Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0}};
 
-ValveData ValveFillStationData[GSDataCenter::VALVE_AMOUNT] = {
-    {.valveStateData = ValveStateData{}, .id = FILLING_STATION_NOS_VALVE_INDEX, .name = "Fill Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0},
-    {.valveStateData = ValveStateData{}, .id = FILLING_STATION_NOS_DUMP_VALVE_INDEX, .name = "Dump Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0}
-};
+ValveData ValveFillStationData[GSDataCenter::VALVE_AMOUNT] = {{.valveStateData = ValveStateData{},
+                                                               .id = FILLING_STATION_FILL_VALVE_INDEX,
+                                                               .name = "Fill Valve",
+                                                               .openedValue_perc = 0,
+                                                               .lastOpenedValue_perc = 0},
+                                                              {.valveStateData = ValveStateData{},
+                                                               .id = FILLING_STATION_DUMP_VALVE_INDEX,
+                                                               .name = "Dump Valve",
+                                                               .openedValue_perc = 0,
+                                                               .lastOpenedValue_perc = 0}};
 
 } // namespace GSDataCenter

@@ -36,21 +36,6 @@ TEST_CASE("SerialStateMonitor initial state should be \"STARTING\"") {
     }
 }
 
-TEST_CASE("SerialStateMonitor state should be \"RESETTING\"") {
-    SerialStateMonitor monitor;
-    monitor.reset();
-
-    SUBCASE("After reset") {
-        CHECK(monitor.getState() == SerialStateMonitor::State::RESETTING);
-    }
-
-    SUBCASE("After reset with no successful io but not enough consecutive failed io") {
-        consecutiveFailedReads(monitor, SerialStateMonitor::CONSECUTIVE_FAILED_READS_BEFORE_FAILURE - 1);
-        consecutiveFailedWrites(monitor, SerialStateMonitor::CONSECUTIVE_FAILED_WRITES_BEFORE_FAILURE - 1);
-        CHECK(monitor.getState() == SerialStateMonitor::State::RESETTING);
-    }
-}
-
 TEST_CASE("SerialStateMonitor state should be \"WORKING\"") {
     SerialStateMonitor monitor;
 
