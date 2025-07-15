@@ -5,6 +5,7 @@
 
 class SensorPlotData;
 struct SwitchData;
+struct ValveStateData;
 struct ValveData;
 
 namespace GSDataCenter {
@@ -29,11 +30,8 @@ extern SwitchData UnsafeKeySwitchData;
 extern SwitchData ValveStartButtonData;
 extern std::vector<SwitchData*> SwitchDataVec;
 
-extern ValveData NosValveData;
-extern ValveData IpaValveData;
-extern ValveData FillValveData;
-extern ValveData DumpValveData;
-extern std::vector<ValveData*> ValveDataVec;
+extern ValveData ValveEngineData[VALVE_AMOUNT];
+extern ValveData ValveFillStationData[VALVE_AMOUNT];
 } // namespace GSDataCenter
 
 #endif // GSDATACENTER_H

@@ -1,9 +1,12 @@
 #include "GSDataCenter.h"
 
+#include "Engine/EngineSensors.h"
+#include "FillingStation/FillingStationSensors.h"
 #include "PlotColors.h"
 #include "SensorPlotData.h"
 #include "SwitchData.h"
 #include "ValveData.h"
+#include "ValveStateData.h"
 
 namespace GSDataCenter {
 SensorPlotData Thermistor_Motor_PlotData[THERMISTOR_AMOUNT_PER_BOARD] = {{"Thermistor 1", PlotColors::BLUE},   {"Thermistor 2", PlotColors::RED},
@@ -31,9 +34,14 @@ SwitchData ValveStartButtonData("Valve Start", false);
 std::vector<SwitchData*> SwitchDataVec({&AllowDumpSwitchData, &AllowFillSwitchData, &ArmIgniterSwitchData, &ArmServoSwitchData,
                                         &EmergencyStopButtonData, &FireIgniterButtonData, &UnsafeKeySwitchData, &ValveStartButtonData});
 
-ValveData NosValveData{.name = "NOS Valve"};
-ValveData IpaValveData{.name = "IPA Valve"};
-ValveData FillValveData{.name = "Fill Valve"};
-ValveData DumpValveData{.name = "Dump Valve"};
-std::vector<ValveData*> ValveDataVec({&NosValveData, &IpaValveData, &FillValveData, &DumpValveData});
+ValveData ValveEngineData[GSDataCenter::VALVE_AMOUNT] = {
+    {.valveStateData = ValveStateData{}, .id = ENGINE_IPA_VALVE_INDEX, .name = "IPA Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0},
+    {.valveStateData = ValveStateData{}, .id = ENGINE_NOS_VALVE_INDEX, .name = "NOS Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0}
+};
+
+ValveData ValveFillStationData[GSDataCenter::VALVE_AMOUNT] = {
+    {.valveStateData = ValveStateData{}, .id = FILLING_STATION_NOS_VALVE_INDEX, .name = "Fill Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0},
+    {.valveStateData = ValveStateData{}, .id = FILLING_STATION_NOS_DUMP_VALVE_INDEX, .name = "Dump Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0}
+};
+
 } // namespace GSDataCenter

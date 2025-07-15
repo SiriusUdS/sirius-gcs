@@ -14,8 +14,8 @@ constexpr size_t LOAD_CELL_AMOUNT = 4;
 
 // clang-format off
 constexpr LoadCellParams LOAD_CELL_PARAMS_TABLE[LOAD_CELL_AMOUNT] = {
-    {.additiveFactor=0.0, .functionRateOfChange=0.0231, .functionOffset=0.0838}, // Tank load cell
-    {.additiveFactor=0.0, .functionRateOfChange=0.0,    .functionOffset=0.0}     // Combustion chamber load cell
+    {.additiveFactor=0.0, .functionRateOfChange=0.0231, .functionOffset=0.0838},  // Tank load cell
+    {.additiveFactor=-11.0, .functionRateOfChange=6.1544, .functionOffset=256.67} // Combustion chamber load cell
 };
 // clang-format on
 } // namespace LoadCell
