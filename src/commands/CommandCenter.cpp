@@ -7,6 +7,7 @@ Command command;
 Command valve1Command;
 Command valve2Command;
 Command valve3Command;
+Command heatPadCommand;
 } // namespace CommandCenter
 
 void CommandCenter::processCommands() {
@@ -14,4 +15,5 @@ void CommandCenter::processCommands() {
     valve1Command.process();
     valve2Command.process();
     valve3Command.process();
+    heatPadCommand.process();
 }

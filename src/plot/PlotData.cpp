@@ -24,8 +24,7 @@ void PlotData::addData(float x, float y) {
 
     if (data.size() && x < data.lastX()) {
         GCS_LOG_WARN("PlotData: Received unordered data for plot data {}, clearing data.", style.name);
-        data.clear();
-        compressedData.clear();
+        clear();
     }
 
     data.add(x, y);
@@ -38,6 +37,14 @@ void PlotData::addData(float x, float y) {
     if (compressedData.size() > MAX_COMPRESSED_DATA_SIZE) {
         PlotDataCompression::meanCompression(data, compressedData, TARGET_COMPRESSED_DATA_SIZE, style.name);
     }
+}
+
+/**
+ * @brief Clears the raw and the compressed data.
+ */
+void PlotData::clear() {
+    data.clear();
+    compressedData.clear();
 }
 
 /**

@@ -17,6 +17,11 @@ void restart();
 void stop();
 
 extern PacketRateMonitor packetRateMonitor;
+extern PacketRateMonitor engineTelemetryPacketRateMonitor;
+extern PacketRateMonitor fillingStationTelemetryPacketRateMonitor;
+extern PacketRateMonitor gsControlPacketRateMonitor;
+extern PacketRateMonitor engineStatusPacketRateMonitor;
+extern PacketRateMonitor fillingStationStatusPacketRateMonitor;
 extern PacketReceiver packetReceiver;
 extern SerialStateMonitor serialStateMonitor;
 extern SerialCom com;

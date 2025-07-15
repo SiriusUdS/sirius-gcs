@@ -15,6 +15,14 @@ void SensorPlotData::addData(float adc, float value, float timestamp) {
 }
 
 /**
+ * @brief Clears both ADC and value plot data.
+ */
+void SensorPlotData::clear() {
+    adcPlotData.clear();
+    valuePlotData.clear();
+}
+
+/**
  * @brief Plot the ADC data for the sensor.
  */
 void SensorPlotData::plotAdc(bool showCompressedData) const {

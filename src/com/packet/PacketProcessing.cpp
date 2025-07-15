@@ -1,9 +1,9 @@
 #include "PacketProcessing.h"
 
-#include "CRC/CRCConstants.h"
 #include "GSDataCenter.h"
 #include "LoadCell.h"
 #include "Logging.h"
+#include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
 #include "PressureTransducer.h"
 #include "SensorPlotData.h"
@@ -31,7 +31,6 @@ void addPressureSensorPlotData(SensorPlotData plotData[GSDataCenter::PRESSURE_SE
                                float timestamp);
 void addLoadCellPlotData(SensorPlotData plotData[GSDataCenter::LOAD_CELL_AMOUNT], uint16_t adcValues[ENGINE_ADC_CHANNEL_AMOUNT], float timestamp);
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
-uint32_t computeCrc(uint8_t* data, size_t sizeInBytes);
 
 size_t packetSize{};
 uint8_t packetBuf[MAX_PACKET_SIZE];
@@ -103,11 +102,18 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     }
 
     EngineTelemetryPacket* packet = (EngineTelemetryPacket*) packetBuf;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(EngineTelemetryPacket));
+    if (!isPacketValid) {
+        return false;
+    }
+
     float timestamp = (float) packet->fields.timestamp_ms;
 
     addThermistorPlotData(GSDataCenter::Thermistor_Motor_PlotData, packet->fields.adcValues, timestamp);
     addPressureSensorPlotData(GSDataCenter::PressureSensor_Motor_PlotData, packet->fields.adcValues, timestamp);
 
+    SerialTask::engineTelemetryPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -117,12 +123,19 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     }
 
     FillingStationTelemetryPacket* packet = (FillingStationTelemetryPacket*) packetBuf;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(FillingStationTelemetryPacket));
+    if (!isPacketValid) {
+        return false;
+    }
+
     float timestamp = (float) packet->fields.timestamp_ms;
 
     addThermistorPlotData(GSDataCenter::Thermistor_FillingStation_PlotData, packet->fields.adcValues, timestamp);
     addPressureSensorPlotData(GSDataCenter::PressureSensor_FillingStation_PlotData, packet->fields.adcValues, timestamp);
     addLoadCellPlotData(GSDataCenter::LoadCell_FillingStation_PlotData, packet->fields.adcValues, timestamp);
 
+    SerialTask::fillingStationTelemetryPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -132,6 +145,11 @@ bool PacketProcessing::processGSControlPacket() {
     }
 
     GSControlStatusPacket* packet = (GSControlStatusPacket*) packetBuf;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(GSControlStatusPacket));
+    if (!isPacketValid) {
+        return false;
+    }
 
     GSControlStatus status = packet->fields.status;
 
@@ -144,6 +162,7 @@ bool PacketProcessing::processGSControlPacket() {
     GSDataCenter::UnsafeKeySwitchData.isOn = status.bits.isUnsafeKeySwitchPressed;
     GSDataCenter::ValveStartButtonData.isOn = status.bits.isValveStartButtonPressed;
 
+    SerialTask::gsControlPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -158,13 +177,28 @@ bool PacketProcessing::processEngineStatusPacket() {
     EngineStatusPacket* packet = (EngineStatusPacket*) packetBuf;
 
     GSDataCenter::ValveFillStationData[ENGINE_NOS_VALVE_INDEX].valveStateData.isIdle = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.isIdle;
-    GSDataCenter::ValveFillStationData[ENGINE_NOS_VALVE_INDEX].valveStateData.closedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
-    GSDataCenter::ValveFillStationData[ENGINE_NOS_VALVE_INDEX].valveStateData.openedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+    GSDataCenter::ValveFillStationData[ENGINE_NOS_VALVE_INDEX].valveStateData.closedSwitchHigh =
+      packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::ValveFillStationData[ENGINE_NOS_VALVE_INDEX].valveStateData.openedSwitchHigh =
+      packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(EngineStatusPacket));
+    if (!isPacketValid) {
+        return false;
+    }
+
+    // TODO: Add back later in GS Data Center
+    // GSDataCenter::NosValveData.isIdle = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.isIdle;
+    // GSDataCenter::NosValveData.closedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    // GSDataCenter::NosValveData.openedSwitchHigh = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
     GSDataCenter::ValveFillStationData[ENGINE_IPA_VALVE_INDEX].valveStateData.isIdle = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.isIdle;
-    GSDataCenter::ValveFillStationData[ENGINE_IPA_VALVE_INDEX].valveStateData.closedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
-    GSDataCenter::ValveFillStationData[ENGINE_IPA_VALVE_INDEX].valveStateData.openedSwitchHigh = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+    GSDataCenter::ValveFillStationData[ENGINE_IPA_VALVE_INDEX].valveStateData.closedSwitchHigh =
+      packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::ValveFillStationData[ENGINE_IPA_VALVE_INDEX].valveStateData.openedSwitchHigh =
+      packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
+    SerialTask::engineStatusPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -178,14 +212,23 @@ bool PacketProcessing::processFillingStationStatusPacket() {
 
     FillingStationStatusPacket* packet = (FillingStationStatusPacket*) packetBuf;
 
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_VALVE_INDEX].valveStateData.isIdle = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.isIdle;
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_VALVE_INDEX].valveStateData.closedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_VALVE_INDEX].valveStateData.openedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+    bool isPacketValid = isPacketIntegrityValid(packetBuf, packet, sizeof(FillingStationStatusPacket));
+    if (!isPacketValid) {
+        return false;
+    }
 
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.isIdle = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.isIdle;
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.closedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.openedSwitchHigh = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+    // GSDataCenter::FillValveData.isIdle = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.isIdle;
+    // GSDataCenter::FillValveData.closedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    // GSDataCenter::FillValveData.openedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
+    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.isIdle =
+      packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.isIdle;
+    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.closedSwitchHigh =
+      packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.openedSwitchHigh =
+      packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+
+    SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
     return true;
 }
 
@@ -234,35 +277,4 @@ bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const
         return false;
     }
     return true;
-}
-uint32_t PacketProcessing::computeCrc(uint8_t* data, size_t sizeInBytes) {
-    constexpr uint32_t POLY = 0x04C11DB7;
-    uint32_t crc = 0xFFFFFFFF;
-
-    size_t i = 0;
-
-    // Process full 32-bit words (little-endian packing)
-    while (i + 3 < sizeInBytes) {
-        uint32_t word = (uint32_t) data[i] | ((uint32_t) data[i + 1] << 8) | ((uint32_t) data[i + 2] << 16) | ((uint32_t) data[i + 3] << 24);
-
-        crc ^= word;
-        for (int j = 0; j < 32; ++j)
-            crc = (crc & 0x80000000) ? (crc << 1) ^ POLY : (crc << 1);
-
-        i += 4;
-    }
-
-    // Handle any remaining bytes (0 to 3), padded with zero
-    if (i < sizeInBytes) {
-        uint32_t word = 0;
-        for (int k = 0; k < sizeInBytes - i; ++k) {
-            word |= (uint32_t) data[i + k] << (8 * k); // still little-endian
-        }
-
-        crc ^= word;
-        for (int j = 0; j < 32; ++j)
-            crc = (crc & 0x80000000) ? (crc << 1) ^ POLY : (crc << 1);
-    }
-
-    return crc;
 }
