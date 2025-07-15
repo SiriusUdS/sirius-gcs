@@ -5,24 +5,8 @@
 #include "Logging.h"
 #include "Telecommunication/PacketHeaderVariable.h"
 
-void CommandDispatch::test() {
-    Command& command = CommandCenter::command;
-
-    if (!command.available()) {
-        GCS_LOG_WARN("CommandDispatch: Couldn't send test command, another one is already being processed.");
-        return;
-    }
-
-    BoardCommand* boardCommand = (BoardCommand*) command.data;
-    boardCommand->fields.crc = 1;
-    boardCommand->fields.header.value = 1234;
-    boardCommand->fields.value = 5678;
-
-    command.ready(sizeof(BoardCommand));
-}
-
-void CommandDispatch::valve(Command& valveCommand, size_t percentageOpen) {
-    if (!valveCommand.available()) {
+void CommandDispatch::valve(size_t percentageOpen) {
+    if (!CommandCenter::fillValveCommand.available()) {
         GCS_LOG_DEBUG("CommandDispatch: Couldn't send valve command, another one is already being processed.");
         return;
     } else {
@@ -34,7 +18,7 @@ void CommandDispatch::valve(Command& valveCommand, size_t percentageOpen) {
         return;
     }
 
-    BoardCommand* boardCommand = (BoardCommand*) valveCommand.data;
+    BoardCommand* boardCommand = (BoardCommand*) CommandCenter::fillValveCommand.data;
     boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
     boardCommand->fields.header.bits.commandCode = ENGINE_COMMAND_CODE_OPEN_VALVE;
     boardCommand->fields.header.bits.commandIndex = 0;
@@ -43,7 +27,7 @@ void CommandDispatch::valve(Command& valveCommand, size_t percentageOpen) {
     boardCommand->fields.crc = 0;
     boardCommand->fields.value = (uint32_t) percentageOpen;
 
-    valveCommand.ready(sizeof(BoardCommand));
+    CommandCenter::fillValveCommand.ready(sizeof(BoardCommand));
 }
 
 void CommandDispatch::heatPad(HeatPadCommandType heatPadCommandType, size_t percentageOpen) {

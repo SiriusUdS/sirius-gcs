@@ -1,19 +1,11 @@
 #ifndef VALVEDATA_H
 #define VALVEDATA_H
 
-#include <cstdint>
-#include <mutex>
-
-#include "ValveStateData.h"
-
 struct ValveData {
-    ValveStateData valveStateData;
-    uint8_t id;
     const char* name;
-    int openedValue_perc;
-    int lastOpenedValue_perc;
-    mutable std::mutex mtx;
-    bool wasSliderEnabled = true;
+    bool isIdle{};
+    bool closedSwitchHigh{};
+    bool openedSwitchHigh{};
 };
 
 #endif // VALVEDATA_H

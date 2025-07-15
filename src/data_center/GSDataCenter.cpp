@@ -6,7 +6,6 @@
 #include "SensorPlotData.h"
 #include "SwitchData.h"
 #include "ValveData.h"
-#include "ValveStateData.h"
 
 namespace GSDataCenter {
 SensorPlotData Thermistor_Motor_PlotData[THERMISTOR_AMOUNT_PER_BOARD] = {{"Thermistor 1", PlotColors::BLUE},   {"Thermistor 2", PlotColors::RED},
@@ -23,30 +22,20 @@ SensorPlotData PressureSensor_FillingStation_PlotData[PRESSURE_SENSOR_AMOUNT_PER
                                                                                            {"Pressure Sensor 2", PlotColors::RED}};
 SensorPlotData LoadCell_FillingStation_PlotData[LOAD_CELL_AMOUNT] = {{"Motor Load Cell", PlotColors::BLUE}, {"Tank Load Cell", PlotColors::RED}};
 
-SwitchData AllowDumpSwitchData("Allow Dump", false);
-SwitchData AllowFillSwitchData("Allow Fill", false);
-SwitchData ArmIgniterSwitchData("Arm Igniter", false);
-SwitchData ArmServoSwitchData("Arm Servo", false);
-SwitchData EmergencyStopButtonData("Emergency Stop", false);
-SwitchData FireIgniterButtonData("Fire Igniter", false);
-SwitchData UnsafeKeySwitchData("Unsafe Key", false);
-SwitchData ValveStartButtonData("Valve Start", false);
+SwitchData AllowDumpSwitchData{.name = "Allow Dump"};
+SwitchData AllowFillSwitchData{.name = "Allow Fill"};
+SwitchData ArmIgniterSwitchData{.name = "Arm Igniter"};
+SwitchData ArmServoSwitchData{.name = "Arm Servo"};
+SwitchData EmergencyStopButtonData{.name = "Emergency Stop"};
+SwitchData FireIgniterButtonData{.name = "Fire Igniter"};
+SwitchData UnsafeKeySwitchData{.name = "Unsafe Key"};
+SwitchData ValveStartButtonData{.name = "Valve Start"};
 std::vector<SwitchData*> SwitchDataVec({&AllowDumpSwitchData, &AllowFillSwitchData, &ArmIgniterSwitchData, &ArmServoSwitchData,
                                         &EmergencyStopButtonData, &FireIgniterButtonData, &UnsafeKeySwitchData, &ValveStartButtonData});
 
-ValveData ValveEngineData[GSDataCenter::VALVE_AMOUNT] = {
-  {.valveStateData = ValveStateData{}, .id = ENGINE_IPA_VALVE_INDEX, .name = "IPA Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0},
-  {.valveStateData = ValveStateData{}, .id = ENGINE_NOS_VALVE_INDEX, .name = "NOS Valve", .openedValue_perc = 0, .lastOpenedValue_perc = 0}};
-
-ValveData ValveFillStationData[GSDataCenter::VALVE_AMOUNT] = {{.valveStateData = ValveStateData{},
-                                                               .id = FILLING_STATION_FILL_VALVE_INDEX,
-                                                               .name = "Fill Valve",
-                                                               .openedValue_perc = 0,
-                                                               .lastOpenedValue_perc = 0},
-                                                              {.valveStateData = ValveStateData{},
-                                                               .id = FILLING_STATION_DUMP_VALVE_INDEX,
-                                                               .name = "Dump Valve",
-                                                               .openedValue_perc = 0,
-                                                               .lastOpenedValue_perc = 0}};
-
+ValveData ipaValveData{.name = "IPA Valve"};
+ValveData nosValveData{.name = "NOS Valve"};
+ValveData fillValveData{.name = "Fill Valve"};
+ValveData dumpValveData{.name = "Dump Valve"};
+std::vector<ValveData*> valveDataVec({&ipaValveData, &nosValveData, &fillValveData, &dumpValveData});
 } // namespace GSDataCenter

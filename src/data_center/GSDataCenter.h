@@ -30,8 +30,11 @@ extern SwitchData UnsafeKeySwitchData;
 extern SwitchData ValveStartButtonData;
 extern std::vector<SwitchData*> SwitchDataVec;
 
-extern ValveData ValveEngineData[VALVE_AMOUNT];
-extern ValveData ValveFillStationData[VALVE_AMOUNT];
+extern ValveData ipaValveData;
+extern ValveData nosValveData;
+extern ValveData fillValveData;
+extern ValveData dumpValveData;
+extern std::vector<ValveData*> valveDataVec;
 } // namespace GSDataCenter
 
 #endif // GSDATACENTER_H
