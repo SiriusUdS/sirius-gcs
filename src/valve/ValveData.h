@@ -13,6 +13,7 @@ struct ValveData {
     int openedValue_perc;
     int lastOpenedValue_perc;
     mutable std::mutex mtx;
+    bool wasSliderEnabled = true;
 };
 
 #endif // VALVEDATA_H
