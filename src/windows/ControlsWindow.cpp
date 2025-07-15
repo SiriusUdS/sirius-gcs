@@ -3,12 +3,12 @@
 #include "Command.h"
 #include "CommandCenter.h"
 #include "CommandDispatch.h"
+#include "Engine/EngineSensors.h"
+#include "FillingStation/FillingStationSensors.h"
 #include "GSDataCenter.h"
 #include "Logging.h"
 #include "SwitchData.h"
 #include "ValveStateData.h"
-#include "Engine/EngineSensors.h"
-#include "FillingStation/FillingStationSensors.h"
 
 #include <imgui.h>
 
@@ -81,8 +81,8 @@ void ControlsWindow::renderFillStationValve(ValveData& data) {
     bool isDumpSwitchOn = GSDataCenter::AllowDumpSwitchData.isOn;
     bool isFillSwitchOn = GSDataCenter::AllowFillSwitchData.isOn;
 
-    bool isDumpSelectedAndOff = (!isDumpSwitchOn && data.id == FILLING_STATION_NOS_DUMP_VALVE_INDEX);
-    bool isFillSelectedAndOff = (!isFillSwitchOn && data.id == FILLING_STATION_NOS_VALVE_INDEX);
+    bool isDumpSelectedAndOff = (!isDumpSwitchOn && data.id == FILLING_STATION_DUMP_VALVE_INDEX);
+    bool isFillSelectedAndOff = (!isFillSwitchOn && data.id == FILLING_STATION_FILL_VALVE_INDEX);
 
     bool sliderEnabled = !(isDumpSelectedAndOff || isFillSelectedAndOff);
 

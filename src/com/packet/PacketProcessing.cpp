@@ -226,12 +226,12 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     // GSDataCenter::FillValveData.closedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
     // GSDataCenter::FillValveData.openedSwitchHigh = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.isIdle =
-      packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.isIdle;
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.closedSwitchHigh =
-      packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
-    GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.openedSwitchHigh =
-      packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
+    // GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.isIdle =
+    //   packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.isIdle;
+    // GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.closedSwitchHigh =
+    //   packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.closedSwitchHigh;
+    // GSDataCenter::ValveFillStationData[FILLING_STATION_NOS_DUMP_VALVE_INDEX].valveStateData.openedSwitchHigh =
+    //   packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX].bits.openedSwitchHigh;
 
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
     SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
