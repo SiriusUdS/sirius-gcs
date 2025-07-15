@@ -69,10 +69,22 @@ void ControlsWindow::renderFillStationValve(ValveData& data) {
     bool isDumpSelectedAndOff = (!isDumpSwitchOn && data.id == FILLING_STATION_NOS_DUMP_VALVE_INDEX);
     bool isFillSelectedAndOff = (!isFillSwitchOn && data.id == FILLING_STATION_NOS_VALVE_INDEX);
 
-    ImGui::BeginDisabled(
-      isDumpSelectedAndOff ||
-      isFillSelectedAndOff
-    );
+    bool sliderEnabled = !(isDumpSelectedAndOff || isFillSelectedAndOff);
+
+    if (data.wasSliderEnabled != sliderEnabled) {
+        std::lock_guard<std::mutex> lock(data.mtx);
+        if (!sliderEnabled) {
+            data.lastOpenedValue_perc = 0;
+            data.openedValue_perc = 0;
+            CommandDispatch::valve(CommandCenter::valve1Command, 0);
+        } else {
+            data.lastOpenedValue_perc = data.openedValue_perc;
+            CommandDispatch::valve(CommandCenter::valve1Command, data.openedValue_perc);
+        }
+        data.wasSliderEnabled = sliderEnabled;
+    }
+
+    ImGui::BeginDisabled(!sliderEnabled);
     bool sliderChanged;
     {
         std::lock_guard<std::mutex> lock(data.mtx);
@@ -80,8 +92,8 @@ void ControlsWindow::renderFillStationValve(ValveData& data) {
     }
     ImGui::EndDisabled();
 
-    if (isDumpSelectedAndOff || isFillSelectedAndOff)
-      return;
+    if (!sliderEnabled)
+        return;
 
     bool needToSynchronize;
     {
@@ -94,4 +106,7 @@ void ControlsWindow::renderFillStationValve(ValveData& data) {
         data.lastOpenedValue_perc = data.openedValue_perc;
         CommandDispatch::valve(CommandCenter::valve1Command, data.openedValue_perc);
     }
+
+    // Update wasSliderEnabled for next frame
+    data.wasSliderEnabled = sliderEnabled;
 }
