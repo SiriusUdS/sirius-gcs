@@ -17,7 +17,6 @@ private:
 public:
     bool available();
     bool ready(size_t dataSize);
-    bool ack();
     void process();
 
     uint8_t data[MAX_DATA_SIZE] = {0}; ///< Command data
@@ -27,12 +26,11 @@ private:
      * @brief Represents the state of the command.
      */
     enum class State {
-        NONE,    ///< No state, command not initialized
-        SENDING, ///< Command is ready to be sent
-        SENT,    ///< Command has been sent, waiting for acknowledgment
+        IDLE,    ///< Command is not being sent
+        SENDING, ///< Command is being sent (potentially multiple times)
     };
 
-    std::atomic<State> state = State::NONE; ///< Current state of the command
+    std::atomic<State> state = State::IDLE; ///< Current state of the command
     size_t size{};                          ///< Size of the command's data
     size_t timesSent{};                     ///< Number of times the same command has been sent
     Timer lastTimeSentTimer;                ///< Timer for the last time the command was sent

@@ -9,7 +9,7 @@
  * @returns True if the command is available, false otherwise.
  */
 bool Command::available() {
-    return state == Command::State::NONE && SerialTask::com.comOpened();
+    return state == Command::State::IDLE && SerialTask::com.comOpened();
 }
 
 /**
@@ -17,7 +17,7 @@ bool Command::available() {
  * @returns True if the command was successfully marked as ready, false otherwise.
  */
 bool Command::ready(size_t dataSize) {
-    if (state != Command::State::NONE) {
+    if (state != Command::State::IDLE) {
         GCS_LOG_WARN("Command: Couldn't mark command as ready, another command is already being processed.");
         return false;
     }
@@ -28,20 +28,11 @@ bool Command::ready(size_t dataSize) {
 }
 
 /**
- * @brief Process an acknowledgment packet.
- * @returns True if the acknowledgment was successfully processed, false otherwise.
- */
-bool Command::ack() {
-    // TODO: Write ack function
-    return true;
-}
-
-/**
  * @brief Process the command based on its current state.
  */
 void Command::process() {
-    static constexpr size_t NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND = 5;
-    static constexpr double TIME_BETWEEN_COMMAND_SENDS_SEC = 0.03;
+    static constexpr size_t NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND = 10;
+    static constexpr double TIME_BETWEEN_COMMAND_SENDS_SEC = 0.1;
 
     switch (state) {
     case Command::State::SENDING:
@@ -54,12 +45,8 @@ void Command::process() {
         }
         timesSent++;
         if (NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND <= timesSent) {
-            state = Command::State::SENT;
+            state = Command::State::IDLE;
         }
-        break;
-    case Command::State::SENT:
-        timesSent = 0;
-        state = Command::State::NONE; // TODO: Implement ack
         break;
     }
 }

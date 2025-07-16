@@ -3,7 +3,6 @@
 #include "Command.h"
 #include "CommandCenter.h"
 #include "CommandDispatch.h"
-#include "CommandValues.h"
 #include "Engine/EngineSensors.h"
 #include "FillingStation/FillingStationSensors.h"
 #include "GSDataCenter.h"
@@ -23,13 +22,15 @@ struct ValveSlider {
 ValveSlider fillValveSlider;
 ValveSlider dumpValveSlider;
 
-static void renderValve(ValveData& data, ValveSlider& slider, bool associatedSwitchIsOn, size_t& valveCommandValue);
+static void renderValve(ValveData& data, ValveSlider& slider, int valveId, bool sliderEnabled);
 } // namespace ControlsWindow
 
 void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
-        renderValve(GSDataCenter::fillValveData, fillValveSlider, GSDataCenter::AllowFillSwitchData.isOn, CommandValues::fillValvePercentageOpen);
-        renderValve(GSDataCenter::dumpValveData, dumpValveSlider, GSDataCenter::AllowDumpSwitchData.isOn, CommandValues::dumpValvePercentageOpen);
+        renderValve(GSDataCenter::fillValveData, fillValveSlider, FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT,
+                    GSDataCenter::AllowFillSwitchData.isOn);
+        renderValve(GSDataCenter::dumpValveData, dumpValveSlider, FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT,
+                    GSDataCenter::AllowDumpSwitchData.isOn);
     }
 
     if (ImGui::CollapsingHeader("Heat pads")) {
@@ -42,20 +43,19 @@ void ControlsWindow::render() {
     }
 }
 
-void ControlsWindow::renderValve(ValveData& data, ValveSlider& slider, bool associatedSwitchIsOn, size_t& valveCommandValue) {
-    const bool sliderEnabled = !associatedSwitchIsOn;
-
+void ControlsWindow::renderValve(ValveData& data, ValveSlider& slider, int valveId, bool sliderEnabled) {
     ImGui::BeginDisabled(!sliderEnabled);
-    bool sliderChanged = ImGui::SliderInt(data.name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SliderInt(data.name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
     ImGui::EndDisabled();
 
     const bool sliderEnableChangedLastFrame = slider.wasSliderEnabled != sliderEnabled;
     const bool needToSynchronize = slider.openedValue_perc != slider.lastOpenedValue_perc;
 
     if (sliderEnabled && (sliderEnableChangedLastFrame || needToSynchronize)) {
-        slider.lastOpenedValue_perc = slider.openedValue_perc;
-        valveCommandValue = slider.openedValue_perc;
+        if (CommandCenter::valveCommand.available()) {
+            slider.wasSliderEnabled = sliderEnabled;
+            slider.lastOpenedValue_perc = slider.openedValue_perc;
+            CommandDispatch::valve(valveId, slider.openedValue_perc);
+        }
     }
-
-    slider.wasSliderEnabled = sliderEnabled;
 }

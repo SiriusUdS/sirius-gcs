@@ -4,9 +4,7 @@
 class Command;
 
 namespace CommandCenter {
-extern Command command;
-extern Command fillValveCommand;
-extern Command dumpValveCommand;
+extern Command valveCommand;
 extern Command heatPadCommand;
 
 void processCommands();

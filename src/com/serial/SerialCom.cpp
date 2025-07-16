@@ -60,11 +60,7 @@ bool SerialCom::comOpened() {
  * @returns True if a packet was successfully received, otherwise false.
  */
 bool SerialCom::getPacket(uint8_t* recv) {
-    bool successful = SerialTask::packetReceiver.getPacket(recv);
-    if (successful) {
-        SerialTask::packetRateMonitor.trackPacket();
-    }
-    return successful;
+    return SerialTask::packetReceiver.getPacket(recv);
 }
 
 /**

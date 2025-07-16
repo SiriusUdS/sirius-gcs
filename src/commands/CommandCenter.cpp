@@ -3,15 +3,11 @@
 #include "Command.h"
 
 namespace CommandCenter {
-Command command;
-Command fillValveCommand;
-Command dumpValveCommand;
+Command valveCommand;
 Command heatPadCommand;
 } // namespace CommandCenter
 
 void CommandCenter::processCommands() {
-    command.process();
-    fillValveCommand.process();
-    dumpValveCommand.process();
+    valveCommand.process();
     heatPadCommand.process();
 }
