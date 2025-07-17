@@ -33,9 +33,9 @@ SwitchData ValveStartButtonData{.name = "Valve Start"};
 std::vector<SwitchData*> SwitchDataVec({&AllowDumpSwitchData, &AllowFillSwitchData, &ArmIgniterSwitchData, &ArmServoSwitchData,
                                         &EmergencyStopButtonData, &FireIgniterButtonData, &UnsafeKeySwitchData, &ValveStartButtonData});
 
-ValveData ipaValveData{.name = "IPA Valve"};
-ValveData nosValveData{.name = "NOS Valve"};
-ValveData fillValveData{.name = "Fill Valve"};
-ValveData dumpValveData{.name = "Dump Valve"};
-std::vector<ValveData*> valveDataVec({&ipaValveData, &nosValveData, &fillValveData, &dumpValveData});
+ValveData nosValveData;
+ValveData ipaValveData;
+ValveData fillValveData;
+ValveData dumpValveData;
+std::vector<ValveData*> valveDataVec({&fillValveData, &dumpValveData});
 } // namespace GSDataCenter

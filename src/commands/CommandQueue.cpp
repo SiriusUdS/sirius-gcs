@@ -1,27 +1,38 @@
 #include "CommandQueue.h"
 
-bool CommandQueue::enqueue(CommandType type, uint32_t value) {
-    auto idx = static_cast<std::size_t>(type);
-    if (inUse[idx]) {
-        return false;
-    }
+#include "Logging.h"
 
-    queue.push({type, value});
-    inUse[idx] = true;
-    return true;
+// Add last-writer-wins implementation explanation
+void CommandQueue::enqueue(CommandType type, uint32_t value) {
+    size_t idx = static_cast<std::size_t>(type);
+
+    if (!values[idx].has_value()) {
+        pendingTypes.push(type);
+    }
+    values[idx] = value;
 }
 
 std::optional<CommandData> CommandQueue::dequeue() {
-    if (queue.empty()) {
+    if (pendingTypes.empty()) {
         return std::nullopt;
     }
 
-    CommandData cmd = queue.front();
-    queue.pop();
-    inUse[static_cast<std::size_t>(cmd.type)] = false;
-    return cmd;
+    CommandType type = pendingTypes.front();
+    pendingTypes.pop();
+
+    size_t idx = static_cast<std::size_t>(type);
+
+    if (!values[idx].has_value()) {
+        GCS_LOG_ERROR("CommandQueue: Internal desync, no value for CommandType {}.", static_cast<int>(type));
+        return std::nullopt;
+    }
+
+    uint32_t value = *values[idx];
+    values[idx] = std::nullopt;
+
+    return CommandData{.type = type, .value = value};
 }
 
 bool CommandQueue::empty() const {
-    return queue.empty();
+    return pendingTypes.empty();
 }

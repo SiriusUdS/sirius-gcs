@@ -30,8 +30,8 @@ extern SwitchData UnsafeKeySwitchData;
 extern SwitchData ValveStartButtonData;
 extern std::vector<SwitchData*> SwitchDataVec;
 
-extern ValveData ipaValveData;
 extern ValveData nosValveData;
+extern ValveData ipaValveData;
 extern ValveData fillValveData;
 extern ValveData dumpValveData;
 extern std::vector<ValveData*> valveDataVec;

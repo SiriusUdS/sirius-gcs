@@ -3,7 +3,7 @@
 #include "BoardComStateMonitor.h"
 #include "ComDiscoveryWindows.h"
 #include "ComPortSelector.h"
-#include "CommandCenter.h"
+#include "CommandControl.h"
 #include "IntervalTimer.h"
 #include "PacketProcessing.h"
 #include "PacketRateMonitor.h"
@@ -50,7 +50,7 @@ void SerialTask::execute() {
         SerialControl::startComIfNeeded();
         SerialControl::readIncomingBytesAtSetRate();
         PacketProcessing::processIncomingPackets();
-        CommandCenter::processCommands();
+        CommandControl::processCommands();
     }
 }
 

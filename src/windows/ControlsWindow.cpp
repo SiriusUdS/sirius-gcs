@@ -1,8 +1,7 @@
 #include "ControlsWindow.h"
 
-#include "Command.h"
-#include "CommandCenter.h"
-#include "CommandDispatch.h"
+#include "CommandControl.h"
+#include "CommandTypes.h"
 #include "Engine/EngineSensors.h"
 #include "FillingStation/FillingStationSensors.h"
 #include "GSDataCenter.h"
@@ -21,41 +20,32 @@ struct ValveSlider {
 
 ValveSlider fillValveSlider;
 ValveSlider dumpValveSlider;
+ValveSlider fillHeatPadSlider;
+ValveSlider dumpHeatPadSlider;
 
-static void renderValve(ValveData& data, ValveSlider& slider, int valveId, bool sliderEnabled);
+static void renderSlider(const char* name, ValveSlider& slider, CommandType commandType, bool sliderEnabled);
 } // namespace ControlsWindow
 
 void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
-        renderValve(GSDataCenter::fillValveData, fillValveSlider, FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT,
-                    GSDataCenter::AllowFillSwitchData.isOn);
-        renderValve(GSDataCenter::dumpValveData, dumpValveSlider, FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT,
-                    GSDataCenter::AllowDumpSwitchData.isOn);
-    }
-
-    if (ImGui::CollapsingHeader("Heat pads")) {
-        if (ImGui::Button("Fill valve heat pad")) {
-            CommandDispatch::heatPad(CommandDispatch::HeatPadCommandType::FILL, 50);
-        }
-        if (ImGui::Button("Dump valve heat pad")) {
-            CommandDispatch::heatPad(CommandDispatch::HeatPadCommandType::DUMP, 50);
-        }
+        renderSlider("Fill Valve", fillValveSlider, CommandType::FillValve, GSDataCenter::AllowFillSwitchData.isOn);
+        renderSlider("Dump Valve", dumpValveSlider, CommandType::DumpValve, GSDataCenter::AllowDumpSwitchData.isOn);
+        renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad, GSDataCenter::AllowFillSwitchData.isOn);
+        renderSlider("Dump Heat Pad", dumpHeatPadSlider, CommandType::DumpHeatPad, GSDataCenter::AllowDumpSwitchData.isOn);
     }
 }
 
-void ControlsWindow::renderValve(ValveData& data, ValveSlider& slider, int valveId, bool sliderEnabled) {
+void ControlsWindow::renderSlider(const char* name, ValveSlider& slider, CommandType commandType, bool sliderEnabled) {
     ImGui::BeginDisabled(!sliderEnabled);
-    ImGui::SliderInt(data.name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+    ImGui::SliderInt(name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
     ImGui::EndDisabled();
 
     const bool sliderEnableChangedLastFrame = slider.wasSliderEnabled != sliderEnabled;
     const bool needToSynchronize = slider.openedValue_perc != slider.lastOpenedValue_perc;
 
     if (sliderEnabled && (sliderEnableChangedLastFrame || needToSynchronize)) {
-        if (CommandCenter::valveCommand.available()) {
-            slider.wasSliderEnabled = sliderEnabled;
-            slider.lastOpenedValue_perc = slider.openedValue_perc;
-            CommandDispatch::valve(valveId, slider.openedValue_perc);
-        }
+        slider.wasSliderEnabled = sliderEnabled;
+        slider.lastOpenedValue_perc = slider.openedValue_perc;
+        CommandControl::sendCommand(commandType, slider.openedValue_perc);
     }
 }
