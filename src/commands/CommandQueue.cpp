@@ -23,7 +23,7 @@ std::optional<CommandData> CommandQueue::dequeue() {
     size_t idx = static_cast<std::size_t>(type);
 
     if (!values[idx].has_value()) {
-        GCS_LOG_ERROR("CommandQueue: Internal desync, no value for CommandType {}.", static_cast<int>(type));
+        GCS_APP_LOG_ERROR("CommandQueue: Internal desync, no value for CommandType {}.", static_cast<int>(type));
         return std::nullopt;
     }
 

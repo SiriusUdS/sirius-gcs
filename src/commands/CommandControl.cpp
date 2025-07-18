@@ -21,7 +21,7 @@ enum class State {
 
 constexpr size_t MAX_DATA_SIZE = 256;                       ///< Maximum size of the command's data
 constexpr size_t NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND = 20; ///< Each command is sent this many times to improve communication with the boards
-constexpr double TIME_BETWEEN_COMMAND_SENDS_SEC = 0.091;    ///< Wait this much between each command send
+constexpr double TIME_BETWEEN_COMMAND_SENDS_SEC = 0.131;    ///< Wait this much between each command send
 
 State state = State::IDLE;                 ///< Current state of the command
 uint8_t data[MAX_DATA_SIZE] = {0};         ///< Current command data
@@ -55,7 +55,7 @@ void CommandControl::processCommands() {
         lastTimeSentTimer.reset();
         BoardCommand* formattedData = reinterpret_cast<BoardCommand*>(data);
         if (!SerialTask::com.write(data, dataSize)) {
-            GCS_LOG_ERROR("Command: Couldn't send command over serial communication.");
+            GCS_APP_LOG_ERROR("Command: Couldn't send command over serial communication.");
             break;
         }
         timesSent++;
@@ -95,13 +95,13 @@ void CommandControl::getNextCommand() {
         setupReset();
         break;
     default:
-        GCS_LOG_ERROR("CommandControl: Invalid command type dequeued from command queue. Ignoring command.");
+        GCS_APP_LOG_ERROR("CommandControl: Invalid command type dequeued from command queue. Ignoring command.");
     }
 }
 
 void CommandControl::setupValveCommand(ValveCommandType type) {
     if (!currentCommand.has_value()) {
-        GCS_LOG_ERROR("CommandControl: Couldn't setup valve command, no command available.");
+        GCS_APP_LOG_ERROR("CommandControl: Couldn't setup valve command, no command available.");
         return;
     }
 
@@ -109,7 +109,7 @@ void CommandControl::setupValveCommand(ValveCommandType type) {
     uint32_t percentageOpen = command.value;
 
     if (percentageOpen > 100) {
-        GCS_LOG_WARN("CommandDispatch: Invalid valve percentage: {}. Must be between 0 and 100.", percentageOpen);
+        GCS_APP_LOG_WARN("CommandDispatch: Invalid valve percentage: {}. Must be between 0 and 100.", percentageOpen);
         return;
     }
 
@@ -125,7 +125,7 @@ void CommandControl::setupValveCommand(ValveCommandType type) {
 
 void CommandControl::setupHeatPadCommand(HeatPadCommandType type) {
     if (!currentCommand.has_value()) {
-        GCS_LOG_ERROR("CommandControl: Couldn't setup heat pad command, no command available.");
+        GCS_APP_LOG_ERROR("CommandControl: Couldn't setup heat pad command, no command available.");
         return;
     }
 
@@ -133,7 +133,7 @@ void CommandControl::setupHeatPadCommand(HeatPadCommandType type) {
     uint32_t percentageOpen = command.value;
 
     if (percentageOpen > 100) {
-        GCS_LOG_WARN("CommandDispatch: Invalid heat pad percentage: {}. Must be between 0 and 100.", percentageOpen);
+        GCS_APP_LOG_WARN("CommandDispatch: Invalid heat pad percentage: {}. Must be between 0 and 100.", percentageOpen);
         return;
     }
 
@@ -149,7 +149,7 @@ void CommandControl::setupHeatPadCommand(HeatPadCommandType type) {
 
 void CommandControl::setupAbort() {
     if (!currentCommand.has_value()) {
-        GCS_LOG_ERROR("CommandControl: Couldn't setup abort command, no command available.");
+        GCS_APP_LOG_ERROR("CommandControl: Couldn't setup abort command, no command available.");
         return;
     }
 
@@ -167,7 +167,7 @@ void CommandControl::setupAbort() {
 
 void CommandControl::setupReset() {
     if (!currentCommand.has_value()) {
-        GCS_LOG_ERROR("CommandControl: Couldn't setup reset command, no command available.");
+        GCS_APP_LOG_ERROR("CommandControl: Couldn't setup reset command, no command available.");
         return;
     }
 

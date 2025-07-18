@@ -23,15 +23,15 @@ ValveSlider dumpValveSlider;
 ValveSlider fillHeatPadSlider;
 ValveSlider dumpHeatPadSlider;
 
-static void renderSlider(const char* name, ValveSlider& slider, CommandType commandType, bool sliderEnabled);
+static void renderSlider(const char* name, ValveSlider& slider, CommandType commandType, bool sliderEnabled = true);
 } // namespace ControlsWindow
 
 void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
         renderSlider("Fill Valve", fillValveSlider, CommandType::FillValve, GSDataCenter::AllowFillSwitchData.isOn);
         renderSlider("Dump Valve", dumpValveSlider, CommandType::DumpValve, GSDataCenter::AllowDumpSwitchData.isOn);
-        renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad, GSDataCenter::AllowFillSwitchData.isOn);
-        renderSlider("Dump Heat Pad", dumpHeatPadSlider, CommandType::DumpHeatPad, GSDataCenter::AllowDumpSwitchData.isOn);
+        renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad);
+        renderSlider("Dump Heat Pad", dumpHeatPadSlider, CommandType::DumpHeatPad);
     }
 }
 

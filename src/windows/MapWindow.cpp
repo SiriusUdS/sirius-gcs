@@ -159,14 +159,14 @@ void MapWindow::render() {
         sourceIsFs = true;
         lastAutoSourceSwitchTime = now;
         hasSwitchedSource = true;
-        GCS_LOG_DEBUG("MapWindow: Lost connection to tile provider.");
+        GCS_APP_LOG_DEBUG("MapWindow: Lost connection to tile provider.");
     } else if (sourceIsFs) {
         startTileProviderConnectivityTest();
         if (urlConnectionTest->successful() && autoSourceSwitchDelayElapsed) {
             sourceIsFs = false;
             lastAutoSourceSwitchTime = now;
             hasSwitchedSource = true;
-            GCS_LOG_DEBUG("MapWindow: Regained connection to tile provider.");
+            GCS_APP_LOG_DEBUG("MapWindow: Regained connection to tile provider.");
         }
     }
 

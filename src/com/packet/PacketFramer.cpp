@@ -32,7 +32,7 @@ void PacketFramer::tryFrame() {
  */
 size_t PacketFramer::consumeNextPacketSize() {
     if (!availablePacketSizesQueue.size()) {
-        GCS_LOG_WARN("PacketFramer: Tried to consume next packet size, but no packets available.");
+        GCS_APP_LOG_WARN("PacketFramer: Tried to consume next packet size, but no packets available.");
         return 0;
     }
 
@@ -96,14 +96,14 @@ bool PacketFramer::checkForTelemetryPacketStart() {
  */
 bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > MAX_HEADER_SIZE) {
-        GCS_LOG_WARN(
+        GCS_APP_LOG_WARN(
           "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the maximum header size accepted of {}.",
           headerSize, MAX_HEADER_SIZE);
         return false;
     }
 
     if (headerSize > currentPacketSize) {
-        GCS_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
+        GCS_APP_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
                      "read of size {}.",
                      headerSize, currentPacketSize);
         return false;
@@ -111,7 +111,7 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
 
     const size_t READ_AVAILABLE = buf.readAvailable();
     if (headerSize > READ_AVAILABLE) {
-        GCS_LOG_WARN(
+        GCS_APP_LOG_WARN(
           "PacketFramer: Tried to get header from buffer, but the header of size {} is bigger than the packet being currently read of size {}.",
           headerSize, READ_AVAILABLE);
         return false;
@@ -120,7 +120,7 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     for (size_t i = 0; i < headerSize; i++) {
         std::optional<uint8_t> byte = buf.peekBack(headerSize - i - 1);
         if (!byte.has_value()) {
-            GCS_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but not enough bytes are available.");
+            GCS_APP_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but not enough bytes are available.");
             return false;
         }
         headerBuf[i] = byte.value();

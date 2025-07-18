@@ -9,13 +9,13 @@
  */
 bool PacketReceiver::receiveByte(uint8_t byte) {
     if (buf.isFull() && !pf.packetAvailable()) {
-        GCS_LOG_WARN("PacketReceiver: Circular buffer full, but no packet available. Clearing buffer.");
+        GCS_APP_LOG_WARN("PacketReceiver: Circular buffer full, but no packet available. Clearing buffer.");
         buf.clear();
         pf.clear();
     }
 
     if (!buf.writeByte(byte)) {
-        GCS_LOG_WARN("PacketReceiver: Unable to write byte in circular buffer.");
+        GCS_APP_LOG_WARN("PacketReceiver: Unable to write byte in circular buffer.");
         return false;
     }
 
@@ -57,12 +57,12 @@ bool PacketReceiver::dumpNextPacket() {
     size_t size = pf.consumeNextPacketSize();
 
     if (size == 0) {
-        GCS_LOG_WARN("PacketReceiver: Tried to dump next packet, but no packet available.");
+        GCS_APP_LOG_WARN("PacketReceiver: Tried to dump next packet, but no packet available.");
         return false;
     }
 
     if (!buf.dump(size)) {
-        GCS_LOG_WARN("PacketReceiver: Tried to dump next packet, but circular buffer did not have enough read data left.");
+        GCS_APP_LOG_WARN("PacketReceiver: Tried to dump next packet, but circular buffer did not have enough read data left.");
         return false;
     }
 

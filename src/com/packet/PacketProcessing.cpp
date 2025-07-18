@@ -34,6 +34,7 @@ bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName)
 
 size_t packetSize{};
 uint8_t packetBuf[MAX_PACKET_SIZE];
+std::string packetLog;
 } // namespace PacketProcessing
 
 void PacketProcessing::processIncomingPackets() {
@@ -49,19 +50,19 @@ bool PacketProcessing::processIncomingPacket() {
         // No available packets
         return false;
     } else if (packetSize < sizeof(TelemetryHeader)) {
-        GCS_LOG_WARN("PacketProcessing: Received packet size ({}) too small to fit header ({}), ignoring packet.", packetSize,
-                     sizeof(TelemetryHeader));
+        GCS_APP_LOG_WARN("PacketProcessing: Received packet size ({}) too small to fit header ({}), ignoring packet.", packetSize,
+                         sizeof(TelemetryHeader));
         SerialTask::packetReceiver.dumpNextPacket();
         return false;
     } else if (packetSize > MAX_PACKET_SIZE) {
-        GCS_LOG_WARN("PacketProcessing: Received packet size ({}) too big to fit in packet buffer ({}), ignoring packet", packetSize,
-                     MAX_PACKET_SIZE);
+        GCS_APP_LOG_WARN("PacketProcessing: Received packet size ({}) too big to fit in packet buffer ({}), ignoring packet", packetSize,
+                         MAX_PACKET_SIZE);
         SerialTask::packetReceiver.dumpNextPacket();
         return false;
     }
 
     if (!SerialTask::com.getPacket(packetBuf)) {
-        GCS_LOG_ERROR("PacketProcessing: Something went wrong while getting the next packet.");
+        GCS_APP_LOG_ERROR("PacketProcessing: Something went wrong while getting the next packet.");
         return false;
     }
 
@@ -74,10 +75,10 @@ bool PacketProcessing::processIncomingPacket() {
         } else if (header->bits.boardId == FILLING_STATION_BOARD_ID) {
             return processFillingStationTelemetryPacket();
         } else if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
-            GCS_LOG_WARN("PacketProcessing: Tried processing GS control telemetry packet, but that doesn't exist.");
+            GCS_APP_LOG_WARN("PacketProcessing: Tried processing GS control telemetry packet, but that doesn't exist.");
             return false;
         } else {
-            GCS_LOG_WARN("PacketProcessing: Telemetry packet contains invalid boardId, ignoring packet.");
+            GCS_APP_LOG_WARN("PacketProcessing: Telemetry packet contains invalid boardId, ignoring packet.");
             return false;
         }
     case STATUS_TYPE_CODE:
@@ -88,12 +89,12 @@ bool PacketProcessing::processIncomingPacket() {
         } else if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
             return processGSControlPacket();
         } else {
-            GCS_LOG_WARN("PacketProcessing: Status packet contains invalid boardId, ignoring packet.");
+            GCS_APP_LOG_WARN("PacketProcessing: Status packet contains invalid boardId, ignoring packet.");
             return false;
         }
     }
 
-    GCS_LOG_WARN("PacketProcessing: Unknown packet type, ignoring packet.");
+    GCS_APP_LOG_WARN("PacketProcessing: Unknown packet type, ignoring packet.");
     return false;
 }
 
@@ -267,7 +268,7 @@ void PacketProcessing::addLoadCellPlotData(SensorPlotData plotData[GSDataCenter:
 
 bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
     if (packetSize != targetPacketSize) {
-        GCS_LOG_WARN("PacketProcessing: Invalid {} size, ignoring packet.", packetName);
+        GCS_APP_LOG_WARN("PacketProcessing: Invalid {} size, ignoring packet.", packetName);
         return false;
     }
     return true;

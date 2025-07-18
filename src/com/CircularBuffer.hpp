@@ -30,7 +30,7 @@ template <size_t BUFSIZE>
 inline bool CircularBuffer<BUFSIZE>::read(uint8_t* recv, size_t size) {
     const size_t READ_AVAILABLE = readAvailable();
     if (READ_AVAILABLE < size) {
-        GCS_LOG_WARN("CircularBuffer: Tried to read {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
+        GCS_APP_LOG_WARN("CircularBuffer: Tried to read {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
         return false;
     }
 
@@ -51,7 +51,7 @@ template <size_t BUFSIZE>
 inline bool CircularBuffer<BUFSIZE>::dump(size_t size) {
     const size_t READ_AVAILABLE = readAvailable();
     if (READ_AVAILABLE < size) {
-        GCS_LOG_WARN("CircularBuffer: Tried to dump {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
+        GCS_APP_LOG_WARN("CircularBuffer: Tried to dump {} bytes, but only {} bytes are available.", size, READ_AVAILABLE);
         return false;
     }
 

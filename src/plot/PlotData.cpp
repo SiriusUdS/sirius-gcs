@@ -23,7 +23,7 @@ void PlotData::addData(float x, float y) {
     std::lock_guard<std::mutex> lock(mtx);
 
     if (data.size() && x < data.lastX()) {
-        GCS_LOG_WARN("PlotData: Received unordered data for plot data {}, clearing data.", style.name);
+        GCS_APP_LOG_WARN("PlotData: Received unordered data for plot data {}, clearing data.", style.name);
         clear();
     }
 
@@ -104,7 +104,7 @@ void PlotData::dropOldData(size_t amount) {
     size_t oldDataSize = data.size();
 
     if (oldDataSize < amount) {
-        GCS_LOG_DEBUG("PlotData: Dropping old data unnecessary for plot data {}, current size {} smaller than amount to drop {}.", style.name,
+        GCS_APP_LOG_DEBUG("PlotData: Dropping old data unnecessary for plot data {}, current size {} smaller than amount to drop {}.", style.name,
                       oldDataSize, amount);
         return;
     }
@@ -112,5 +112,5 @@ void PlotData::dropOldData(size_t amount) {
     data.eraseOld(amount);
     PlotDataCompression::meanCompression(data, compressedData, TARGET_COMPRESSED_DATA_SIZE, style.name);
 
-    GCS_LOG_DEBUG("PlotData: Plot data {} successfully dropped old data, went from size {} to {}.", style.name, oldDataSize, data.size());
+    GCS_APP_LOG_DEBUG("PlotData: Plot data {} successfully dropped old data, went from size {} to {}.", style.name, oldDataSize, data.size());
 }

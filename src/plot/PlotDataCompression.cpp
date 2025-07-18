@@ -8,7 +8,7 @@ void PlotDataCompression::meanCompression(const PlotRawData& originalData, PlotR
     const size_t compressedDataSize = compressedData.size();
 
     if (dataSize <= targetCompressionSize || targetCompressionSize == 0) {
-        GCS_LOG_DEBUG("PlotData: Compression unnecessary for plot data {}, current size {} smaller than target size {}.", name, dataSize,
+        GCS_APP_LOG_DEBUG("PlotData: Compression unnecessary for plot data {}, current size {} smaller than target size {}.", name, dataSize,
                       targetCompressionSize);
         compressedData = originalData;
         return;
@@ -42,5 +42,5 @@ void PlotDataCompression::meanCompression(const PlotRawData& originalData, PlotR
 
     compressedData = std::move(newData);
 
-    GCS_LOG_DEBUG("PlotData: Plot data {} successfully compressed from size {} to {}.", name, compressedDataSize, compressedData.size());
+    GCS_APP_LOG_DEBUG("PlotData: Plot data {} successfully compressed from size {} to {}.", name, compressedDataSize, compressedData.size());
 }

@@ -26,7 +26,7 @@ ImTextureID LoadLedTexture(const char* filePath) {
 
     unsigned char* data = stbi_load(filePath, &width, &height, &channels, 0);
     if (!data) {
-        GCS_LOG_ERROR("Failed to load LED texture: {}", filePath);
+        GCS_APP_LOG_ERROR("Failed to load LED texture: {}", filePath);
         return NULL;
     }
 

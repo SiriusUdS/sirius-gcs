@@ -1,17 +1,53 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+#include <memory>
 #include <spdlog/spdlog.h>
 
 class ImGuiTextBufferSink;
 
 namespace Logging {
 void init();
+
+inline std::shared_ptr<spdlog::logger> appLogger{};
+inline std::shared_ptr<spdlog::logger> dataLogger{};
+inline std::mutex mtx;
+
+template <class... Args>
+void implAppDebugLog(fmt::format_string<Args...> fmt, Args&&... args) {
+    std::lock_guard<std::mutex> lock(mtx);
+    appLogger->debug(fmt, std::forward<Args>(args)...);
+}
+
+template <class... Args>
+void implAppErrorLog(fmt::format_string<Args...> fmt, Args&&... args) {
+    std::lock_guard<std::mutex> lock(mtx);
+    appLogger->error(fmt, std::forward<Args>(args)...);
+}
+
+template <class... Args>
+void implAppInfoLog(fmt::format_string<Args...> fmt, Args&&... args) {
+    std::lock_guard<std::mutex> lock(mtx);
+    appLogger->info(fmt, std::forward<Args>(args)...);
+}
+
+template <class... Args>
+void implAppWarnLog(fmt::format_string<Args...> fmt, Args&&... args) {
+    std::lock_guard<std::mutex> lock(mtx);
+    appLogger->warn(fmt, std::forward<Args>(args)...);
+}
+
+template <class... Args>
+void implDataLog(fmt::format_string<Args...> fmt, Args&&... args) {
+    std::lock_guard<std::mutex> lock(mtx);
+    dataLogger->info(fmt, std::forward<Args>(args)...);
+}
 } // namespace Logging
 
-#define GCS_LOG_DEBUG(msg, ...) spdlog::debug(msg, __VA_ARGS__)
-#define GCS_LOG_ERROR(msg, ...) spdlog::error(msg, __VA_ARGS__)
-#define GCS_LOG_INFO(msg, ...) spdlog::info(msg, __VA_ARGS__)
-#define GCS_LOG_WARN(msg, ...) spdlog::warn(msg, __VA_ARGS__)
+#define GCS_APP_LOG_DEBUG(fmt, ...) Logging::implAppDebugLog(fmt, __VA_ARGS__)
+#define GCS_APP_LOG_ERROR(fmt, ...) Logging::implAppErrorLog(fmt, __VA_ARGS__)
+#define GCS_APP_LOG_INFO(fmt, ...) Logging::implAppInfoLog(fmt, __VA_ARGS__)
+#define GCS_APP_LOG_WARN(fmt, ...) Logging::implAppWarnLog(fmt, __VA_ARGS__)
+#define GCS_DATA_LOG(fmt, ...) Logging::implDataLog(fmt, __VA_ARGS__)
 
 #endif // LOGGING_H
