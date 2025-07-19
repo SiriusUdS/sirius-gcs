@@ -2,13 +2,19 @@
 #define PACKETLOGGER_H
 
 #include "GSControl/GSControlStatus.h"
+#include "Valve/ValveStatus.h"
 
 namespace PacketLogger {
-constexpr const char* GS_CONTROL_PACKET_LOG_TEMPLATE =
-  "Allow Dump Switch: {}, Allow Fill Switch: {}, Arm Igniter Switch: {}, Arm Servo Switch: {}, Emergency "
-  "Stop Button: {}, Fire Igniter Button: {}, Unsafe Key Switch: {}, Valve Start Button: {}";
-
-void logGsControl(GSControlStatus* packet);
+void logEngineTelemetry(uint16_t* thermistorAdcValues, float* thermistorValues, uint16_t* pressureSensorAdcValues, float* pressureSensorValues);
+void logFillingStationTelemetry(uint16_t* thermistorAdcValues,
+                                float* thermistorValues,
+                                uint16_t* pressureSensorAdcValues,
+                                float* pressureSensorValues,
+                                uint16_t* loadCellAdcValues,
+                                float* loadCellValues);
+void logGsControl(GSControlStatus& packet);
+void logEngineStatus(ValveStatus& nosValveStatus, ValveStatus& ipaValveStatus);
+void logFillingStationStatus(ValveStatus& fillValveStatus, ValveStatus& dumpValveStatus);
 } // namespace PacketLogger
 
 #endif // PACKETLOGGER_H

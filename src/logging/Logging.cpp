@@ -16,6 +16,7 @@ void initDataLogger();
 void Logging::init() {
     spdlog::flush_every(std::chrono::seconds(5));
     initAppLogger();
+    initDataLogger();
 }
 
 void Logging::initAppLogger() {
@@ -31,10 +32,9 @@ void Logging::initAppLogger() {
 }
 
 void Logging::initDataLogger() {
-    spdlog::sink_ptr dataConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     spdlog::sink_ptr dataFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/data.log");
 
-    dataLoggerSinks = {dataConsoleSink, dataFileSink};
+    dataLoggerSinks = {dataFileSink};
 
     dataLogger = std::make_shared<spdlog::logger>("data", dataLoggerSinks.begin(), dataLoggerSinks.end());
     dataLogger->set_level(spdlog::level::info);
