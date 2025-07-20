@@ -10,7 +10,7 @@
 class CommandQueue {
 public:
     void enqueue(CommandType type, uint32_t value);
-    std::optional<CommandData> dequeue();
+    std::optional<Command> dequeue();
     bool empty() const;
 
 private:

@@ -29,7 +29,7 @@ size_t dataSize;                           ///< Size of the current command data
 Timer lastTimeSentTimer;                   ///< Timer for the last time the command was sent
 size_t timesSent{};                        ///< Number of times the same command has been sent
 CommandQueue commandQueue;                 ///< Queue containing all future commands to be sent
-std::optional<CommandData> currentCommand; ///< Current command being sent
+std::optional<Command> currentCommand; ///< Current command being sent
 
 void getNextCommand();
 void setupValveCommand(ValveCommandType type);
@@ -105,7 +105,7 @@ void CommandControl::setupValveCommand(ValveCommandType type) {
         return;
     }
 
-    CommandData& command = currentCommand.value();
+    Command& command = currentCommand.value();
     uint32_t percentageOpen = command.value;
 
     if (percentageOpen > 100) {
@@ -129,7 +129,7 @@ void CommandControl::setupHeatPadCommand(HeatPadCommandType type) {
         return;
     }
 
-    CommandData& command = currentCommand.value();
+    Command& command = currentCommand.value();
     uint32_t percentageOpen = command.value;
 
     if (percentageOpen > 100) {
@@ -153,7 +153,7 @@ void CommandControl::setupAbort() {
         return;
     }
 
-    CommandData& command = currentCommand.value();
+    Command& command = currentCommand.value();
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
     boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
@@ -171,7 +171,7 @@ void CommandControl::setupReset() {
         return;
     }
 
-    CommandData& command = currentCommand.value();
+    Command& command = currentCommand.value();
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
     boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;

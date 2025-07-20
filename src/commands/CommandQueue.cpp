@@ -12,7 +12,7 @@ void CommandQueue::enqueue(CommandType type, uint32_t value) {
     values[idx] = value;
 }
 
-std::optional<CommandData> CommandQueue::dequeue() {
+std::optional<Command> CommandQueue::dequeue() {
     if (pendingTypes.empty()) {
         return std::nullopt;
     }
@@ -30,7 +30,7 @@ std::optional<CommandData> CommandQueue::dequeue() {
     uint32_t value = *values[idx];
     values[idx] = std::nullopt;
 
-    return CommandData{.type = type, .value = value};
+    return Command{.type = type, .value = value};
 }
 
 bool CommandQueue::empty() const {

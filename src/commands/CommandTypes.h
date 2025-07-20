@@ -14,7 +14,7 @@ enum class CommandType : size_t {
     Count // Always keep this as the last element
 };
 
-struct CommandData {
+struct Command {
     CommandType type;
     uint32_t value;
 };
