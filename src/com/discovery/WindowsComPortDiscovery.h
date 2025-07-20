@@ -1,7 +1,7 @@
 #ifndef WINDOWSCOMPORTDISCOVERY_H
 #define WINDOWSCOMPORTDISCOVERY_H
 
-#include "AbstractComDiscovery.h"
+#include "AbstractComPortDiscovery.h"
 
 #include <Windows.h>
 

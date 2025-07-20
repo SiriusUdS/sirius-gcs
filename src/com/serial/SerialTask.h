@@ -5,7 +5,7 @@
 #include <thread>
 
 class BoardComStateMonitor;
-class ComDiscoveryWindows;
+class WindowsComPortDiscovery;
 class ComPortSelector;
 class IntervalTimer;
 class PacketRateMonitor;
@@ -28,7 +28,7 @@ extern PacketReceiver packetReceiver;
 extern BoardComStateMonitor motorBoardComStateMonitor;
 extern BoardComStateMonitor fillingStationBoardComStateMonitor;
 extern BoardComStateMonitor gsControlBoardComStateMonitor;
-extern ComDiscoveryWindows comDiscovery;
+extern WindowsComPortDiscovery comPortDiscovery;
 extern ComPortSelector comPortSelector;
 extern SerialCom com;
 } // namespace SerialTask

@@ -1,7 +1,6 @@
 #include "SerialTask.h"
 
 #include "BoardComStateMonitor.h"
-#include "ComDiscoveryWindows.h"
 #include "ComPortSelector.h"
 #include "CommandControl.h"
 #include "IntervalTimer.h"
@@ -11,6 +10,7 @@
 #include "SerialCom.h"
 #include "SerialConfig.h"
 #include "SerialControl.h"
+#include "WindowsComPortDiscovery.h"
 
 namespace SerialTask {
 PacketRateMonitor packetRateMonitor;
@@ -23,8 +23,8 @@ PacketReceiver packetReceiver;
 BoardComStateMonitor motorBoardComStateMonitor;
 BoardComStateMonitor fillingStationBoardComStateMonitor;
 BoardComStateMonitor gsControlBoardComStateMonitor;
-ComDiscoveryWindows comDiscovery;
-ComPortSelector comPortSelector(comDiscovery);
+WindowsComPortDiscovery comPortDiscovery;
+ComPortSelector comPortSelector(comPortDiscovery);
 SerialCom com;
 
 IntervalTimer intervalTimer(std::chrono::milliseconds(1000 / SerialConfig::SERIAL_TASK_LOOPS_PER_SECOND));

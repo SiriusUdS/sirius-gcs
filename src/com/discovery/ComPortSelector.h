@@ -1,21 +1,21 @@
 #ifndef COMPORTSELECTOR_H
 #define COMPORTSELECTOR_H
 
-#include "ComDiscovery.h"
-
 #include <mutex>
 #include <string>
 #include <vector>
 
+class AbstractComPortDiscovery;
+
 class ComPortSelector {
 public:
-    ComPortSelector(ComDiscovery& comDiscovery);
+    ComPortSelector(AbstractComPortDiscovery& comPortDiscovery);
     std::string current() const;
     void next();
     bool available() const;
 
 private:
-    ComDiscovery& comDiscovery;
+    AbstractComPortDiscovery& comPortDiscovery;
     size_t currentComPortIdx{};
     std::vector<std::string> comPorts;
     mutable std::mutex mtx;

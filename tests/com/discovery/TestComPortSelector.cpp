@@ -1,9 +1,9 @@
-#include "ComDiscovery.h"
+#include "AbstractComPortDiscovery.h"
 #include "ComPortSelector.h"
 
 #include <doctest.h>
 
-class MockComDiscovery : public ComDiscovery {
+class MockComDiscovery : public AbstractComPortDiscovery {
 public:
     void getAvailableComPorts(std::vector<std::string>& comPortVec) override {
         comPortVec = comPorts;

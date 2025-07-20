@@ -27,7 +27,7 @@ TEST_CASE("BoardComStateMonitor state should be \"STARTING\"") {
     }
 }
 
-TEST_CASE("SerialStateMonitor state should be \"WORKING\"") {
+TEST_CASE("BoardComStateMonitor state should be \"WORKING\"") {
     BoardComStateMonitor monitor;
 
     SUBCASE("After a packet was tracked") {
@@ -42,7 +42,7 @@ TEST_CASE("SerialStateMonitor state should be \"WORKING\"") {
     }
 }
 
-TEST_CASE("SerialStateMonitor state should be \"NOT_WORKING\"") {
+TEST_CASE("BoardComStateMonitor state should be \"NOT_WORKING\"") {
     BoardComStateMonitor monitor;
 
     SUBCASE("Com just started and no packet was received for too long") {
