@@ -14,6 +14,7 @@
 #include "SerialComWindow.h"
 #include "SerialTask.h"
 #include "SwitchesWindow.h"
+#include "ValvesHeatPadsWindow.h"
 
 #include <imgui.h>
 #include <implot.h>
@@ -118,6 +119,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::MAP, []() { ControlsWindow::render(); });
     HelloImGui::DockableWindow serialComDockWin("Serial COM", ImGuiConfig::Dockspace::MAP, []() { SerialComWindow::render(); });
     HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
+    HelloImGui::DockableWindow valvesHeatPadsDockWin("Valves & Heat Pads", ImGuiConfig::Dockspace::MAP, []() { ValvesHeatPadsWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
     dockableWindows.push_back(loggingDockWin);
@@ -125,6 +127,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     dockableWindows.push_back(controlsDockWin);
     dockableWindows.push_back(serialComDockWin);
     dockableWindows.push_back(switchesDockWin);
+    dockableWindows.push_back(valvesHeatPadsDockWin);
 
     return dockableWindows;
 }

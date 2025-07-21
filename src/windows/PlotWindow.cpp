@@ -34,10 +34,19 @@ PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel,
  */
 void PlotWindow::render() {
     ImGui::Checkbox("Auto-fit", &autofit);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Automatically adjusts the view to fit all data. Disables zooming and panning.");
+    }
     ImGui::SameLine();
     ImGui::Checkbox("Compressed", &showCompressedData);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Reduces the number of displayed data points to improve performance.");
+    }
     ImGui::SameLine();
-    ImGui::Checkbox("Show avg. values", &showAvgValues);
+    ImGui::Checkbox("Avg. values", &showAvgValues);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Shows the recent average of each plot line.");
+    }
     ImGui::SameLine();
     ImGui::RadioButton("Value", &dataType, VALUE);
     ImGui::SameLine();
