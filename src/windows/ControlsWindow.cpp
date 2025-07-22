@@ -20,6 +20,8 @@ struct ValveSlider {
 
 ValveSlider fillValveSlider;
 ValveSlider dumpValveSlider;
+ValveSlider nosValveSlider;
+ValveSlider ipaValveSlider;
 ValveSlider fillHeatPadSlider;
 ValveSlider dumpHeatPadSlider;
 
@@ -30,6 +32,11 @@ void ControlsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
         renderSlider("Fill Valve", fillValveSlider, CommandType::FillValve, GSDataCenter::AllowFillSwitchData.isOn);
         renderSlider("Dump Valve", dumpValveSlider, CommandType::DumpValve, GSDataCenter::AllowDumpSwitchData.isOn);
+    }
+
+    if (ImGui::CollapsingHeader("Heat pads")) {
+        renderSlider("Nos Heat Pad", nosValveSlider, CommandType::NosHeatPad);
+        renderSlider("Ipa Heat Pad", ipaValveSlider, CommandType::IpaHeatPad);
         renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad);
         renderSlider("Dump Heat Pad", dumpHeatPadSlider, CommandType::DumpHeatPad);
     }

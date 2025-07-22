@@ -10,8 +10,7 @@
 bool PacketReceiver::receiveByte(uint8_t byte) {
     if (buf.isFull() && !pf.packetAvailable()) {
         GCS_APP_LOG_WARN("PacketReceiver: Circular buffer full, but no packet available. Clearing buffer.");
-        buf.clear();
-        pf.clear();
+        clear();
     }
 
     if (!buf.writeByte(byte)) {
@@ -36,7 +35,12 @@ bool PacketReceiver::getPacket(uint8_t* recv) {
     }
 
     size_t size = pf.consumeNextPacketSize();
-    buf.read(recv, size);
+    if (!buf.read(recv, size)) {
+        GCS_APP_LOG_ERROR("PacketReceiver: Tried reading data from the circular buffer, but not enough data is available. Clearing all data to avoid "
+                          "desynchronization.");
+        clear();
+        return false;
+    }
 
     return true;
 }
@@ -75,4 +79,12 @@ bool PacketReceiver::dumpNextPacket() {
  */
 size_t PacketReceiver::nextPacketSize() const {
     return pf.peekNextPacketSize();
+}
+
+/**
+ * @brief Clears the packet framer and circular buffer.
+ */
+void PacketReceiver::clear() {
+    buf.clear();
+    pf.clear();
 }

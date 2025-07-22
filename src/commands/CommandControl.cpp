@@ -5,8 +5,6 @@
 #include "Logging.h"
 #include "SerialCom.h"
 #include "SerialTask.h"
-#include "Telecommunication/BoardCommand.h"
-#include "Telecommunication/PacketHeaderVariable.h"
 #include "Timer.h"
 
 namespace CommandControl {
@@ -23,17 +21,17 @@ constexpr size_t MAX_DATA_SIZE = 256;                       ///< Maximum size of
 constexpr size_t NUMBER_OF_TIMES_TO_SEND_SAME_COMMAND = 20; ///< Each command is sent this many times to improve communication with the boards
 constexpr double TIME_BETWEEN_COMMAND_SENDS_SEC = 0.131;    ///< Wait this much between each command send
 
-State state = State::IDLE;                 ///< Current state of the command
-uint8_t data[MAX_DATA_SIZE] = {0};         ///< Current command data
-size_t dataSize;                           ///< Size of the current command data
-Timer lastTimeSentTimer;                   ///< Timer for the last time the command was sent
-size_t timesSent{};                        ///< Number of times the same command has been sent
-CommandQueue commandQueue;                 ///< Queue containing all future commands to be sent
+State state = State::IDLE;             ///< Current state of the command
+uint8_t data[MAX_DATA_SIZE] = {0};     ///< Current command data
+size_t dataSize;                       ///< Size of the current command data
+Timer lastTimeSentTimer;               ///< Timer for the last time the command was sent
+size_t timesSent{};                    ///< Number of times the same command has been sent
+CommandQueue commandQueue;             ///< Queue containing all future commands to be sent
 std::optional<Command> currentCommand; ///< Current command being sent
 
 void getNextCommand();
 void setupValveCommand(ValveCommandType type);
-void setupHeatPadCommand(HeatPadCommandType type);
+void setupHeatPadCommand(HeatPadCommandType heatPadtype, BoardType boardType);
 void setupAbort();
 void setupReset();
 void finalizeCommandSetup(BoardCommand* cmd);
@@ -82,11 +80,17 @@ void CommandControl::getNextCommand() {
     case CommandType::DumpValve:
         setupValveCommand(ValveCommandType::Dump);
         break;
+    case CommandType::NosHeatPad:
+        setupHeatPadCommand(HeatPadCommandType::Nos, BoardType::Engine);
+        break;
+    case CommandType::IpaHeatPad:
+        setupHeatPadCommand(HeatPadCommandType::Ipa, BoardType::Engine);
+        break;
     case CommandType::FillHeatPad:
-        setupHeatPadCommand(HeatPadCommandType::Fill);
+        setupHeatPadCommand(HeatPadCommandType::Fill, BoardType::FillingStation);
         break;
     case CommandType::DumpHeatPad:
-        setupHeatPadCommand(HeatPadCommandType::Dump);
+        setupHeatPadCommand(HeatPadCommandType::Dump, BoardType::FillingStation);
         break;
     case CommandType::Abort:
         setupAbort();
@@ -123,7 +127,7 @@ void CommandControl::setupValveCommand(ValveCommandType type) {
     finalizeCommandSetup(boardCommand);
 }
 
-void CommandControl::setupHeatPadCommand(HeatPadCommandType type) {
+void CommandControl::setupHeatPadCommand(HeatPadCommandType heatPadtype, BoardType boardType) {
     if (!currentCommand.has_value()) {
         GCS_APP_LOG_ERROR("CommandControl: Couldn't setup heat pad command, no command available.");
         return;
@@ -138,8 +142,8 @@ void CommandControl::setupHeatPadCommand(HeatPadCommandType type) {
     }
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
-    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
-    boardCommand->fields.header.bits.commandCode = static_cast<int>(type);
+    boardCommand->fields.header.bits.boardId = static_cast<int>(boardType);
+    boardCommand->fields.header.bits.commandCode = static_cast<int>(heatPadtype);
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_UNICAST_TYPE_CODE;
     boardCommand->fields.value = percentageOpen;
@@ -156,7 +160,7 @@ void CommandControl::setupAbort() {
     Command& command = currentCommand.value();
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
-    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
+    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID; // TODO: Are you sure?
     boardCommand->fields.header.bits.commandCode = BOARD_COMMAND_CODE_ABORT;
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_BROADCAST_TYPE_CODE;
@@ -174,7 +178,7 @@ void CommandControl::setupReset() {
     Command& command = currentCommand.value();
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
-    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
+    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID; // TODO: Are you sure?
     boardCommand->fields.header.bits.commandCode = BOARD_COMMAND_CODE_RESET;
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_BROADCAST_TYPE_CODE;

@@ -14,6 +14,16 @@ void writeTelemetryPacket(PacketReceiver& pr) {
     }
 }
 
+void writeIncompleteTelemetryPacket(PacketReceiver& pr) {
+    EngineTelemetryPacket packet;
+    packet.fields.header.bits.type = TELEMETRY_TYPE_CODE;
+    packet.fields.adcValues[0] = 1234;
+
+    for (size_t i = 0; i < sizeof(EngineTelemetryPacket) / 2; i++) {
+        pr.receiveByte(packet.data[i]);
+    }
+}
+
 void fill(PacketReceiver& pr, size_t size) {
     for (size_t i = 0; i < size; i++) {
         pr.receiveByte(0);

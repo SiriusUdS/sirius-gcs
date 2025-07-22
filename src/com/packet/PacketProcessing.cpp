@@ -103,7 +103,9 @@ bool PacketProcessing::processIncomingPacket() {
         }
     }
 
-    GCS_APP_LOG_WARN("PacketProcessing: Unknown packet type, ignoring packet.");
+    GCS_APP_LOG_ERROR("PacketProcessing: Unknown packet type. THIS IS BAD AND SHOULD BE FIXED ASAP. This means there's desynchronization between the "
+                      "packet framer and the circular buffer. Clearing packet receiver.");
+    SerialTask::packetReceiver.clear();
     return false;
 }
 
@@ -314,7 +316,7 @@ void PacketProcessing::addPlotData(SensorPlotData* plotData, uint16_t* adcValues
 
 bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
     if (packetSize != targetPacketSize) {
-        GCS_APP_LOG_WARN("PacketProcessing: Invalid {} size, ignoring packet.", packetName);
+        GCS_APP_LOG_WARN("PacketProcessing: Invalid {} size ({}), expected size ({}), ignoring packet.", packetName, packetSize, targetPacketSize);
         return false;
     }
     return true;

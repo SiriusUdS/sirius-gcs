@@ -76,11 +76,12 @@ bool PacketFramer::checkForTelemetryPacketStart() {
     static const uint32_t TELEMETRY_HEADER_CODES[] = {TELEMETRY_TYPE_CODE, STATUS_TYPE_CODE};
 
     if (currentPacketSize < sizeof(TelemetryHeader)) {
-        return {};
+        return false;
     }
 
+    getHeaderFromBuf(sizeof(TelemetryHeader));
+
     for (const uint32_t headerCode : TELEMETRY_HEADER_CODES) {
-        getHeaderFromBuf(sizeof(TelemetryHeader));
         TelemetryHeader* header = (TelemetryHeader*) headerBuf;
         if (headerCode == header->bits.type) {
             return true;
@@ -98,14 +99,17 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > MAX_HEADER_SIZE) {
         GCS_APP_LOG_WARN(
           "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the maximum header size accepted of {}.",
-          headerSize, MAX_HEADER_SIZE);
+          headerSize,
+          MAX_HEADER_SIZE);
         return false;
     }
 
     if (headerSize > currentPacketSize) {
-        GCS_APP_LOG_WARN("PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
-                     "read of size {}.",
-                     headerSize, currentPacketSize);
+        GCS_APP_LOG_WARN(
+          "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
+          "read of size {}.",
+          headerSize,
+          currentPacketSize);
         return false;
     }
 
@@ -113,7 +117,8 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > READ_AVAILABLE) {
         GCS_APP_LOG_WARN(
           "PacketFramer: Tried to get header from buffer, but the header of size {} is bigger than the packet being currently read of size {}.",
-          headerSize, READ_AVAILABLE);
+          headerSize,
+          READ_AVAILABLE);
         return false;
     }
 

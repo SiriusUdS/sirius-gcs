@@ -15,6 +15,7 @@ public:
     uint8_t* getBuffer();
     bool dumpNextPacket();
     size_t nextPacketSize() const;
+    void clear();
 
 private:
     PacketCircularBuffer buf;
