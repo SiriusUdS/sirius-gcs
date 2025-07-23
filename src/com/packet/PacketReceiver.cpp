@@ -30,12 +30,13 @@ bool PacketReceiver::receiveByte(uint8_t byte) {
  * @returns True if the packet was successfully written in the reception buffer, else false
  */
 bool PacketReceiver::getPacket(uint8_t* recv) {
-    if (!pf.packetAvailable()) {
+    std::optional<PacketMetadata> optionalMetadata = pf.consumeNextPacketMetadata();
+
+    if (!optionalMetadata.has_value()) {
         return false;
     }
 
-    size_t size = pf.consumeNextPacketSize();
-    if (!buf.read(recv, size)) {
+    if (!buf.read(recv, optionalMetadata.value().size)) {
         GCS_APP_LOG_ERROR("PacketReceiver: Tried reading data from the circular buffer, but not enough data is available. Clearing all data to avoid "
                           "desynchronization.");
         clear();
@@ -58,14 +59,14 @@ uint8_t* PacketReceiver::getBuffer() {
  * @returns True if a packet was successfully dumped, else false
  */
 bool PacketReceiver::dumpNextPacket() {
-    size_t size = pf.consumeNextPacketSize();
+    std::optional<PacketMetadata> optionalMetadata = pf.consumeNextPacketMetadata();
 
-    if (size == 0) {
+    if (!optionalMetadata.has_value() || !optionalMetadata.value().size) {
         GCS_APP_LOG_WARN("PacketReceiver: Tried to dump next packet, but no packet available.");
         return false;
     }
 
-    if (!buf.dump(size)) {
+    if (!buf.dump(optionalMetadata.value().size)) {
         GCS_APP_LOG_WARN("PacketReceiver: Tried to dump next packet, but circular buffer did not have enough read data left.");
         return false;
     }
@@ -74,17 +75,25 @@ bool PacketReceiver::dumpNextPacket() {
 }
 
 /**
- * @brief Returns the next packet's size
- * @returns Next packet's size
- */
-size_t PacketReceiver::nextPacketSize() const {
-    return pf.peekNextPacketSize();
-}
-
-/**
  * @brief Clears the packet framer and circular buffer.
  */
 void PacketReceiver::clear() {
     buf.clear();
     pf.clear();
+}
+
+/**
+ * @brief Checks if a packet is currently available to be fetched
+ * @returns True if a packet is available, else false
+ */
+bool PacketReceiver::packetAvailable() const {
+    return pf.packetAvailable();
+}
+
+/**
+ * @brief Returns the next packet's metadata
+ * @returns Next packet's metadata
+ */
+std::optional<PacketMetadata> PacketReceiver::nextPacketMetadata() const {
+    return pf.peekNextPacketMetadata();
 }
