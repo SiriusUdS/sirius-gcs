@@ -2,6 +2,7 @@
 
 #include "Logging.h"
 #include "PacketCircularBuffer.h"
+#include "SerialConfig.h"
 #include "Telecommunication/TelemetryHeader.h"
 
 /**
@@ -14,12 +15,14 @@ PacketFramer::PacketFramer(const PacketCircularBuffer& buf) : buf{buf}, headerBu
  * @brief Try to frame a packet, starting from the last byte received in the circular buffer
  */
 void PacketFramer::tryFrame() {
-    if (!checkForPacketStart()) {
+    std::optional<PacketMetadata> optionalMetadata = tryGetNextPacketMetadata();
+
+    if (!optionalMetadata.has_value()) {
         return;
     }
 
     if (readingValidPacket) {
-        availablePacketSizesQueue.push(currentPacketSize);
+        availablePacketMetadata.push(optionalMetadata.value());
     } else {
         readingValidPacket = true;
     }
@@ -27,18 +30,18 @@ void PacketFramer::tryFrame() {
 }
 
 /**
- * @brief Retrieve the size of the next packet and remove it from the packet framer
- * @returns The size of the next packet
+ * @brief Retrieve the metadata of the next packet and remove it from the packet framer
+ * @returns The metadata of the next packet
  */
-size_t PacketFramer::consumeNextPacketSize() {
-    if (!availablePacketSizesQueue.size()) {
+std::optional<PacketMetadata> PacketFramer::consumeNextPacketMetadata() {
+    if (!availablePacketMetadata.size()) {
         GCS_APP_LOG_WARN("PacketFramer: Tried to consume next packet size, but no packets available.");
-        return 0;
+        return std::nullopt;
     }
 
-    size_t size = availablePacketSizesQueue.front();
-    availablePacketSizesQueue.pop();
-    return size;
+    PacketMetadata metadata = availablePacketMetadata.front();
+    availablePacketMetadata.pop();
+    return metadata;
 }
 
 /**
@@ -49,46 +52,39 @@ void PacketFramer::byteWritten() {
 }
 
 /**
- * @brief Clears all packets detected from the packet framer
+ * @brief Clears all packet metadata from the packet framer
  */
 void PacketFramer::clear() {
     currentPacketSize = 0;
-    while (!availablePacketSizesQueue.empty()) {
-        availablePacketSizesQueue.pop();
+    while (!availablePacketMetadata.empty()) {
+        availablePacketMetadata.pop();
     }
 }
 
 /**
- * @brief Check if a packet was received in the circular buffer, starting from the last byte written in the buffer
- * @returns True if a packet was detected, else false
+ * @brief Try getting the metadata of the latest packet received if a new one is available
+ * @returns Metadata of the next packet if a packet is available, otherwise nullopt is returned
  */
-bool PacketFramer::checkForPacketStart() {
-    return checkForTelemetryPacketStart();
-
-    // TODO: Check for GS Control packet
-}
-
-/**
- * @brief Check if a telemetry packet was received in the circular buffer, starting from the last byte written in the buffer
- * @returns True if a packet was detected, else false
- */
-bool PacketFramer::checkForTelemetryPacketStart() {
-    static const uint32_t TELEMETRY_HEADER_CODES[] = {TELEMETRY_TYPE_CODE, STATUS_TYPE_CODE};
-
+std::optional<PacketMetadata> PacketFramer::tryGetNextPacketMetadata() {
     if (currentPacketSize < sizeof(TelemetryHeader)) {
-        return false;
+        return std::nullopt;
     }
 
     getHeaderFromBuf(sizeof(TelemetryHeader));
 
-    for (const uint32_t headerCode : TELEMETRY_HEADER_CODES) {
-        TelemetryHeader* header = (TelemetryHeader*) headerBuf;
-        if (headerCode == header->bits.type) {
-            return true;
-        }
+    TelemetryHeader* header = reinterpret_cast<TelemetryHeader*>(headerBuf);
+    bool isPacketValid = true;
+
+    if (header->bits.type != TELEMETRY_TYPE_CODE && header->bits.type != STATUS_TYPE_CODE) {
+        return std::nullopt;
+    } else if (currentPacketSize > SerialConfig::MAX_PACKET_SIZE) {
+        GCS_APP_LOG_WARN("PacketFramer: Packet of size ({}) bigger than max packet size ({}), ignoring packet.",
+                         currentPacketSize,
+                         SerialConfig::MAX_PACKET_SIZE);
+        isPacketValid = false;
     }
 
-    return false;
+    return PacketMetadata{.size = currentPacketSize, .isValid = isPacketValid, .packetTypeCode = header->bits.type, .boardId = header->bits.boardId};
 }
 
 /**
@@ -98,7 +94,7 @@ bool PacketFramer::checkForTelemetryPacketStart() {
 bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > MAX_HEADER_SIZE) {
         GCS_APP_LOG_WARN(
-          "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the maximum header size accepted of {}.",
+          "PacketFramer: Tried to get header from circular buffer, but the header size ({}) is bigger than the maximum accepted header size ({}).",
           headerSize,
           MAX_HEADER_SIZE);
         return false;
@@ -106,19 +102,19 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
 
     if (headerSize > currentPacketSize) {
         GCS_APP_LOG_WARN(
-          "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
-          "read of size {}.",
+          "PacketFramer: Tried to get header from circular buffer, but the header size ({}) is bigger than the size of the packet being currently "
+          "read ({}).",
           headerSize,
           currentPacketSize);
         return false;
     }
 
-    const size_t READ_AVAILABLE = buf.readAvailable();
-    if (headerSize > READ_AVAILABLE) {
-        GCS_APP_LOG_WARN(
-          "PacketFramer: Tried to get header from buffer, but the header of size {} is bigger than the packet being currently read of size {}.",
-          headerSize,
-          READ_AVAILABLE);
+    const size_t readAvailable = buf.readAvailable();
+    if (headerSize > readAvailable) {
+        GCS_APP_LOG_WARN("PacketFramer: Tried to get header from buffer, but the header size ({}) is bigger than the amount of read data available "
+                         "in the circular buffer ({}).",
+                         headerSize,
+                         readAvailable);
         return false;
     }
 
@@ -139,16 +135,16 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
  * @returns True if a packet is available, else false
  */
 bool PacketFramer::packetAvailable() const {
-    return availablePacketSizesQueue.size();
+    return availablePacketMetadata.size();
 }
 
 /**
- * @brief Get the size of the next packet without removing it from the packet framer
- * @returns Size of the next packet
+ * @brief Get the metadata of the next packet without removing it from the packet framer
+ * @returns Metadata of the next packet
  */
-size_t PacketFramer::peekNextPacketSize() const {
-    if (!availablePacketSizesQueue.size()) {
-        return 0;
+std::optional<PacketMetadata> PacketFramer::peekNextPacketMetadata() const {
+    if (!availablePacketMetadata.size()) {
+        return std::nullopt;
     }
-    return availablePacketSizesQueue.front();
+    return availablePacketMetadata.front();
 }

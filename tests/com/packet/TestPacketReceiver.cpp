@@ -24,6 +24,14 @@ void writeIncompleteTelemetryPacket(PacketReceiver& pr) {
     }
 }
 
+uint32_t nextPacketSize(PacketReceiver& pr) {
+    std::optional optionalMetadata = pr.nextPacketMetadata();
+    if (!optionalMetadata.has_value()) {
+        return 0;
+    }
+    return optionalMetadata.value().size;
+}
+
 void fill(PacketReceiver& pr, size_t size) {
     for (size_t i = 0; i < size; i++) {
         pr.receiveByte(0);
@@ -33,11 +41,11 @@ void fill(PacketReceiver& pr, size_t size) {
 TEST_CASE("PacketReceiver should receive packet") {
     PacketReceiver pr;
 
-    CHECK(pr.nextPacketSize() == 0);
+    CHECK(nextPacketSize(pr) == 0);
     writeTelemetryPacket(pr);
-    CHECK(pr.nextPacketSize() == 0);
+    CHECK(nextPacketSize(pr) == 0);
     writeTelemetryPacket(pr);
-    CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
+    CHECK(nextPacketSize(pr) == sizeof(EngineTelemetryPacket));
 }
 
 TEST_CASE("PacketReceiver should be able to get packet") {
@@ -58,15 +66,15 @@ TEST_CASE("PacketReceiver should dump next packet") {
     fill(pr, 4);
     writeTelemetryPacket(pr);
     fill(pr, 8);
-    CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
+    CHECK(nextPacketSize(pr) == sizeof(EngineTelemetryPacket));
     CHECK(pr.dumpNextPacket());
-    CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket) + 4);
+    CHECK(nextPacketSize(pr) == sizeof(EngineTelemetryPacket) + 4);
     writeTelemetryPacket(pr);
     fill(pr, 1000);
     CHECK(pr.dumpNextPacket());
-    CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket) + 8);
+    CHECK(nextPacketSize(pr) == sizeof(EngineTelemetryPacket) + 8);
     CHECK(pr.dumpNextPacket());
-    CHECK(pr.nextPacketSize() == 0);
+    CHECK(nextPacketSize(pr) == 0);
     CHECK_FALSE(pr.dumpNextPacket());
 }
 
@@ -77,7 +85,7 @@ TEST_CASE("PacketReceiver internal buffer reset") {
         fill(pr, SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE);
         writeTelemetryPacket(pr);
         writeTelemetryPacket(pr);
-        CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
+        CHECK(nextPacketSize(pr) == sizeof(EngineTelemetryPacket));
     }
 
     SUBCASE("PacketReceiver should not reset when the interval buffer is full and packet are available") {
@@ -89,8 +97,8 @@ TEST_CASE("PacketReceiver internal buffer reset") {
         writeTelemetryPacket(pr);
         writeTelemetryPacket(pr);
         writeTelemetryPacket(pr);
-        CHECK(pr.nextPacketSize() == sizeof(EngineTelemetryPacket));
+        CHECK(nextPacketSize(pr) == sizeof(EngineTelemetryPacket));
         pr.getPacket(recv);
-        CHECK(pr.nextPacketSize() == 0);
+        CHECK(nextPacketSize(pr) == 0);
     }
 }

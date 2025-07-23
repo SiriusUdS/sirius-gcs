@@ -10,6 +10,7 @@
 #include "PressureTransducer.h"
 #include "SensorPlotData.h"
 #include "SerialCom.h"
+#include "SerialConfig.h"
 #include "SerialTask.h"
 #include "SwitchData.h"
 #include "Telecommunication/PacketHeaderVariable.h"
@@ -18,54 +19,60 @@
 #include "ValveData.h"
 
 namespace PacketProcessing {
-constexpr size_t MAX_PACKET_SIZE = 64;
 constexpr size_t THERMISTOR_ADC_VALUES_INDEX_OFFSET = 0;
 constexpr size_t PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET = 8;
 constexpr size_t PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET = 10;
 constexpr size_t LOAD_CELL_ADC_VALUES_INDEX_OFFSET = 14;
 
 bool processIncomingPacket();
-bool processEngineTelemetryPacket();
-bool processFillingStationTelemetryPacket();
-bool processGSControlPacket();
-bool processEngineStatusPacket();
-bool processFillingStationStatusPacket();
+bool processEngineTelemetryPacket(PacketMetadata& metadata);
+bool processFillingStationTelemetryPacket(PacketMetadata& metadata);
+bool processGSControlPacket(PacketMetadata& metadata);
+bool processEngineStatusPacket(PacketMetadata& metadata);
+bool processFillingStationStatusPacket(PacketMetadata& metadata);
 void computeThermistorValues(uint16_t thermistorAdcValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]);
 void computePressureSensorValues(uint16_t pressureSensorIndices[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD],
                                  uint16_t pressureSensorAdcValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD]);
 void computeLoadCellValues(uint16_t loadCellAdcValues[GSDataCenter::LOAD_CELL_AMOUNT]);
 void addPlotData(SensorPlotData* plotData, uint16_t* adcValues, float* computedValues, size_t amount, float timestamp);
-bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
+bool validateIncomingPacketSize(size_t currentPacketSize, size_t targetPacketSize, const char* packetName);
 
-size_t packetSize{};
-uint8_t packetBuf[MAX_PACKET_SIZE];
+template <typename PacketType>
+bool isPacketIntegrityValid(uint8_t* packetBuffer, PacketType packet, size_t sizeInBytes) {
+    uint32_t computedCrc = CRC::computeCrc(packetBuffer, sizeInBytes - sizeof(packet->fields.crc));
+    if (computedCrc != packet->fields.crc) {
+        GCS_APP_LOG_WARN("PacketProcessing: CRC mismatch in {}, computed: {}, received: {}. Ignoring packet.",
+                         typeid(*packet).name(),
+                         computedCrc,
+                         packet->fields.crc);
+        return false;
+    }
+    return true;
+}
+
+uint8_t packetBuf[SerialConfig::MAX_PACKET_SIZE];
 float thermistorValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]{};
 float pressureSensorValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD]{};
 float loadCellValues[GSDataCenter::LOAD_CELL_AMOUNT]{};
 } // namespace PacketProcessing
 
 void PacketProcessing::processIncomingPackets() {
-    while (SerialTask::packetReceiver.nextPacketSize() > 0) {
+    while (SerialTask::packetReceiver.packetAvailable()) {
         processIncomingPacket();
     }
 }
 
 bool PacketProcessing::processIncomingPacket() {
-    packetSize = SerialTask::packetReceiver.nextPacketSize();
+    std::optional<PacketMetadata> optionalPacketMetadata = SerialTask::packetReceiver.nextPacketMetadata();
 
-    if (packetSize == 0) {
-        // No available packets
+    if (!optionalPacketMetadata.has_value()) {
         return false;
-    } else if (packetSize < sizeof(TelemetryHeader)) {
-        GCS_APP_LOG_WARN("PacketProcessing: Received packet size ({}) too small to fit header ({}), ignoring packet.",
-                         packetSize,
-                         sizeof(TelemetryHeader));
-        SerialTask::packetReceiver.dumpNextPacket();
-        return false;
-    } else if (packetSize > MAX_PACKET_SIZE) {
-        GCS_APP_LOG_WARN("PacketProcessing: Received packet size ({}) too big to fit in packet buffer ({}), ignoring packet.",
-                         packetSize,
-                         MAX_PACKET_SIZE);
+    }
+
+    PacketMetadata packetMetadata = optionalPacketMetadata.value();
+
+    if (!packetMetadata.isValid) {
+        GCS_APP_LOG_DEBUG("PacketProcessing: Ignoring invalid packet.");
         SerialTask::packetReceiver.dumpNextPacket();
         return false;
     }
@@ -75,15 +82,13 @@ bool PacketProcessing::processIncomingPacket() {
         return false;
     }
 
-    TelemetryHeader* header = reinterpret_cast<TelemetryHeader*>(packetBuf);
-
-    switch (header->bits.type) {
+    switch (packetMetadata.packetTypeCode) {
     case TELEMETRY_TYPE_CODE:
-        if (header->bits.boardId == ENGINE_BOARD_ID) {
-            return processEngineTelemetryPacket();
-        } else if (header->bits.boardId == FILLING_STATION_BOARD_ID) {
-            return processFillingStationTelemetryPacket();
-        } else if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
+        if (packetMetadata.boardId == ENGINE_BOARD_ID) {
+            return processEngineTelemetryPacket(packetMetadata);
+        } else if (packetMetadata.boardId == FILLING_STATION_BOARD_ID) {
+            return processFillingStationTelemetryPacket(packetMetadata);
+        } else if (packetMetadata.boardId == GS_CONTROL_BOARD_ID) {
             GCS_APP_LOG_WARN("PacketProcessing: Tried processing GS control telemetry packet, but that doesn't exist.");
             return false;
         } else {
@@ -91,26 +96,24 @@ bool PacketProcessing::processIncomingPacket() {
             return false;
         }
     case STATUS_TYPE_CODE:
-        if (header->bits.boardId == ENGINE_BOARD_ID) {
-            return processEngineStatusPacket();
-        } else if (header->bits.boardId == FILLING_STATION_BOARD_ID) {
-            return processFillingStationStatusPacket();
-        } else if (header->bits.boardId == GS_CONTROL_BOARD_ID) {
-            return processGSControlPacket();
+        if (packetMetadata.boardId == ENGINE_BOARD_ID) {
+            return processEngineStatusPacket(packetMetadata);
+        } else if (packetMetadata.boardId == FILLING_STATION_BOARD_ID) {
+            return processFillingStationStatusPacket(packetMetadata);
+        } else if (packetMetadata.boardId == GS_CONTROL_BOARD_ID) {
+            return processGSControlPacket(packetMetadata);
         } else {
             GCS_APP_LOG_WARN("PacketProcessing: Status packet contains invalid boardId, ignoring packet.");
             return false;
         }
     }
 
-    GCS_APP_LOG_ERROR("PacketProcessing: Unknown packet type. THIS IS BAD AND SHOULD BE FIXED ASAP. This means there's desynchronization between the "
-                      "packet framer and the circular buffer. Clearing packet receiver.");
-    SerialTask::packetReceiver.clear();
+    GCS_APP_LOG_ERROR("PacketProcessing: Unknown packet type. Ignoring packet.");
     return false;
 }
 
-bool PacketProcessing::processEngineTelemetryPacket() {
-    if (!validateIncomingPacketSize(sizeof(EngineTelemetryPacket), "EngineTelemetryPacket")) {
+bool PacketProcessing::processEngineTelemetryPacket(PacketMetadata& metadata) {
+    if (!validateIncomingPacketSize(metadata.size, sizeof(EngineTelemetryPacket), "EngineTelemetryPacket")) {
         return false;
     }
 
@@ -145,8 +148,8 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     return true;
 }
 
-bool PacketProcessing::processFillingStationTelemetryPacket() {
-    if (!validateIncomingPacketSize(sizeof(FillingStationTelemetryPacket), "FillingStationTelemetryPacket")) {
+bool PacketProcessing::processFillingStationTelemetryPacket(PacketMetadata& metadata) {
+    if (!validateIncomingPacketSize(metadata.size, sizeof(FillingStationTelemetryPacket), "FillingStationTelemetryPacket")) {
         return false;
     }
 
@@ -193,8 +196,8 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     return true;
 }
 
-bool PacketProcessing::processGSControlPacket() {
-    if (!validateIncomingPacketSize(sizeof(GSControlStatusPacket), "GSControlStatusPacket")) {
+bool PacketProcessing::processGSControlPacket(PacketMetadata& metadata) {
+    if (!validateIncomingPacketSize(metadata.size, sizeof(GSControlStatusPacket), "GSControlStatusPacket")) {
         return false;
     }
 
@@ -223,8 +226,8 @@ bool PacketProcessing::processGSControlPacket() {
     return true;
 }
 
-bool PacketProcessing::processEngineStatusPacket() {
-    if (!validateIncomingPacketSize(sizeof(EngineStatusPacket), "EngineStatusPacket")) {
+bool PacketProcessing::processEngineStatusPacket(PacketMetadata& metadata) {
+    if (!validateIncomingPacketSize(metadata.size, sizeof(EngineStatusPacket), "EngineStatusPacket")) {
         return false;
     }
 
@@ -256,8 +259,8 @@ bool PacketProcessing::processEngineStatusPacket() {
     return true;
 }
 
-bool PacketProcessing::processFillingStationStatusPacket() {
-    if (!validateIncomingPacketSize(sizeof(FillingStationStatusPacket), "FillingStationStatusPacket")) {
+bool PacketProcessing::processFillingStationStatusPacket(PacketMetadata& metadata) {
+    if (!validateIncomingPacketSize(metadata.size, sizeof(FillingStationStatusPacket), "FillingStationStatusPacket")) {
         return false;
     }
 
@@ -314,9 +317,12 @@ void PacketProcessing::addPlotData(SensorPlotData* plotData, uint16_t* adcValues
     }
 }
 
-bool PacketProcessing::validateIncomingPacketSize(size_t targetPacketSize, const char* packetName) {
-    if (packetSize != targetPacketSize) {
-        GCS_APP_LOG_WARN("PacketProcessing: Invalid {} size ({}), expected size ({}), ignoring packet.", packetName, packetSize, targetPacketSize);
+bool PacketProcessing::validateIncomingPacketSize(size_t currentPacketSize, size_t targetPacketSize, const char* packetName) {
+    if (currentPacketSize != targetPacketSize) {
+        GCS_APP_LOG_WARN("PacketProcessing: Invalid {} size ({}), expected size ({}), ignoring packet.",
+                         packetName,
+                         currentPacketSize,
+                         targetPacketSize);
         return false;
     }
     return true;
