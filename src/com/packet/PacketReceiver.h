@@ -20,6 +20,7 @@ public:
 private:
     PacketCircularBuffer buf;
     PacketFramer pf{buf};
+    std::queue<size_t> availablePacketSizesQueue{};
 };
 
 #endif // PACKETRECEIVER_H
