@@ -14,9 +14,8 @@ public:
     bool getPacket(uint8_t* recv);
     uint8_t* getBuffer();
     bool dumpNextPacket();
+    size_t nextPacketSize() const;
     void clear();
-    bool packetAvailable() const;
-    std::optional<PacketMetadata> nextPacketMetadata() const;
 
 private:
     PacketCircularBuffer buf;
