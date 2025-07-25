@@ -2,6 +2,7 @@
 #define PACKETFRAMER_H
 
 #include "PacketCircularBuffer.h"
+#include "PacketMetadata.h"
 
 #include <queue>
 
@@ -12,24 +13,22 @@
 class PacketFramer {
 public:
     PacketFramer(const PacketCircularBuffer& buf);
-    void tryFrame();
-    size_t consumeNextPacketSize();
+    bool tryFrame();
     void byteWritten();
+    void newPacket();
     void clear();
-    bool packetAvailable() const;
-    size_t peekNextPacketSize() const;
+    std::optional<PacketMetadata> getLastPacketMetadata() const;
 
 private:
     bool checkForPacketStart();
-    bool checkForTelemetryPacketStart();
     bool getHeaderFromBuf(size_t headerSize);
 
     static constexpr size_t MAX_HEADER_SIZE = 4;
 
     const PacketCircularBuffer& buf;
     uint8_t headerBuf[MAX_HEADER_SIZE];
-    size_t currentPacketSize{};
-    std::queue<size_t> availablePacketSizesQueue{};
+    std::optional<PacketMetadata> lastPacketMetadata;
+    PacketMetadata currentPacketMetadata;
     bool readingValidPacket{};
 };
 
