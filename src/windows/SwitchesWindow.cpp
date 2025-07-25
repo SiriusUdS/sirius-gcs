@@ -8,12 +8,23 @@
 #include <imgui.h>
 #include <string>
 
+namespace SwitchesWindow {
+void renderSwitch(SwitchData& data, const char* name);
+}
+
 void SwitchesWindow::render() {
-    for (const SwitchData* switchData : GSDataCenter::SwitchDataVec) {
-        const char* switchName = switchData->name;
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", switchName);
-        ImGui::SameLine(260);
-        OnOff(switchData->isOn, switchName);
-    }
+    renderSwitch(GSDataCenter::AllowDumpSwitchData, "Allow Dump");
+    renderSwitch(GSDataCenter::AllowFillSwitchData, "Allow Fill");
+    renderSwitch(GSDataCenter::ArmIgniterSwitchData, "Arm Igniter");
+    renderSwitch(GSDataCenter::ArmServoSwitchData, "Arm Servo");
+    renderSwitch(GSDataCenter::EmergencyStopButtonData, "Emergency Stop");
+    renderSwitch(GSDataCenter::FireIgniterButtonData, "Fire Igniter");
+    renderSwitch(GSDataCenter::ValveStartButtonData, "Valve Start");
+}
+
+void SwitchesWindow::renderSwitch(SwitchData& data, const char* name) {
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("%s", name);
+    ImGui::SameLine(260);
+    OnOff(data.isOn, name);
 }

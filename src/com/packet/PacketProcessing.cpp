@@ -107,9 +107,7 @@ bool PacketProcessing::processIncomingPacket() {
         }
     }
 
-    GCS_APP_LOG_ERROR("PacketProcessing: Unknown packet type. THIS IS BAD AND SHOULD BE FIXED ASAP. This means there's desynchronization between the "
-                      "packet framer and the circular buffer. Clearing packet receiver.");
-    SerialTask::packetReceiver.clear();
+    GCS_APP_LOG_ERROR("PacketProcessing: Unknown packet type, ignoring packet.");
     return false;
 }
 

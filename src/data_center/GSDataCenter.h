@@ -28,7 +28,6 @@ extern SwitchData EmergencyStopButtonData;
 extern SwitchData FireIgniterButtonData;
 extern SwitchData UnsafeKeySwitchData;
 extern SwitchData ValveStartButtonData;
-extern std::vector<SwitchData*> SwitchDataVec;
 
 extern ValveData nosValveData;
 extern ValveData ipaValveData;
