@@ -10,6 +10,7 @@
 #include "PressureTransducer.h"
 #include "SensorPlotData.h"
 #include "SerialCom.h"
+#include "SerialConfig.h"
 #include "SerialTask.h"
 #include "SwitchData.h"
 #include "Telecommunication/PacketHeaderVariable.h"
@@ -18,7 +19,6 @@
 #include "ValveData.h"
 
 namespace PacketProcessing {
-constexpr size_t MAX_PACKET_SIZE = 64;
 constexpr size_t THERMISTOR_ADC_VALUES_INDEX_OFFSET = 0;
 constexpr size_t PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET = 8;
 constexpr size_t PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET = 10;
@@ -38,7 +38,7 @@ void addPlotData(SensorPlotData* plotData, uint16_t* adcValues, float* computedV
 bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName);
 
 size_t packetSize{};
-uint8_t packetBuf[MAX_PACKET_SIZE];
+uint8_t packetBuf[SerialConfig::MAX_PACKET_SIZE];
 float thermistorValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]{};
 float pressureSensorValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD]{};
 float loadCellValues[GSDataCenter::LOAD_CELL_AMOUNT]{};
@@ -66,10 +66,10 @@ bool PacketProcessing::processIncomingPacket() {
                          sizeof(TelemetryHeader));
         SerialTask::packetReceiver.dumpNextPacket();
         return false;
-    } else if (packetSize > MAX_PACKET_SIZE) {
+    } else if (packetSize > SerialConfig::MAX_PACKET_SIZE) {
         GCS_APP_LOG_WARN("PacketProcessing: Received packet size ({}) too big to fit in packet buffer ({}), ignoring packet.",
                          packetSize,
-                         MAX_PACKET_SIZE);
+                         SerialConfig::MAX_PACKET_SIZE);
         SerialTask::packetReceiver.dumpNextPacket();
         return false;
     }
