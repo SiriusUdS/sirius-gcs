@@ -45,18 +45,22 @@ float loadCellValues[GSDataCenter::LOAD_CELL_AMOUNT]{};
 } // namespace PacketProcessing
 
 void PacketProcessing::processIncomingPackets() {
-    while (SerialTask::packetReceiver.nextPacketSize() > 0) {
+    while (SerialTask::packetReceiver.packetAvailable()) {
         processIncomingPacket();
     }
 }
 
 bool PacketProcessing::processIncomingPacket() {
-    packetSize = SerialTask::packetReceiver.nextPacketSize();
+    std::optional<PacketMetadata> packetMetadataOpt = SerialTask::packetReceiver.nextPacketMetadata();
 
-    if (packetSize == 0) {
+    if (!packetMetadataOpt.has_value()) {
         // No available packets
         return false;
-    } else if (packetSize < sizeof(TelemetryHeader)) {
+    }
+
+    packetSize = packetMetadataOpt->size;
+
+    if (packetSize < sizeof(TelemetryHeader)) {
         GCS_APP_LOG_WARN("PacketProcessing: Received packet size ({}) too small to fit header ({}), ignoring packet.",
                          packetSize,
                          sizeof(TelemetryHeader));

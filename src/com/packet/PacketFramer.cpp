@@ -5,52 +5,65 @@
 #include "Telecommunication/TelemetryHeader.h"
 
 /**
- * @brief Constructs a packet framer by specifing the circular buffer to read the bytes from
+ * @brief Constructs a packet framer by specifing the circular buffer to read the bytes from.
  */
 PacketFramer::PacketFramer(const PacketCircularBuffer& buf) : buf{buf}, headerBuf{{0}} {
 }
 
 /**
- * @brief Try to frame a packet, starting from the last byte received in the circular buffer
+ * @brief Try to frame a packet, starting from the last byte received in the circular buffer.
+ * @returns Packet metadata if a packet was successfully framed, else std::nullopt.
  */
-std::optional<size_t> PacketFramer::tryFrame() {
+bool PacketFramer::tryFrame() {
     if (!checkForPacketStart()) {
-        return;
+        return false;
     }
 
     if (readingValidPacket) {
-        size_t tempPacketSize = currentPacketSize;
-        currentPacketSize = 0;
-        return tempPacketSize;
-
+        currentPacketMetadata.status = PacketMetadata::Status::VALID;
     } else {
         readingValidPacket = true;
-        currentPacketSize = 0;
-        return std::nullopt;
+        currentPacketMetadata.status = PacketMetadata::Status::DUMP_IMMEDIATLY;
     }
+
+    lastPacketMetadata = currentPacketMetadata;
+    lastPacketMetadata->size -= sizeof(TelemetryHeader);
+
+    return true;
 }
 
 /**
- * @brief Notify the packet framer that a byte was written in the circular buffer to keep track of the current packet's size
+ * @brief Notify the packet framer that a byte was written in the circular buffer to keep track of the current packet's size.
  */
 void PacketFramer::byteWritten() {
-    currentPacketSize++;
+    currentPacketMetadata.size++;
+}
+
+void PacketFramer::newPacket() {
+    currentPacketMetadata.status = PacketMetadata::Status::NONE;
+    currentPacketMetadata.size = sizeof(TelemetryHeader);
 }
 
 /**
- * @brief Clears all packets detected from the packet framer
+ * @brief Clears all packet framer state.
  */
 void PacketFramer::clear() {
-    currentPacketSize = 0;
+    currentPacketMetadata.status = PacketMetadata::Status::NONE;
+    currentPacketMetadata.size = 0;
+    lastPacketMetadata = std::nullopt;
     readingValidPacket = false;
 }
 
+std::optional<PacketMetadata> PacketFramer::getLastPacketMetadata() const {
+    return lastPacketMetadata;
+}
+
 /**
- * @brief Check if a packet was received in the circular buffer, starting from the last byte written in the buffer
- * @returns True if a packet was detected, else false
+ * @brief Check if a packet was received in the circular buffer, starting from the last byte written in the buffer.
+ * @returns True if a packet was detected, else false.
  */
 bool PacketFramer::checkForPacketStart() {
-    if (currentPacketSize < sizeof(TelemetryHeader) || !getHeaderFromBuf(sizeof(TelemetryHeader))) {
+    if (currentPacketMetadata.size < sizeof(TelemetryHeader) || !getHeaderFromBuf(sizeof(TelemetryHeader))) {
         return false;
     }
 
@@ -59,8 +72,8 @@ bool PacketFramer::checkForPacketStart() {
 }
 
 /**
- * @brief Copies the header of packet written in the circular buffer to an internal buffer in the packet framer for further processing
- * @returns True if the header was successfully copied in the internal buffer, else false
+ * @brief Copies the header of packet written in the circular buffer to an internal buffer for further processing.
+ * @returns True if the header was successfully copied into the internal buffer, else false.
  */
 bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
     if (headerSize > MAX_HEADER_SIZE) {
@@ -71,12 +84,12 @@ bool PacketFramer::getHeaderFromBuf(size_t headerSize) {
         return false;
     }
 
-    if (headerSize > currentPacketSize) {
+    if (headerSize > currentPacketMetadata.size) {
         GCS_APP_LOG_ERROR(
           "PacketFramer: Tried to get header from circular buffer, but the header of size {} is bigger than the packet being currently "
           "read of size {}.",
           headerSize,
-          currentPacketSize);
+          currentPacketMetadata.size);
         return false;
     }
 

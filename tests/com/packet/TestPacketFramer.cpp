@@ -1,19 +1,35 @@
 #include "PacketCircularBuffer.h"
 #include "PacketFramer.h"
+#include "Telecommunication/PacketHeaderVariable.h"
 #include "Telecommunication/TelemetryHeader.h"
 #include "Telecommunication/TelemetryPacket.h"
 
 #include <doctest.h>
 
-void writeTelemetryPacket(PacketCircularBuffer& buf, PacketFramer& pf) {
-    EngineTelemetryPacket packet;
-    packet.fields.header.bits.type = TELEMETRY_TYPE_CODE;
+constexpr size_t ENGINE_TELEMETRY_PACKET_BODY_SIZE = sizeof(EngineTelemetryPacket) - sizeof(TelemetryHeader);
 
-    for (size_t i = 0; i < sizeof(EngineTelemetryPacket); i++) {
+void writeTelemetryPacketHeader(PacketCircularBuffer& buf, PacketFramer& pf) {
+    TelemetryHeader header;
+    header.bits.type = TELEMETRY_TYPE_CODE;
+    header.bits.boardId = ENGINE_BOARD_ID;
+    for (uint16_t i = 0; i < sizeof(TelemetryHeader); i++) {
+        uint8_t byte = ((uint8_t*) &header)[i];
+        buf.writeByte(byte);
+        pf.byteWritten();
+    }
+}
+
+void writeTelemetryPacketBody(PacketCircularBuffer& buf, PacketFramer& pf) {
+    EngineTelemetryPacket packet;
+    for (uint16_t i = 0; i < ENGINE_ADC_CHANNEL_AMOUNT; i++) {
+        packet.fields.adcValues[i] = 0x1234 + i;
+    }
+    packet.fields.crc = 0x12345678;
+
+    for (size_t i = sizeof(TelemetryHeader); i < sizeof(EngineTelemetryPacket); i++) {
         uint8_t byte = packet.data[i];
         buf.writeByte(byte);
         pf.byteWritten();
-        pf.tryFrame();
     }
 }
 
@@ -21,7 +37,6 @@ void fillCircularBuffer(PacketCircularBuffer& buf, PacketFramer& pf, size_t size
     for (size_t i = 0; i < size; i++) {
         buf.writeByte(0);
         pf.byteWritten();
-        pf.tryFrame();
     }
 }
 
@@ -29,45 +44,67 @@ TEST_CASE("PacketFramer should detect packets") {
     PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
-    CHECK_FALSE(pf.packetAvailable());
-    writeTelemetryPacket(buf, pf);
-    CHECK_FALSE(pf.packetAvailable());
-    writeTelemetryPacket(buf, pf);
-    CHECK(pf.packetAvailable());
-}
+    CHECK_FALSE(pf.tryFrame());
+    CHECK_FALSE(pf.getLastPacketMetadata());
 
-TEST_CASE("PacketFramer should consume next packet size") {
-    PacketCircularBuffer buf;
-    PacketFramer pf(buf);
+    writeTelemetryPacketBody(buf, pf);
+    CHECK_FALSE(pf.tryFrame());
+    CHECK_FALSE(pf.getLastPacketMetadata());
 
-    CHECK(pf.consumeNextPacketSize() == 0);
-    writeTelemetryPacket(buf, pf);
-    CHECK(pf.consumeNextPacketSize() == 0);
-    writeTelemetryPacket(buf, pf);
-    fillCircularBuffer(buf, pf, 4);
-    CHECK(pf.consumeNextPacketSize() == sizeof(EngineTelemetryPacket));
-    writeTelemetryPacket(buf, pf);
-    fillCircularBuffer(buf, pf, 8);
-    writeTelemetryPacket(buf, pf);
-    fillCircularBuffer(buf, pf, 100);
-    writeTelemetryPacket(buf, pf);
-    CHECK(pf.consumeNextPacketSize() == sizeof(EngineTelemetryPacket) + 4);
-    CHECK(pf.consumeNextPacketSize() == sizeof(EngineTelemetryPacket) + 8);
-    CHECK(pf.consumeNextPacketSize() == sizeof(EngineTelemetryPacket) + 100);
+    writeTelemetryPacketHeader(buf, pf);
+    CHECK(pf.tryFrame());
+    CHECK(pf.getLastPacketMetadata());
+    CHECK(pf.getLastPacketMetadata()->status == PacketMetadata::Status::DUMP_IMMEDIATLY);
+    CHECK(pf.getLastPacketMetadata()->size == ENGINE_TELEMETRY_PACKET_BODY_SIZE);
+
+    pf.newPacket();
+
+    writeTelemetryPacketBody(buf, pf);
+    CHECK_FALSE(pf.tryFrame());
+    CHECK(pf.getLastPacketMetadata());
+    CHECK(pf.getLastPacketMetadata()->status == PacketMetadata::Status::DUMP_IMMEDIATLY);
+    CHECK(pf.getLastPacketMetadata()->size == ENGINE_TELEMETRY_PACKET_BODY_SIZE);
+
+    writeTelemetryPacketBody(buf, pf);
+    writeTelemetryPacketHeader(buf, pf);
+    CHECK(pf.tryFrame());
+    CHECK(pf.getLastPacketMetadata());
+    CHECK(pf.getLastPacketMetadata()->status == PacketMetadata::Status::VALID);
+    CHECK(pf.getLastPacketMetadata()->size == sizeof(EngineTelemetryPacket) + ENGINE_TELEMETRY_PACKET_BODY_SIZE);
 }
 
 TEST_CASE("PacketFramer should clear correctly") {
     PacketCircularBuffer buf;
     PacketFramer pf(buf);
 
-    CHECK_FALSE(pf.packetAvailable());
-    CHECK(pf.consumeNextPacketSize() == 0);
-    for (int i = 0; i < 5; i++) {
-        writeTelemetryPacket(buf, pf);
-    }
-    CHECK(pf.packetAvailable());
-    CHECK(pf.consumeNextPacketSize() > 0);
+    CHECK_FALSE(pf.getLastPacketMetadata());
+
+    writeTelemetryPacketHeader(buf, pf);
+    CHECK(pf.tryFrame());
+    CHECK(pf.getLastPacketMetadata());
+    CHECK(pf.getLastPacketMetadata()->status == PacketMetadata::Status::DUMP_IMMEDIATLY);
+    CHECK(pf.getLastPacketMetadata()->size == 0);
+
     pf.clear();
-    CHECK_FALSE(pf.packetAvailable());
-    CHECK(pf.consumeNextPacketSize() == 0);
+    CHECK_FALSE(pf.getLastPacketMetadata());
+    CHECK_FALSE(pf.tryFrame());
+    CHECK_FALSE(pf.getLastPacketMetadata());
+
+    writeTelemetryPacketHeader(buf, pf);
+    CHECK(pf.tryFrame());
+    CHECK(pf.getLastPacketMetadata());
+    CHECK(pf.getLastPacketMetadata()->status == PacketMetadata::Status::DUMP_IMMEDIATLY);
+    CHECK(pf.getLastPacketMetadata()->size == 0);
+
+    writeTelemetryPacketBody(buf, pf);
+    writeTelemetryPacketHeader(buf, pf);
+    CHECK(pf.tryFrame());
+    CHECK(pf.getLastPacketMetadata());
+    CHECK(pf.getLastPacketMetadata()->status == PacketMetadata::Status::VALID);
+    CHECK(pf.getLastPacketMetadata()->size == sizeof(EngineTelemetryPacket));
+
+    pf.clear();
+    CHECK_FALSE(pf.getLastPacketMetadata());
+    CHECK_FALSE(pf.tryFrame());
+    CHECK_FALSE(pf.getLastPacketMetadata());
 }

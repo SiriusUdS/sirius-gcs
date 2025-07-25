@@ -8,7 +8,7 @@
  * @returns True if packet successfully received, else false.
  */
 bool PacketReceiver::receiveByte(uint8_t byte) {
-    if (buf.isFull() && availablePacketSizesQueue.empty()) {
+    if (buf.isFull() && packetMetadataQueue.empty()) {
         GCS_APP_LOG_WARN("PacketReceiver: Circular buffer full, but no packet available. Clearing buffer.");
         clear();
     }
@@ -20,9 +20,19 @@ bool PacketReceiver::receiveByte(uint8_t byte) {
 
     pf.byteWritten();
 
-    std::optional<size_t> packetSize = pf.tryFrame();
-    if (packetSize.has_value()) {
-        availablePacketSizesQueue.push(packetSize.value());
+    if (pf.tryFrame()) {
+        pf.newPacket();
+        std::optional<PacketMetadata> metadata = pf.getLastPacketMetadata();
+        if (!metadata.has_value()) {
+            GCS_APP_LOG_ERROR("PacketReceiver: Packet metadata is not available after framing.");
+            return false;
+        }
+        if (metadata->status == PacketMetadata::Status::DUMP_IMMEDIATLY) {
+            GCS_APP_LOG_DEBUG("PacketReceiver: Received packet that should be dumped immediately, dumping it.");
+            buf.dump(metadata->size);
+        } else {
+            packetMetadataQueue.push(metadata.value());
+        }
     }
 
     return true;
@@ -34,14 +44,14 @@ bool PacketReceiver::receiveByte(uint8_t byte) {
  * @returns True if the packet was successfully written in the reception buffer, else false.
  */
 bool PacketReceiver::getPacket(uint8_t* recv) {
-    if (availablePacketSizesQueue.empty()) {
+    if (packetMetadataQueue.empty()) {
         return false;
     }
 
-    size_t size = availablePacketSizesQueue.front();
-    availablePacketSizesQueue.pop();
+    PacketMetadata metadata = packetMetadataQueue.front();
+    packetMetadataQueue.pop();
 
-    if (!buf.read(recv, size)) {
+    if (!buf.read(recv, metadata.size)) {
         GCS_APP_LOG_ERROR("PacketReceiver: Tried reading data from the circular buffer, but not enough data is available. Clearing all data to avoid "
                           "desynchronization.");
         clear();
@@ -64,15 +74,15 @@ uint8_t* PacketReceiver::getBuffer() {
  * @returns True if a packet was successfully dumped, else false.
  */
 bool PacketReceiver::dumpNextPacket() {
-    if (availablePacketSizesQueue.empty()) {
+    if (packetMetadataQueue.empty()) {
         GCS_APP_LOG_WARN("PacketReceiver: Tried to dump next packet, but no packet available.");
         return false;
     }
 
-    size_t size = availablePacketSizesQueue.front();
-    availablePacketSizesQueue.pop();
+    PacketMetadata metadata = packetMetadataQueue.front();
+    packetMetadataQueue.pop();
 
-    if (!buf.dump(size)) {
+    if (!buf.dump(metadata.size)) {
         GCS_APP_LOG_WARN("PacketReceiver: Tried to dump next packet, but circular buffer did not have enough read data left.");
         return false;
     }
@@ -81,23 +91,27 @@ bool PacketReceiver::dumpNextPacket() {
 }
 
 /**
- * @brief Returns the next packet's size.
- * @returns Next packet's size.
- */
-size_t PacketReceiver::nextPacketSize() const {
-    if (availablePacketSizesQueue.empty()) {
-        return 0;
-    }
-    return availablePacketSizesQueue.front();
-}
-
-/**
  * @brief Clears the packet framer, circular buffer and stored packet data.
  */
 void PacketReceiver::clear() {
     buf.clear();
     pf.clear();
-    while (!availablePacketSizesQueue.empty()) {
-        availablePacketSizesQueue.pop();
+    while (!packetMetadataQueue.empty()) {
+        packetMetadataQueue.pop();
     }
+}
+
+/**
+ * @brief Returns the next packet's size.
+ * @returns Next packet's size.
+ */
+std::optional<PacketMetadata> PacketReceiver::nextPacketMetadata() const {
+    if (packetMetadataQueue.empty()) {
+        return std::nullopt;
+    }
+    return packetMetadataQueue.front();
+}
+
+bool PacketReceiver::packetAvailable() const {
+    return !packetMetadataQueue.empty();
 }
