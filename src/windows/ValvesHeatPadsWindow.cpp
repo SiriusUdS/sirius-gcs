@@ -10,46 +10,52 @@
 #include <string>
 
 namespace ValvesHeatPadsWindow {
-void renderValveOrHeatPadState(const char* name, ValveData& data);
-void renderValveOrHeatPadStateRow(const char* label, bool isOn);
+void renderValveOrHeatPadStateRow(const char* label, ValveData& data);
 } // namespace ValvesHeatPadsWindow
 
 void ValvesHeatPadsWindow::render() {
     if (ImGui::CollapsingHeader("Valves")) {
-        renderValveOrHeatPadState("NOS Valve", GSDataCenter::nosValveData);
-        renderValveOrHeatPadState("IPA Valve", GSDataCenter::ipaValveData);
-        renderValveOrHeatPadState("Fill Valve", GSDataCenter::fillValveData);
-        renderValveOrHeatPadState("Dump Valve", GSDataCenter::dumpValveData);
+        if (ImGui::BeginTable("ValveStateTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+            ImGui::TableSetupColumn("Valve");
+            ImGui::TableSetupColumn("Is idle");
+            ImGui::TableSetupColumn("Closed switch");
+            ImGui::TableSetupColumn("Opened switch");
+            ImGui::TableHeadersRow();
+
+            renderValveOrHeatPadStateRow("NOS", GSDataCenter::nosValveData);
+            renderValveOrHeatPadStateRow("IPA", GSDataCenter::ipaValveData);
+            renderValveOrHeatPadStateRow("Dump", GSDataCenter::dumpValveData);
+            renderValveOrHeatPadStateRow("Fill", GSDataCenter::fillValveData);
+
+            ImGui::EndTable();
+        }
     }
 
     if (ImGui::CollapsingHeader("Heat pads")) {
         ImGui::Text("TODO");
+        // if (ImGui::BeginTable("HeadPadStateTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+        //     ImGui::TableSetupColumn("Heat Pad");
+        //     ImGui::TableSetupColumn("Is idle");
+        //     ImGui::TableSetupColumn("Closed switch");
+        //     ImGui::TableSetupColumn("Opened switch");
+        //     ImGui::TableHeadersRow();
+
+        //    ImGui::EndTable();
+        //}
     }
 }
 
-void ValvesHeatPadsWindow::renderValveOrHeatPadState(const char* name, ValveData& data) {
-    ImGui::PushFont(FontConfig::boldDefaultFont);
-    ImGui::Text(name);
-    ImGui::PopFont();
-
-    if (ImGui::BeginTable("ValveStateTable", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-        ImGui::TableSetupColumn("Signal");
-        ImGui::TableSetupColumn("State");
-        ImGui::TableHeadersRow();
-
-        renderValveOrHeatPadStateRow("Is idle", data.isIdle);
-        renderValveOrHeatPadStateRow("Closed switch high", data.closedSwitchHigh);
-        renderValveOrHeatPadStateRow("Opened switch high", data.openedSwitchHigh);
-
-        ImGui::EndTable();
-    }
-}
-
-void ValvesHeatPadsWindow::renderValveOrHeatPadStateRow(const char* label, bool isOn) {
+void ValvesHeatPadsWindow::renderValveOrHeatPadStateRow(const char* label, ValveData& data) {
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
     ImGui::Text(label);
 
     ImGui::TableSetColumnIndex(1);
-    ImGui::Text(isOn ? "On" : "Off");
+    ImGui::Text(data.isIdle ? "Yes" : "No");
+
+    ImGui::TableSetColumnIndex(2);
+    ImGui::Text(data.closedSwitchHigh ? "On" : "Off");
+
+    ImGui::TableSetColumnIndex(3);
+    ImGui::Text(data.openedSwitchHigh ? "On" : "Off");
 }
