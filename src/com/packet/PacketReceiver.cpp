@@ -28,7 +28,7 @@ bool PacketReceiver::receiveByte(uint8_t byte) {
             return false;
         }
         if (metadata->status == PacketMetadata::Status::DUMP_IMMEDIATLY) {
-            GCS_APP_LOG_DEBUG("PacketReceiver: Received packet that should be dumped immediately, dumping it.");
+            GCS_APP_LOG_DEBUG("PacketReceiver: Dumping initial invalid data ({}).", metadata->size);
             buf.dump(metadata->size);
         } else {
             packetMetadataQueue.push(metadata.value());
