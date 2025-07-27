@@ -4,6 +4,7 @@
 #include "GSDataCenter.h"
 #include "LoadCell.h"
 #include "Logging.h"
+#include "PacketCSVLogging.h"
 #include "PacketLogger.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
@@ -19,11 +20,6 @@
 #include "ValveData.h"
 
 namespace PacketProcessing {
-constexpr size_t THERMISTOR_ADC_VALUES_INDEX_OFFSET = 0;
-constexpr size_t PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET = 8;
-constexpr size_t PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET = 10;
-constexpr size_t LOAD_CELL_ADC_VALUES_INDEX_OFFSET = 14;
-
 bool processIncomingPacket();
 bool processEngineTelemetryPacket();
 bool processFillingStationTelemetryPacket();
@@ -125,9 +121,9 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     float timestamp = static_cast<float>(packet->fields.timestamp_ms);
     uint16_t* adcValues = packet->fields.adcValues;
 
-    uint16_t* thermistorAdcValues = adcValues + THERMISTOR_ADC_VALUES_INDEX_OFFSET;
-    uint16_t* pressureSensorIndices = adcValues + PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET;
-    uint16_t* pressureSensorAdcValues = adcValues + PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* thermistorAdcValues = adcValues + SerialConfig::THERMISTOR_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* pressureSensorIndices = adcValues + SerialConfig::PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* pressureSensorAdcValues = adcValues + SerialConfig::PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET;
 
     computeThermistorValues(thermistorAdcValues);
     computePressureSensorValues(pressureSensorIndices, pressureSensorAdcValues);
@@ -143,7 +139,8 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     SerialTask::engineTelemetryPacketRateMonitor.trackPacket();
     SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketLogger::logEngineTelemetry(thermistorAdcValues, thermistorValues, pressureSensorAdcValues, pressureSensorValues);
+    // PacketLogger::logEngineTelemetry(thermistorAdcValues, thermistorValues, pressureSensorAdcValues, pressureSensorValues);
+    PacketCSVLogging::logEngineTelemetryPacket(timestamp, thermistorValues, pressureSensorValues);
     return true;
 }
 
@@ -161,10 +158,10 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     float timestamp = static_cast<float>(packet->fields.timestamp_ms);
     uint16_t* adcValues = packet->fields.adcValues;
 
-    uint16_t* thermistorAdcValues = adcValues + THERMISTOR_ADC_VALUES_INDEX_OFFSET;
-    uint16_t* pressureSensorIndices = adcValues + PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET;
-    uint16_t* pressureSensorAdcValues = adcValues + PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET;
-    uint16_t* loadCellAdcValues = adcValues + LOAD_CELL_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* thermistorAdcValues = adcValues + SerialConfig::THERMISTOR_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* pressureSensorIndices = adcValues + SerialConfig::PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* pressureSensorAdcValues = adcValues + SerialConfig::PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET;
+    uint16_t* loadCellAdcValues = adcValues + SerialConfig::LOAD_CELL_ADC_VALUES_INDEX_OFFSET;
 
     computeThermistorValues(thermistorAdcValues);
     computePressureSensorValues(pressureSensorIndices, pressureSensorAdcValues);
@@ -186,12 +183,13 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     SerialTask::fillingStationTelemetryPacketRateMonitor.trackPacket();
     SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketLogger::logFillingStationTelemetry(thermistorAdcValues,
-                                             thermistorValues,
-                                             pressureSensorAdcValues,
-                                             pressureSensorValues,
-                                             loadCellAdcValues,
-                                             loadCellValues);
+    // PacketLogger::logFillingStationTelemetry(thermistorAdcValues,
+    //                                          thermistorValues,
+    //                                          pressureSensorAdcValues,
+    //                                          pressureSensorValues,
+    //                                          loadCellAdcValues,
+    //                                          loadCellValues);
+    PacketCSVLogging::logFillingStationTelemetryPacket(timestamp, thermistorValues, pressureSensorValues, loadCellValues);
     return true;
 }
 
@@ -221,7 +219,8 @@ bool PacketProcessing::processGSControlPacket() {
     SerialTask::gsControlPacketRateMonitor.trackPacket();
     SerialTask::gsControlBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketLogger::logGsControl(status);
+    // PacketLogger::logGsControl(status);
+    PacketCSVLogging::logGSControlPacket(packet);
     return true;
 }
 
@@ -230,17 +229,14 @@ bool PacketProcessing::processEngineStatusPacket() {
         return false;
     }
 
-    constexpr size_t NOS_VALVE_STATUS_INDEX = 0;
-    constexpr size_t IPA_VALVE_STATUS_INDEX = 1;
-
     EngineStatusPacket* packet = reinterpret_cast<EngineStatusPacket*>(packetBuf);
 
     if (!isPacketIntegrityValid(packetBuf, packet, sizeof(EngineStatusPacket))) {
         return false;
     }
 
-    ValveStatus& nosValveStatus = packet->fields.valveStatus[NOS_VALVE_STATUS_INDEX];
-    ValveStatus& ipaValveStatus = packet->fields.valveStatus[IPA_VALVE_STATUS_INDEX];
+    ValveStatus& nosValveStatus = packet->fields.valveStatus[SerialConfig::NOS_VALVE_STATUS_INDEX];
+    ValveStatus& ipaValveStatus = packet->fields.valveStatus[SerialConfig::IPA_VALVE_STATUS_INDEX];
 
     GSDataCenter::nosValveData.isIdle = nosValveStatus.bits.isIdle;
     GSDataCenter::nosValveData.closedSwitchHigh = nosValveStatus.bits.closedSwitchHigh;
@@ -254,7 +250,8 @@ bool PacketProcessing::processEngineStatusPacket() {
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
     SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketLogger::logEngineStatus(nosValveStatus, ipaValveStatus);
+    // PacketLogger::logEngineStatus(nosValveStatus, ipaValveStatus);
+    PacketCSVLogging::logEngineStatusPacket(packet);
     return true;
 }
 
@@ -263,17 +260,14 @@ bool PacketProcessing::processFillingStationStatusPacket() {
         return false;
     }
 
-    constexpr size_t FILL_VALVE_STATUS_INDEX = 0;
-    constexpr size_t DUMP_VALVE_STATUS_INDEX = 1;
-
     FillingStationStatusPacket* packet = reinterpret_cast<FillingStationStatusPacket*>(packetBuf);
 
     if (!isPacketIntegrityValid(packetBuf, packet, sizeof(FillingStationStatusPacket))) {
         return false;
     }
 
-    ValveStatus& fillValveStatus = packet->fields.valveStatus[FILL_VALVE_STATUS_INDEX];
-    ValveStatus& dumpValveStatus = packet->fields.valveStatus[DUMP_VALVE_STATUS_INDEX];
+    ValveStatus& fillValveStatus = packet->fields.valveStatus[SerialConfig::FILL_VALVE_STATUS_INDEX];
+    ValveStatus& dumpValveStatus = packet->fields.valveStatus[SerialConfig::DUMP_VALVE_STATUS_INDEX];
 
     GSDataCenter::fillValveData.isIdle = fillValveStatus.bits.isIdle;
     GSDataCenter::fillValveData.closedSwitchHigh = fillValveStatus.bits.closedSwitchHigh;
@@ -287,7 +281,8 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
     SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketLogger::logFillingStationStatus(fillValveStatus, dumpValveStatus);
+    // PacketLogger::logFillingStationStatus(fillValveStatus, dumpValveStatus);
+    PacketCSVLogging::logFillingStationStatusPacket(packet);
     return true;
 }
 

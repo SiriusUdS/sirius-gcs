@@ -1,0 +1,31 @@
+#ifndef CSVLOGGER_H
+#define CSVLOGGER_H
+
+#include <fstream>
+#include <vector>
+
+/**
+ * @class CSVLogger
+ * @brief Logs data in files in the CSV format.
+ */
+class CSVLogger {
+public:
+    void openFile(const char* filename);
+    void addColumn(const char* column);
+    void setValue(size_t columnIndex, float value);
+    void log();
+    bool fileIsOpen();
+
+private:
+    struct Column {
+        std::string name;
+        float currentValue;
+    };
+
+    std::vector<Column> columns;
+    std::ofstream file;
+    std::string currentFileName;
+    bool firstLog{true};
+};
+
+#endif // CSVLOGGER_H
