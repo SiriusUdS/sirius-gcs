@@ -5,7 +5,6 @@
 #include "LoadCell.h"
 #include "Logging.h"
 #include "PacketCSVLogging.h"
-#include "PacketLogger.h"
 #include "PacketRateMonitor.h"
 #include "PacketReceiver.h"
 #include "PressureTransducer.h"
@@ -139,7 +138,6 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     SerialTask::engineTelemetryPacketRateMonitor.trackPacket();
     SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    // PacketLogger::logEngineTelemetry(thermistorAdcValues, thermistorValues, pressureSensorAdcValues, pressureSensorValues);
     PacketCSVLogging::logEngineTelemetryPacket(timestamp, thermistorValues, pressureSensorValues);
     return true;
 }
@@ -183,12 +181,6 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     SerialTask::fillingStationTelemetryPacketRateMonitor.trackPacket();
     SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    // PacketLogger::logFillingStationTelemetry(thermistorAdcValues,
-    //                                          thermistorValues,
-    //                                          pressureSensorAdcValues,
-    //                                          pressureSensorValues,
-    //                                          loadCellAdcValues,
-    //                                          loadCellValues);
     PacketCSVLogging::logFillingStationTelemetryPacket(timestamp, thermistorValues, pressureSensorValues, loadCellValues);
     return true;
 }
@@ -219,7 +211,6 @@ bool PacketProcessing::processGSControlPacket() {
     SerialTask::gsControlPacketRateMonitor.trackPacket();
     SerialTask::gsControlBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    // PacketLogger::logGsControl(status);
     PacketCSVLogging::logGSControlPacket(packet);
     return true;
 }
@@ -250,7 +241,6 @@ bool PacketProcessing::processEngineStatusPacket() {
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
     SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    // PacketLogger::logEngineStatus(nosValveStatus, ipaValveStatus);
     PacketCSVLogging::logEngineStatusPacket(packet);
     return true;
 }
@@ -281,7 +271,6 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
     SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    // PacketLogger::logFillingStationStatus(fillValveStatus, dumpValveStatus);
     PacketCSVLogging::logFillingStationStatusPacket(packet);
     return true;
 }
