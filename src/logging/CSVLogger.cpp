@@ -2,7 +2,7 @@
 
 #include "Logging.h"
 
-void CSVLogger::openFile(const char* filename) {
+void CSVLogger::openFile(std::string filename) {
     if (file.is_open()) {
         file.close();
     }
@@ -16,7 +16,7 @@ void CSVLogger::openFile(const char* filename) {
     currentFileName = filename;
 }
 
-void CSVLogger::addColumn(const char* column) {
+void CSVLogger::addColumn(std::string column) {
     columns.emplace_back(column, 0);
 }
 

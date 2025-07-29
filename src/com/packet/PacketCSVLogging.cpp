@@ -3,16 +3,37 @@
 #include "Logging.h"
 #include "SerialConfig.h"
 
+#include <chrono>
+#include <ctime>
+#include <filesystem>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
 namespace PacketCSVLogging {
+std::string getCurrentDateTimeForDir();
+
 CSVLogger engineTelemetryLogger;
 CSVLogger fillingStationTelemetryLogger;
 CSVLogger gsControlLogger;
 CSVLogger engineStatusLogger;
 CSVLogger fillingStationStatusLogger;
+
+bool dataLogDirExists{};
 } // namespace PacketCSVLogging
 
 void PacketCSVLogging::init() {
-    engineTelemetryLogger.openFile("logs/EngineTelemetry.log");
+    std::string dataLogDir = "logs/data/" + getCurrentDateTimeForDir();
+
+    try {
+        std::filesystem::create_directories(dataLogDir);
+        dataLogDirExists = true;
+    } catch (const std::filesystem::filesystem_error& e) {
+        GCS_APP_LOG_ERROR("PacketCSVLogging: Failed to create directory '{}': {}", dataLogDir, e.what());
+        return;
+    }
+
+    engineTelemetryLogger.openFile(dataLogDir + "/EngineTelemetry.log");
     engineTelemetryLogger.addColumn("Timestamp");
     engineTelemetryLogger.addColumn("Thermistor 1");
     engineTelemetryLogger.addColumn("Thermistor 2");
@@ -25,7 +46,7 @@ void PacketCSVLogging::init() {
     engineTelemetryLogger.addColumn("Pressure Sensor 1");
     engineTelemetryLogger.addColumn("Pressure Sensor 2");
 
-    fillingStationTelemetryLogger.openFile("logs/FillingStationTelemetry.log");
+    fillingStationTelemetryLogger.openFile(dataLogDir + "/FillingStationTelemetry.log");
     fillingStationTelemetryLogger.addColumn("Timestamp");
     fillingStationTelemetryLogger.addColumn("Thermistor 1");
     fillingStationTelemetryLogger.addColumn("Thermistor 2");
@@ -40,7 +61,7 @@ void PacketCSVLogging::init() {
     fillingStationTelemetryLogger.addColumn("Motor Load Cell");
     fillingStationTelemetryLogger.addColumn("Tank Load Cell");
 
-    gsControlLogger.openFile("logs/GSStatus.log");
+    gsControlLogger.openFile(dataLogDir + "/GSStatus.log");
     gsControlLogger.addColumn("Timestamp");
     gsControlLogger.addColumn("Allow Dump");
     gsControlLogger.addColumn("Allow Fill");
@@ -50,7 +71,7 @@ void PacketCSVLogging::init() {
     gsControlLogger.addColumn("Fire Igniter");
     gsControlLogger.addColumn("Valve Start");
 
-    engineStatusLogger.openFile("logs/EngineStatus.log");
+    engineStatusLogger.openFile(dataLogDir + "/EngineStatus.log");
     engineStatusLogger.addColumn("Timestamp");
     engineStatusLogger.addColumn("NOS Valve Idle");
     engineStatusLogger.addColumn("NOS Valve Closed Switch High");
@@ -59,7 +80,7 @@ void PacketCSVLogging::init() {
     engineStatusLogger.addColumn("IPA Valve Closed Switch High");
     engineStatusLogger.addColumn("IPA Valve Opened Switch High");
 
-    fillingStationStatusLogger.openFile("logs/FillingStationStatus.log");
+    fillingStationStatusLogger.openFile(dataLogDir + "/FillingStationStatus.log");
     fillingStationStatusLogger.addColumn("Timestamp");
     fillingStationStatusLogger.addColumn("Fill Valve Idle");
     fillingStationStatusLogger.addColumn("Fill Valve Closed Switch High");
@@ -72,6 +93,10 @@ void PacketCSVLogging::init() {
 void PacketCSVLogging::logEngineTelemetryPacket(float timestamp,
                                                 float thermistorValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD],
                                                 float pressureSensorValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD]) {
+    if (!dataLogDirExists) {
+        return;
+    }
+
     if (!engineTelemetryLogger.fileIsOpen()) {
         GCS_APP_LOG_WARN("PacketCSVLogging: Can't log engine telemetry packet, log file isn't open.");
         return;
@@ -96,6 +121,10 @@ void PacketCSVLogging::logFillingStationTelemetryPacket(float timestamp,
                                                         float thermistorValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD],
                                                         float pressureSensorValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD],
                                                         float loadCellValues[GSDataCenter::LOAD_CELL_AMOUNT]) {
+    if (!dataLogDirExists) {
+        return;
+    }
+
     if (!fillingStationTelemetryLogger.fileIsOpen()) {
         GCS_APP_LOG_WARN("PacketCSVLogging: Can't log filling station telemetry packet, log file isn't open.");
         return;
@@ -122,6 +151,10 @@ void PacketCSVLogging::logFillingStationTelemetryPacket(float timestamp,
 }
 
 void PacketCSVLogging::logGSControlPacket(const GSControlStatusPacket* packet) {
+    if (!dataLogDirExists) {
+        return;
+    }
+
     if (!gsControlLogger.fileIsOpen()) {
         GCS_APP_LOG_WARN("PacketCSVLogging: Can't log GS control packet, log file isn't open.");
         return;
@@ -141,6 +174,10 @@ void PacketCSVLogging::logGSControlPacket(const GSControlStatusPacket* packet) {
 }
 
 void PacketCSVLogging::logEngineStatusPacket(const EngineStatusPacket* packet) {
+    if (!dataLogDirExists) {
+        return;
+    }
+
     if (!engineStatusLogger.fileIsOpen()) {
         GCS_APP_LOG_WARN("PacketCSVLogging: Can't log engine status packet, log file isn't open.");
         return;
@@ -160,6 +197,10 @@ void PacketCSVLogging::logEngineStatusPacket(const EngineStatusPacket* packet) {
 }
 
 void PacketCSVLogging::logFillingStationStatusPacket(const FillingStationStatusPacket* packet) {
+    if (!dataLogDirExists) {
+        return;
+    }
+
     if (!fillingStationStatusLogger.fileIsOpen()) {
         GCS_APP_LOG_WARN("PacketCSVLogging: Can't log filling station status packet, log file isn't open.");
         return;
@@ -176,4 +217,17 @@ void PacketCSVLogging::logFillingStationStatusPacket(const FillingStationStatusP
     fillingStationStatusLogger.setValue(5, static_cast<float>(dumpValve.bits.closedSwitchHigh));
     fillingStationStatusLogger.setValue(6, static_cast<float>(dumpValve.bits.openedSwitchHigh));
     fillingStationStatusLogger.log();
+}
+
+std::string PacketCSVLogging::getCurrentDateTimeForDir() {
+    std::time_t now = std::time(nullptr);
+    std::tm tm{};
+#ifdef _WIN32
+    localtime_s(&tm, &now);
+#else
+    localtime_r(&now, &tm);
+#endif
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S");
+    return oss.str();
 }

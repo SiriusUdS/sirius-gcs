@@ -10,6 +10,7 @@
 #include "Logging.h"
 #include "LoggingWindow.h"
 #include "MapWindow.h"
+#include "PacketCSVLogging.h"
 #include "PlotWindowCenter.h"
 #include "SerialComWindow.h"
 #include "SerialTask.h"
@@ -69,6 +70,7 @@ void Application::init() {
 
     LoggingWindow::init();
     MapWindow::init();
+    PacketCSVLogging::init();
 
     LoggingWindow::loadState(iniStructure);
     MapWindow::loadState(iniStructure);

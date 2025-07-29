@@ -10,8 +10,8 @@
  */
 class CSVLogger {
 public:
-    void openFile(const char* filename);
-    void addColumn(const char* column);
+    void openFile(std::string filename);
+    void addColumn(std::string column);
     void setValue(size_t columnIndex, float value);
     void log();
     bool fileIsOpen();

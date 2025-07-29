@@ -277,26 +277,30 @@ bool PacketProcessing::processFillingStationStatusPacket() {
 
 void PacketProcessing::computeThermistorValues(uint16_t thermistorAdcValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]) {
     for (size_t i = 0; i < GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD; i++) {
-        thermistorValues[i] = TemperatureSensor::adcToTemperature(thermistorAdcValues[i]);
+        float adcValue = static_cast<float>(thermistorAdcValues[i]);
+        thermistorValues[i] = TemperatureSensor::adcToTemperature(adcValue);
     }
 }
 
 void PacketProcessing::computePressureSensorValues(uint16_t pressureSensorIndices[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD],
                                                    uint16_t pressureSensorAdcValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD]) {
     for (size_t i = 0; i < GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD; i++) {
-        pressureSensorValues[i] = PressureTransducer::adcToPressure(pressureSensorAdcValues[i], pressureSensorIndices[i]);
+        float adcValue = static_cast<float>(pressureSensorAdcValues[i]);
+        pressureSensorValues[i] = PressureTransducer::adcToPressure(adcValue, pressureSensorIndices[i]);
     }
 }
 
 void PacketProcessing::computeLoadCellValues(uint16_t loadCellAdcValues[GSDataCenter::LOAD_CELL_AMOUNT]) {
     for (size_t i = 0; i < GSDataCenter::LOAD_CELL_AMOUNT; i++) {
-        loadCellValues[i] = LoadCell::adcToForce(loadCellAdcValues[i], 0); // TODO: Change this index later?
+        float adcValue = static_cast<float>(loadCellAdcValues[i]);
+        loadCellValues[i] = LoadCell::adcToForce(adcValue, 0); // TODO: Change this index later?
     }
 }
 
 void PacketProcessing::addPlotData(SensorPlotData* plotData, uint16_t* adcValues, float* computedValues, size_t amount, float timestamp) {
     for (size_t i = 0; i < amount; i++) {
-        plotData[i].addData(adcValues[i], computedValues[i], timestamp);
+        float adcValue = static_cast<float>(adcValues[i]);
+        plotData[i].addData(adcValue, computedValues[i], timestamp);
     }
 }
 
