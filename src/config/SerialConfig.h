@@ -8,7 +8,6 @@ constexpr size_t SERIAL_TASK_LOOPS_PER_SECOND = 20;
 
 // TODO: Move constants below to another config file?
 constexpr size_t THERMISTOR_ADC_VALUES_INDEX_OFFSET = 0;
-constexpr size_t PRESSURE_SENSOR_INDEX_ADC_VALUES_INDEX_OFFSET = 8;
 constexpr size_t PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET = 10;
 constexpr size_t LOAD_CELL_ADC_VALUES_INDEX_OFFSET = 14;
 
