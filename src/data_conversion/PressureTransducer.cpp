@@ -17,10 +17,10 @@ constexpr PressureTransducerParams PRESSURE_TRANSDUCER_PARAMS_TABLE[PRESSURE_TRA
     {.additiveFactor=-158.37, .functionRateOfChange=0.9767, .functionOffset=0.0},  // Filling Station - IPA
     {.additiveFactor=-442.65, .functionRateOfChange=0.9414, .functionOffset=0.0}, // Filling Station - NOS
     {.additiveFactor=-55.316, .functionRateOfChange=0.9438, .functionOffset=0.0}, // Engine - Chamber
-		{.additiveFactor=-717.67, .functionRateOfChange=0.9202, .functionOffset=0.0}  // Engine - Tank
+	{.additiveFactor=-717.67, .functionRateOfChange=0.9202, .functionOffset=0.0}  // Engine - Tank
 };
 // clang-format on
-} // namespace LoadCell
+} // namespace PressureTransducer
 
 float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
     const PressureTransducerParams& params = PRESSURE_TRANSDUCER_PARAMS_TABLE[sensorIndex];
