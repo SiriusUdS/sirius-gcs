@@ -17,7 +17,7 @@ void CSVLogger::openFile(std::string filename) {
 }
 
 void CSVLogger::addColumn(std::string column) {
-    columns.emplace_back(column, 0);
+    columns.emplace_back(column, 0.f);
 }
 
 void CSVLogger::setValue(size_t columnIndex, float value) {
