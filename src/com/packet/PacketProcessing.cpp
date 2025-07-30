@@ -207,10 +207,9 @@ bool PacketProcessing::processGSControlPacket() {
     GSDataCenter::UnsafeKeySwitchData.isOn = status.bits.isUnsafeKeySwitchPressed;
     GSDataCenter::ValveStartButtonData.isOn = status.bits.isValveStartButtonPressed;
 
-    // TODO: IMPLEMENT IT WITH THE DATA CENTER
-    uint32_t gsControlLastSentCommandTimestamp_ms = packet->fields.lastSentCommandTimestamp_ms;
-    uint32_t gsControlLastSentCommandCode = packet->fields.lastBoardSentCommandCode;
-    uint32_t gsControlLastReceivedCommandTimestamp_ms = packet->fields.lastReceivedGSCommandTimestamp_ms;
+    GSDataCenter::lastReceivedGSCommandTimestamp_ms = packet->fields.lastReceivedGSCommandTimestamp_ms;
+    GSDataCenter::lastBoardSentCommandCode = packet->fields.lastBoardSentCommandCode;
+    GSDataCenter::lastSentCommandTimestamp_ms = packet->fields.lastSentCommandTimestamp_ms;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::gsControlPacketRateMonitor.trackPacket();
@@ -231,8 +230,6 @@ bool PacketProcessing::processEngineStatusPacket() {
         return false;
     }
 
-    GCS_APP_LOG_INFO("FILLING STATION LAST COMMAND RECEIVED: {}", packet->fields.timeSinceLastCommand_ms);
-
     ValveStatus& nosValveStatus = packet->fields.valveStatus[SerialConfig::NOS_VALVE_STATUS_INDEX];
     ValveStatus& ipaValveStatus = packet->fields.valveStatus[SerialConfig::IPA_VALVE_STATUS_INDEX];
 
@@ -243,6 +240,11 @@ bool PacketProcessing::processEngineStatusPacket() {
     GSDataCenter::ipaValveData.isIdle = ipaValveStatus.bits.isIdle;
     GSDataCenter::ipaValveData.closedSwitchHigh = ipaValveStatus.bits.closedSwitchHigh;
     GSDataCenter::ipaValveData.openedSwitchHigh = ipaValveStatus.bits.openedSwitchHigh;
+
+    GSDataCenter::igniteTimestamp_ms = packet->fields.igniteTimestamp_ms;
+    GSDataCenter::launchTimestamp_ms = packet->fields.launchTimestamp_ms;
+    GSDataCenter::timeSinceLastCommand_ms = packet->fields.timeSinceLastCommand_ms;
+    GSDataCenter::lastReceivedCommandCode = packet->fields.lastReceivedCommandCode;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
@@ -263,21 +265,21 @@ bool PacketProcessing::processFillingStationStatusPacket() {
         return false;
     }
 
-    GCS_APP_LOG_DEBUG("FILLING STATION LAST COMMAND RECEIVED: {}", packet->fields.timeSinceLastCommand_ms);
-
     ValveStatus& fillValveStatus = packet->fields.valveStatus[SerialConfig::FILL_VALVE_STATUS_INDEX];
     ValveStatus& dumpValveStatus = packet->fields.valveStatus[SerialConfig::DUMP_VALVE_STATUS_INDEX];
-
-    // TODO: IMPLEMENT IT WITH THE DATA CENTER
-    uint32_t fillStationLastReceivedCommandTimestamp_ms = packet->fields.timeSinceLastCommand_ms;
 
     GSDataCenter::fillValveData.isIdle = fillValveStatus.bits.isIdle;
     GSDataCenter::fillValveData.closedSwitchHigh = fillValveStatus.bits.closedSwitchHigh;
     GSDataCenter::fillValveData.openedSwitchHigh = fillValveStatus.bits.openedSwitchHigh;
+    GSDataCenter::fillValveData.positionOpened_pct = fillValveStatus.bits.positionOpened_pct;
 
     GSDataCenter::dumpValveData.isIdle = dumpValveStatus.bits.isIdle;
     GSDataCenter::dumpValveData.closedSwitchHigh = dumpValveStatus.bits.closedSwitchHigh;
     GSDataCenter::dumpValveData.openedSwitchHigh = dumpValveStatus.bits.openedSwitchHigh;
+    GSDataCenter::dumpValveData.positionOpened_pct = dumpValveStatus.bits.positionOpened_pct;
+
+    GSDataCenter::timeSinceLastCommand_ms = packet->fields.timeSinceLastCommand_ms;
+    GSDataCenter::lastReceivedCommandCode = packet->fields.lastReceivedCommandCode;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
@@ -299,7 +301,7 @@ void PacketProcessing::computePressureSensorValues(uint16_t pressureSensorAdcVal
     uint8_t indexOffset = boardId == ENGINE_BOARD_ID ? 2 : 0;
     for (size_t i = 0; i < GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD; i++) {
         float adcValue = static_cast<float>(pressureSensorAdcValues[i]);
-        uint16_t sensorIndex = i + indexOffset;
+        uint16_t sensorIndex = static_cast<uint16_t>(i + indexOffset);
         pressureSensorValues[i] = PressureTransducer::adcToPressure(adcValue, sensorIndex);
     }
 }

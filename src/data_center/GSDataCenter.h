@@ -34,6 +34,16 @@ extern ValveData ipaValveData;
 extern ValveData fillValveData;
 extern ValveData dumpValveData;
 extern std::vector<ValveData*> valveDataVec;
+
+extern uint32_t igniteTimestamp_ms;
+extern uint32_t launchTimestamp_ms;
+
+extern uint32_t lastReceivedCommandCode;
+extern uint32_t lastBoardSentCommandCode;
+
+extern uint32_t timeSinceLastCommand_ms;
+extern uint32_t lastReceivedGSCommandTimestamp_ms;
+extern uint32_t lastSentCommandTimestamp_ms;
 } // namespace GSDataCenter
 
 #endif // GSDATACENTER_H

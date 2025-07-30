@@ -3,6 +3,7 @@
 #include "BoardComStateMonitor.h"
 #include "ComPortSelector.h"
 #include "FontConfig.h"
+#include "GSDataCenter.h"
 #include "IniConfig.h"
 #include "PacketRateMonitor.h"
 #include "SerialCom.h"
@@ -61,6 +62,16 @@ void SerialComWindow::render() {
 
             ImGui::EndTable();
         }
+    }
+
+    if (ImGui::CollapsingHeader("Temp")) {
+        ImGui::Text("igniteTimestamp_ms: %d", GSDataCenter::igniteTimestamp_ms);
+        ImGui::Text("launchTimestamp_ms: %d", GSDataCenter::launchTimestamp_ms);
+        ImGui::Text("lastReceivedCommandCode: %d", GSDataCenter::lastReceivedCommandCode);
+        ImGui::Text("lastBoardSentCommandCode: %d", GSDataCenter::lastBoardSentCommandCode);
+        ImGui::Text("timeSinceLastCommand_ms: %d", GSDataCenter::timeSinceLastCommand_ms);
+        ImGui::Text("lastReceivedGSCommandTimestamp_ms: %d", GSDataCenter::lastReceivedGSCommandTimestamp_ms);
+        ImGui::Text("lastSentCommandTimestamp_ms: %d", GSDataCenter::lastSentCommandTimestamp_ms);
     }
 
     if (ImGui::CollapsingHeader("RECV Buffer")) {

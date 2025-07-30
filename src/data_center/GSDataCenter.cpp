@@ -44,4 +44,14 @@ ValveData ipaValveData;
 ValveData fillValveData;
 ValveData dumpValveData;
 std::vector<ValveData*> valveDataVec({&fillValveData, &dumpValveData});
+
+uint32_t igniteTimestamp_ms;
+uint32_t launchTimestamp_ms;
+
+uint32_t lastReceivedCommandCode;
+uint32_t lastBoardSentCommandCode;
+
+uint32_t timeSinceLastCommand_ms;
+uint32_t lastReceivedGSCommandTimestamp_ms;
+uint32_t lastSentCommandTimestamp_ms;
 } // namespace GSDataCenter
