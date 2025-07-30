@@ -3,6 +3,8 @@
 #include "Logging.h"
 #include "PlotConfig.h"
 
+#include <algorithm>
+
 namespace PressureTransducer {
 struct PressureTransducerParams {
     double additiveFactor{};
@@ -24,7 +26,9 @@ constexpr PressureTransducerParams PRESSURE_TRANSDUCER_PARAMS_TABLE[PRESSURE_TRA
 
 float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
     const PressureTransducerParams& params = PRESSURE_TRANSDUCER_PARAMS_TABLE[sensorIndex];
-    return static_cast<float>(params.functionRateOfChange * adcValue) - static_cast<float>(params.functionOffset - params.additiveFactor);
+    const float pressure_psi =
+      static_cast<float>(params.functionRateOfChange * adcValue) - static_cast<float>(params.functionOffset - params.additiveFactor);
+    return std::max(pressure_psi, 0.f);
 }
 /*float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
     static constexpr float PRESSURE_SENSOR_VOLTAGE_RANGE_V = 3.3f;
