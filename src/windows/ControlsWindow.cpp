@@ -40,6 +40,16 @@ void ControlsWindow::render() {
         renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad);
         renderSlider("Dump Heat Pad", dumpHeatPadSlider, CommandType::DumpHeatPad);
     }
+
+    if (ImGui::CollapsingHeader("Reset & Abort")) {
+        if (ImGui::Button("Reset")) {
+            CommandControl::sendCommand(CommandType::Reset, 0);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Abort")) {
+            CommandControl::sendCommand(CommandType::Abort, 0);
+        }
+    }
 }
 
 void ControlsWindow::renderSlider(const char* name, ValveSlider& slider, CommandType commandType, bool sliderEnabled) {

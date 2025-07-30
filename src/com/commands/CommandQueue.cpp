@@ -2,7 +2,7 @@
 
 #include "Logging.h"
 
-// Add last-writer-wins implementation explanation
+// TODO: Add last-writer-wins implementation explanation
 void CommandQueue::enqueue(CommandType type, uint32_t value) {
     size_t idx = static_cast<std::size_t>(type);
 

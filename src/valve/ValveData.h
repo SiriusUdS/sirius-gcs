@@ -1,6 +1,8 @@
 #ifndef VALVEDATA_H
 #define VALVEDATA_H
 
+#include <stdint.h>
+
 struct ValveData {
     bool isIdle{};
     bool closedSwitchHigh{};
