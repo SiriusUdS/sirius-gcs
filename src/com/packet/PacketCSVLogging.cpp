@@ -61,7 +61,7 @@ void PacketCSVLogging::init() {
     fillingStationTelemetryLogger.addColumn("Motor Load Cell");
     fillingStationTelemetryLogger.addColumn("Tank Load Cell");
 
-    gsControlLogger.openFile(dataLogDir + "/GSStatus.log");
+    gsControlLogger.openFile(dataLogDir + "/GSControl.log");
     gsControlLogger.addColumn("Timestamp");
     gsControlLogger.addColumn("Allow Dump");
     gsControlLogger.addColumn("Allow Fill");

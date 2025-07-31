@@ -6,7 +6,6 @@
 #include <spdlog/spdlog.h>
 
 namespace LoggingWindow {
-void init();
 void render();
 void loadState(const mINI::INIStructure& ini);
 void saveState(mINI::INIStructure& ini);

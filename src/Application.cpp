@@ -68,7 +68,6 @@ void Application::init() {
 
     iniFile.read(iniStructure);
 
-    LoggingWindow::init();
     MapWindow::init();
     PacketCSVLogging::init();
 
