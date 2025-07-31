@@ -9,6 +9,7 @@
 #include "SerialCom.h"
 #include "SerialConfig.h"
 #include "SerialTask.h"
+#include "Telecommunication/BoardCommand.h"
 
 #include <algorithm>
 #include <imgui.h>
@@ -64,14 +65,80 @@ void SerialComWindow::render() {
         }
     }
 
-    if (ImGui::CollapsingHeader("Temp")) {
-        ImGui::Text("igniteTimestamp_ms: %d", GSDataCenter::igniteTimestamp_ms);
-        ImGui::Text("launchTimestamp_ms: %d", GSDataCenter::launchTimestamp_ms);
-        ImGui::Text("lastReceivedCommandCode: %d", GSDataCenter::lastReceivedCommandCode);
-        ImGui::Text("lastBoardSentCommandCode: %d", GSDataCenter::lastBoardSentCommandCode);
-        ImGui::Text("timeSinceLastCommand_ms: %d", GSDataCenter::timeSinceLastCommand_ms);
-        ImGui::Text("lastReceivedGSCommandTimestamp_ms: %d", GSDataCenter::lastReceivedGSCommandTimestamp_ms);
-        ImGui::Text("lastSentCommandTimestamp_ms: %d", GSDataCenter::lastSentCommandTimestamp_ms);
+    std::string lastReceivedBoardCommandName = "UNKNOWN";
+    switch (GSDataCenter::lastReceivedCommandCode) {
+    case BOARD_COMMAND_CODE_ACK:
+        lastReceivedBoardCommandName = "ACK";
+        break;
+    case BOARD_COMMAND_CODE_UNSAFE:
+        lastReceivedBoardCommandName = "UNSAFE";
+        break;
+    case BOARD_COMMAND_CODE_SAFE:
+        lastReceivedBoardCommandName = "SAFE";
+        break;
+    case BOARD_COMMAND_CODE_ABORT:
+        lastReceivedBoardCommandName = "ABORT";
+        break;
+    case BOARD_COMMAND_CODE_RESET:
+        lastReceivedBoardCommandName = "RESET";
+        break;
+    }
+
+    std::string lastBoardSentCommandName = "UNKNOWN";
+    switch (GSDataCenter::lastBoardSentCommandCode) {
+    case FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT:
+        lastBoardSentCommandName = "OPEN_FILL_VALVE_PCT";
+        break;
+    case FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT:
+        lastBoardSentCommandName = "OPEN_DUMP_VALVE_PCT";
+        break;
+    case ENGINE_COMMAND_CODE_SET_NOS_VALVE_HEATER_POWER_PCT:
+        lastBoardSentCommandName = "SET_NOS_VALVE_HEATER_POWER_PCT";
+        break;
+    case ENGINE_COMMAND_CODE_SET_IPA_VALVE_HEATER_POWER_PCT:
+        lastBoardSentCommandName = "SET_IPA_VALVE_HEATER_POWER_PCT";
+        break;
+    // TODO: Fix this!!!
+    // case FILLING_STATION_COMMAND_CODE_SET_FILL_VALVE_HEATER_POWER_PCT:
+    //     lastBoardSentCommandName = "SET_FILL_VALVE_HEATER_POWER_PCT";
+    //     break;
+    // case FILLING_STATION_COMMAND_CODE_SET_DUMP_VALVE_HEATER_POWER_PCT:
+    //     lastBoardSentCommandName = "SET_DUMP_VALVE_HEATER_POWER_PCT";
+    //     break;
+    case BOARD_COMMAND_CODE_ABORT:
+        lastBoardSentCommandName = "ABORT";
+        break;
+    case BOARD_COMMAND_CODE_RESET:
+        lastBoardSentCommandName = "RESET";
+        break;
+    }
+
+    if (ImGui::CollapsingHeader("Commands")) {
+        ImGui::PushFont(FontConfig::boldDefaultFont);
+        ImGui::Text("Launch steps");
+        ImGui::PopFont();
+
+        ImGui::Text("Ignite timestamp (ms): %d", GSDataCenter::igniteTimestamp_ms);
+        ImGui::Text("Launch timestamp (ms): %d", GSDataCenter::launchTimestamp_ms);
+
+        ImGui::Separator();
+
+        ImGui::PushFont(FontConfig::boldDefaultFont);
+        ImGui::Text("Last commands");
+        ImGui::PopFont();
+
+        ImGui::Text("Last board command received by : %s", lastReceivedBoardCommandName.c_str());
+        // TODO received by engine
+        // TODO received by filling station
+
+        ImGui::Text("Last command GS sent to boards: %s", lastBoardSentCommandName.c_str());
+
+        ImGui::Text("Time since last command (ms): %d", GSDataCenter::timeSinceLastCommand_ms);
+        // TODO for engine
+        // TODO for fill
+
+        // ImGui::Text("Last command sent to GS timestamp (ms): %d", GSDataCenter::lastReceivedGSCommandTimestamp_ms);
+        // ImGui::Text("Last GCS command received timestamp (ms): %d", GSDataCenter::lastSentCommandTimestamp_ms);
     }
 
     if (ImGui::CollapsingHeader("RECV Buffer")) {
