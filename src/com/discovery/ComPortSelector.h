@@ -7,6 +7,10 @@
 
 class AbstractComPortDiscovery;
 
+/**
+ * @class ComPortSelector
+ * @brief Selects available COM ports for communication.
+ */
 class ComPortSelector {
 public:
     ComPortSelector(AbstractComPortDiscovery& comPortDiscovery);

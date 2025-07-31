@@ -112,6 +112,10 @@ std::optional<PacketMetadata> PacketReceiver::nextPacketMetadata() const {
     return packetMetadataQueue.front();
 }
 
+/**
+ * @brief Checks if a packet is available to be read from the receiver.
+ * @returns True if a packet is available, else false.
+ */
 bool PacketReceiver::packetAvailable() const {
     return !packetMetadataQueue.empty();
 }

@@ -1,15 +1,25 @@
 #include "BoardComStateMonitor.h"
 
+/**
+ * @brief Tracks a successful packet read;
+ */
 void BoardComStateMonitor::trackSuccessfulPacketRead() {
     lastSuccessfulPacketReadTimer.reset();
     ioSuccessSinceStart = true;
 }
 
+/**
+ * @brief Resets the monitor state.
+ */
 void BoardComStateMonitor::reset() {
     lastSuccessfulPacketReadTimer.reset();
     ioSuccessSinceStart = false;
 }
 
+/**
+ * @brief Gets the current state of the board communication.
+ * @returns The current state of the board communication.
+ */
 BoardComStateMonitor::State BoardComStateMonitor::getState() const {
     const double secondsSinceLastPacketRead = lastSuccessfulPacketReadTimer.getElapsedTimeInSeconds();
     if (ioSuccessSinceStart) {

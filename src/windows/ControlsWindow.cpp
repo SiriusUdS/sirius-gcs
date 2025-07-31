@@ -12,10 +12,14 @@
 #include <imgui.h>
 
 namespace ControlsWindow {
+/**
+ * @struct ValveSlider
+ * @brief Holds the state of a valve slider.
+ */
 struct ValveSlider {
-    int openedValue_perc{};
-    int lastOpenedValue_perc{};
-    bool wasSliderEnabled = true;
+    int openedValue_perc{};       ///< Current value of the slider in percentage.
+    int lastOpenedValue_perc{};   ///< Last value sent to the command control.
+    bool wasSliderEnabled = true; ///< Whether the slider was last enabled.
 };
 
 ValveSlider fillValveSlider;

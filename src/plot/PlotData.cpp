@@ -61,7 +61,7 @@ void PlotData::plot(bool showCompressedData) const {
 
 /**
  * @brief Compute the average value of the data in the last x milliseconds.
- * @param durationSec The duration in milliseconds in which we measure the recent average value.
+ * @param durationMs The duration in milliseconds in which we measure the recent average value.
  * @returns The recent average value.
  */
 float PlotData::recentAverageValue(size_t durationMs) const {
@@ -92,6 +92,10 @@ float PlotData::recentAverageValue(size_t durationMs) const {
     return sum / count;
 }
 
+/**
+ * @brief Returns the name of the plot data.
+ * @returns The name of the plot data.
+ */
 const char* PlotData::getName() const {
     return style.name;
 }
@@ -104,8 +108,10 @@ void PlotData::dropOldData(size_t amount) {
     size_t oldDataSize = data.size();
 
     if (oldDataSize < amount) {
-        GCS_APP_LOG_DEBUG("PlotData: Dropping old data unnecessary for plot data {}, current size {} smaller than amount to drop {}.", style.name,
-                      oldDataSize, amount);
+        GCS_APP_LOG_DEBUG("PlotData: Dropping old data unnecessary for plot data {}, current size {} smaller than amount to drop {}.",
+                          style.name,
+                          oldDataSize,
+                          amount);
         return;
     }
 
