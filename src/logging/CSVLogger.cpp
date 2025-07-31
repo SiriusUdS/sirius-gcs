@@ -78,6 +78,6 @@ void CSVLogger::log() {
  * @brief Checks if the CSV file is currently open.
  * @returns True if the file is open, false otherwise.
  */
-bool CSVLogger::fileIsOpen() {
+bool CSVLogger::fileIsOpen() const {
     return file.is_open();
 }

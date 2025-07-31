@@ -14,7 +14,7 @@ public:
     void addColumn(std::string column);
     void setValue(size_t columnIndex, float value);
     void log();
-    bool fileIsOpen();
+    bool fileIsOpen() const;
 
 private:
     struct Column {
