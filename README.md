@@ -1,5 +1,14 @@
 # sirius-gcs
 
+Sirius GCS is a ground control station application for managing and monitoring rocket flights. It provides features such as real-time mapping, data visualization, and command transmission.
+
+## Table of Contents
+
+- [Setup](#setup)
+- [Add a new C++ file/folder to the VS2022 project](#add-a-new-c-filefolder-to-the-vs2022-project)
+- [Enable format on save in VS2022 (ClangFormat)](#enable-format-on-save-in-vs2022-clangformat)
+- [Debugging](#debugging)
+
 ## Setup
 
 1. Install Visual Studio 2022.
@@ -8,7 +17,7 @@
 4. Open the **sirius-gcs.sln** solution in Visual Studio 2022.
 5. Compile and run.
 
-## Create C++ file/folder
+## Add a new C++ file/folder to the VS2022 project
 
 1. Create new file/folder in File Explorer at the desired location in the **src** folder.
 2. If a new folder was created:
@@ -20,9 +29,17 @@
     - *If you haven't restarted Visual Studio and no window pop-up appears, it means no changes were detected. Make sure you followed step 2 correctly.*
 5. The new files and/or folders should appear in the **Solution Explorer** window.
 
-## Enable format on save (ClangFormat)
+## Enable format on save in VS2022 (ClangFormat)
 
 In Visual Studio:
 1. In **Tools > Options > Text Editor > C/C++ > Code Style > Formatting > General**, check the **Enable ClangFormat support** option, and under it check the **Enable ClangFormat for all formatting scenarios** option.
 2. In **Analyze > Code Cleanup > Configure Code Cleanup**, select the default profile in the left window. Select the **Format Document (C++)** fixer in the bottom window and then click the arrow pointing up button. Make sure the fixer appears in the upper window.
 3. The code should now get formatted automatically when saving.
+
+## Debugging
+
+If you come across the following error when trying to compile/run the program:
+
+![Screenshot of the "fmtd.dll was not found" Windows error.](./assets/images/fmtd_dll_not_found.png)
+
+Delete the entire **sirius-gcs/out** folder before recompiling and running the program.

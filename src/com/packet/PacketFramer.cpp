@@ -39,6 +39,10 @@ void PacketFramer::byteWritten() {
     currentPacketMetadata.size++;
 }
 
+/**
+ * @brief Initializes a new packet.
+ * This should be called before starting to read a new packet.
+ */
 void PacketFramer::newPacket() {
     currentPacketMetadata.status = PacketMetadata::Status::NONE;
     currentPacketMetadata.size = sizeof(TelemetryHeader);
@@ -54,6 +58,10 @@ void PacketFramer::clear() {
     readingValidPacket = false;
 }
 
+/**
+ * @brief Gets the metadata of the last packet that was successfully framed.
+ * @returns The metadata of the last packet, or std::nullopt if no packet was framed yet.
+ */
 std::optional<PacketMetadata> PacketFramer::getLastPacketMetadata() const {
     return lastPacketMetadata;
 }

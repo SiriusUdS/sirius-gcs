@@ -3,6 +3,8 @@
 #include "Logging.h"
 #include "PlotConfig.h"
 
+#include <algorithm>
+
 namespace LoadCell {
 struct LoadCellParams {
     double additiveFactor{};
@@ -22,5 +24,7 @@ constexpr LoadCellParams LOAD_CELL_PARAMS_TABLE[LOAD_CELL_AMOUNT] = {
 
 float LoadCell::adcToForce(float adcValue, size_t loadCellIndex) {
     const LoadCellParams& params = LOAD_CELL_PARAMS_TABLE[loadCellIndex];
-    return static_cast<float>(params.functionRateOfChange * adcValue) - static_cast<float>(params.functionOffset - params.additiveFactor);
+    const float force_N =
+      static_cast<float>(params.functionRateOfChange * adcValue) - static_cast<float>(params.functionOffset - params.additiveFactor);
+    return std::max(force_N, 0.f);
 }

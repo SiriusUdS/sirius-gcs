@@ -28,13 +28,28 @@ extern SwitchData EmergencyStopButtonData;
 extern SwitchData FireIgniterButtonData;
 extern SwitchData UnsafeKeySwitchData;
 extern SwitchData ValveStartButtonData;
-extern std::vector<SwitchData*> SwitchDataVec;
 
 extern ValveData nosValveData;
 extern ValveData ipaValveData;
 extern ValveData fillValveData;
 extern ValveData dumpValveData;
 extern std::vector<ValveData*> valveDataVec;
+
+extern uint8_t motorBoardState;
+extern uint8_t fillingStationBoardState;
+extern uint8_t gsControlBoardState;
+
+extern uint32_t igniteTimestamp_ms;
+extern uint32_t launchTimestamp_ms;
+
+extern uint32_t lastReceivedCommandCodeMotorBoard;
+extern uint32_t lastReceivedCommandCodeFillingStationBoard;
+extern uint32_t lastBoardSentCommandCode;
+
+extern uint32_t timeSinceLastCommandMotorBoard_ms;
+extern uint32_t timeSinceLastCommandFillingStationBoard_ms;
+extern uint32_t lastReceivedGSCommandTimestamp_ms;
+extern uint32_t lastSentCommandTimestamp_ms;
 } // namespace GSDataCenter
 
 #endif // GSDATACENTER_H

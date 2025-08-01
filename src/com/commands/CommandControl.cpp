@@ -160,7 +160,6 @@ void CommandControl::setupAbort() {
     Command& command = currentCommand.value();
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
-    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID; // TODO: Are you sure?
     boardCommand->fields.header.bits.commandCode = BOARD_COMMAND_CODE_ABORT;
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_BROADCAST_TYPE_CODE;
@@ -178,7 +177,6 @@ void CommandControl::setupReset() {
     Command& command = currentCommand.value();
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
-    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID; // TODO: Are you sure?
     boardCommand->fields.header.bits.commandCode = BOARD_COMMAND_CODE_RESET;
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_BROADCAST_TYPE_CODE;

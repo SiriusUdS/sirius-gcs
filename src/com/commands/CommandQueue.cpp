@@ -2,7 +2,11 @@
 
 #include "Logging.h"
 
-// Add last-writer-wins implementation explanation
+/**
+ * @brief Queues commands for later processing.
+ * @param type The type of command to enqueue.
+ * @param value The value associated with the command.
+ */
 void CommandQueue::enqueue(CommandType type, uint32_t value) {
     size_t idx = static_cast<std::size_t>(type);
 
@@ -12,6 +16,9 @@ void CommandQueue::enqueue(CommandType type, uint32_t value) {
     values[idx] = value;
 }
 
+/**
+ * @brief Dequeues the next command from the queue.
+ */
 std::optional<Command> CommandQueue::dequeue() {
     if (pendingTypes.empty()) {
         return std::nullopt;
@@ -33,6 +40,10 @@ std::optional<Command> CommandQueue::dequeue() {
     return Command{.type = type, .value = value};
 }
 
+/**
+ * @brief Checks if the command queue is empty.
+ * @returns True if the queue is empty, false otherwise.
+ */
 bool CommandQueue::empty() const {
     return pendingTypes.empty();
 }

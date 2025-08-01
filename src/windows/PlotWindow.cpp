@@ -11,11 +11,11 @@
 #include <iomanip>
 
 /**
- * @brief Constructs a plot window
- * @param name Name of the plot window
- * @param xLabel Text to display along the X axis
- * @param yLabel Text to display along the Y axis
- * @param plotData The plot data object to render the data from on the plot
+ * @brief Constructs a plot window.
+ * @param name Name of the plot window.
+ * @param xLabel Text to display along the X axis.
+ * @param yLabel Text to display along the Y axis.
+ * @param sensorPlotDataVec A vector of all the sensor plot data to be displayed in this window.
  */
 PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel, std::vector<SensorPlotData*> sensorPlotDataVec)
     : name(name), xLabel(xLabel), yLabel(yLabel), sensorPlotDataVec(sensorPlotDataVec) {
@@ -30,7 +30,7 @@ PlotWindow::PlotWindow(const char* name, const char* xLabel, const char* yLabel,
 }
 
 /**
- * @brief Renders the plot window with ImGui
+ * @brief Renders the plot window with ImGui.
  */
 void PlotWindow::render() {
     ImGui::Checkbox("Auto-fit", &autofit);
@@ -97,8 +97,8 @@ void PlotWindow::render() {
 }
 
 /**
- * @brief Loads the state of the window from an ini file
- * @param ini The struct of the ini file
+ * @brief Loads the state of the window from an ini file.
+ * @param ini The struct of the ini file.
  */
 void PlotWindow::loadState(const mINI::INIStructure& ini) {
     if (ini.has(IniConfig::GCS_SECTION)) {
@@ -118,8 +118,8 @@ void PlotWindow::loadState(const mINI::INIStructure& ini) {
 }
 
 /**
- * @brief Saves the state of the window to an ini file
- * @param ini The struct of the ini file
+ * @brief Saves the state of the window to an ini file.
+ * @param ini The struct of the ini file.
  */
 void PlotWindow::saveState(mINI::INIStructure& ini) {
     ini[IniConfig::GCS_SECTION].set(autofitIniId, std::to_string(autofit));
@@ -129,8 +129,8 @@ void PlotWindow::saveState(mINI::INIStructure& ini) {
 }
 
 /**
- * @brief Generates a window id to uniquely identify different plot windows
- * @returns The generatsed window id
+ * @brief Generates a window id to uniquely identify different plot windows.
+ * @returns The generatsed window id.
  */
 std::string PlotWindow::getWindowId() {
     return "Plot - " + name;

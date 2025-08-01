@@ -17,9 +17,13 @@ enum class CommandType : size_t {
     Count // Always keep this as the last element
 };
 
+/**
+ * @struct Command
+ * @brief Represents a command with its type and value.
+ */
 struct Command {
-    CommandType type;
-    uint32_t value;
+    CommandType type; ///< Type of the command.
+    uint32_t value;   ///< Value of the command.
 };
 
 enum class ValveCommandType { Fill = FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT, Dump = FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT };

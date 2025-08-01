@@ -3,7 +3,34 @@
 #include "Logging.h"
 #include "PlotConfig.h"
 
+#include <algorithm>
+
+namespace PressureTransducer {
+struct PressureTransducerParams {
+    double additiveFactor{};
+    double functionRateOfChange{};
+    double functionOffset{};
+};
+
+constexpr size_t PRESSURE_TRANSDUCER_AMOUNT = 4;
+
+// clang-format off
+constexpr PressureTransducerParams PRESSURE_TRANSDUCER_PARAMS_TABLE[PRESSURE_TRANSDUCER_AMOUNT] = {
+    {.additiveFactor=-158.37, .functionRateOfChange=0.9767, .functionOffset=0.0},  // Filling Station - IPA
+    {.additiveFactor=-442.65, .functionRateOfChange=0.9414, .functionOffset=0.0}, // Filling Station - NOS
+    {.additiveFactor=-55.316, .functionRateOfChange=0.9438, .functionOffset=0.0}, // Engine - Chamber
+	{.additiveFactor=-717.67, .functionRateOfChange=0.9202, .functionOffset=0.0}  // Engine - Tank
+};
+// clang-format on
+} // namespace PressureTransducer
+
 float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
+    const PressureTransducerParams& params = PRESSURE_TRANSDUCER_PARAMS_TABLE[sensorIndex];
+    const float pressure_psi =
+      static_cast<float>(params.functionRateOfChange * adcValue) - static_cast<float>(params.functionOffset - params.additiveFactor);
+    return std::max(pressure_psi, 0.f);
+}
+/*float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
     static constexpr float PRESSURE_SENSOR_VOLTAGE_RANGE_V = 3.3f;
     static constexpr float PRESSURE_SENSOR_ADC_RANGE_BIT = 4095.f;
 
@@ -39,4 +66,4 @@ float PressureTransducer::adcToPressure(float adcValue, uint16_t sensorIndex) {
 
     const float voltage = (adcValue / PRESSURE_SENSOR_ADC_RANGE_BIT) * PRESSURE_SENSOR_VOLTAGE_RANGE_V;
     return (float) ((PRESSURE_SENSOR_ARRAY_SLOPE[sensorIndex] * voltage) + PRESSURE_SENSOR_ARRAY_CONST[sensorIndex]);
-}
+}*/
