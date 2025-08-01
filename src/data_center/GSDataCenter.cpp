@@ -45,13 +45,19 @@ ValveData fillValveData;
 ValveData dumpValveData;
 std::vector<ValveData*> valveDataVec({&fillValveData, &dumpValveData});
 
-uint32_t igniteTimestamp_ms;
-uint32_t launchTimestamp_ms;
+uint8_t motorBoardState{};
+uint8_t fillingStationBoardState{};
+uint8_t gsControlBoardState{};
 
-uint32_t lastReceivedCommandCode;
+uint32_t igniteTimestamp_ms{};
+uint32_t launchTimestamp_ms{};
+
+uint32_t lastReceivedCommandCodeMotorBoard{};
+uint32_t lastReceivedCommandCodeFillingStationBoard{};
 uint32_t lastBoardSentCommandCode;
 
-uint32_t timeSinceLastCommand_ms;
-uint32_t lastReceivedGSCommandTimestamp_ms;
-uint32_t lastSentCommandTimestamp_ms;
+uint32_t timeSinceLastCommandMotorBoard_ms{};
+uint32_t timeSinceLastCommandFillingStationBoard_ms{};
+uint32_t lastReceivedGSCommandTimestamp_ms{};
+uint32_t lastSentCommandTimestamp_ms{};
 } // namespace GSDataCenter

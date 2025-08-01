@@ -65,46 +65,85 @@ void SerialComWindow::render() {
         }
     }
 
-    std::string lastReceivedBoardCommandName = "UNKNOWN";
-    switch (GSDataCenter::lastReceivedCommandCode) {
+    std::string lastReceivedMotorBoardCommandName = "UNKNOWN";
+    switch (GSDataCenter::lastReceivedCommandCodeMotorBoard) {
     case BOARD_COMMAND_CODE_ACK:
-        lastReceivedBoardCommandName = "ACK";
+        lastReceivedMotorBoardCommandName = "ACK";
         break;
     case BOARD_COMMAND_CODE_UNSAFE:
-        lastReceivedBoardCommandName = "UNSAFE";
+        lastReceivedMotorBoardCommandName = "UNSAFE";
         break;
     case BOARD_COMMAND_CODE_SAFE:
-        lastReceivedBoardCommandName = "SAFE";
+        lastReceivedMotorBoardCommandName = "SAFE";
         break;
     case BOARD_COMMAND_CODE_ABORT:
-        lastReceivedBoardCommandName = "ABORT";
+        lastReceivedMotorBoardCommandName = "ABORT";
         break;
     case BOARD_COMMAND_CODE_RESET:
-        lastReceivedBoardCommandName = "RESET";
+        lastReceivedMotorBoardCommandName = "RESET";
+        break;
+    case ENGINE_COMMAND_CODE_OPEN_VALVE:
+        lastReceivedMotorBoardCommandName = "OPEN VALVE";
+        break;
+    case ENGINE_COMMAND_CODE_CLOSE_VALVE:
+        lastReceivedMotorBoardCommandName = "CLOSE VALVE";
+        break;
+    case ENGINE_COMMAND_CODE_FIRE_IGNITER:
+        lastReceivedMotorBoardCommandName = "FIRE IGNITER";
+        break;
+    case ENGINE_COMMAND_CODE_SET_NOS_VALVE_HEATER_POWER_PCT:
+        lastReceivedMotorBoardCommandName = "SET NOS VALVE HEATER POWER PCT";
+        break;
+    case ENGINE_COMMAND_CODE_SET_IPA_VALVE_HEATER_POWER_PCT:
+        lastReceivedMotorBoardCommandName = "SET IPA VALVE HEATER POWER PCT";
+        break;
+    }
+
+    std::string lastReceivedFillingStationBoardCommandName = "UNKNOWN";
+    switch (GSDataCenter::lastReceivedCommandCodeFillingStationBoard) {
+    case BOARD_COMMAND_CODE_ACK:
+        lastReceivedFillingStationBoardCommandName = "ACK";
+        break;
+    case BOARD_COMMAND_CODE_UNSAFE:
+        lastReceivedFillingStationBoardCommandName = "UNSAFE";
+        break;
+    case BOARD_COMMAND_CODE_SAFE:
+        lastReceivedFillingStationBoardCommandName = "SAFE";
+        break;
+    case BOARD_COMMAND_CODE_ABORT:
+        lastReceivedFillingStationBoardCommandName = "ABORT";
+        break;
+    case BOARD_COMMAND_CODE_RESET:
+        lastReceivedFillingStationBoardCommandName = "RESET";
+        break;
+    case FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT:
+        lastReceivedFillingStationBoardCommandName = "OPEN FILL VALVE PCT";
+        break;
+    case FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT:
+        lastReceivedFillingStationBoardCommandName = "OPEN DUMP VALVE PCT";
+        break;
+    case FILLING_STATION_COMMAND_CODE_SET_FILL_VALVE_HEATER_POWER_PCT:
+        lastReceivedFillingStationBoardCommandName = "SET FILL VALVE HEATER POWER PCT";
+        break;
+    case FILLING_STATION_COMMAND_CODE_SET_DUMP_VALVE_HEATER_POWER_PCT:
+        lastReceivedFillingStationBoardCommandName = "SET DUMP VALVE HEATER POWER PCT";
         break;
     }
 
     std::string lastBoardSentCommandName = "UNKNOWN";
     switch (GSDataCenter::lastBoardSentCommandCode) {
     case FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT:
-        lastBoardSentCommandName = "OPEN_FILL_VALVE_PCT";
+        lastBoardSentCommandName = "OPEN FILL VALVE PCT";
         break;
     case FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT:
-        lastBoardSentCommandName = "OPEN_DUMP_VALVE_PCT";
+        lastBoardSentCommandName = "OPEN DUMP VALVE PCT";
         break;
     case ENGINE_COMMAND_CODE_SET_NOS_VALVE_HEATER_POWER_PCT:
-        lastBoardSentCommandName = "SET_NOS_VALVE_HEATER_POWER_PCT";
+        lastBoardSentCommandName = "SET NOS/FILL VALVE HEATER POWER PCT";
         break;
     case ENGINE_COMMAND_CODE_SET_IPA_VALVE_HEATER_POWER_PCT:
-        lastBoardSentCommandName = "SET_IPA_VALVE_HEATER_POWER_PCT";
+        lastBoardSentCommandName = "SET IPA/DUMP VALVE HEATER POWER PCT";
         break;
-    // TODO: Fix this!!!
-    // case FILLING_STATION_COMMAND_CODE_SET_FILL_VALVE_HEATER_POWER_PCT:
-    //     lastBoardSentCommandName = "SET_FILL_VALVE_HEATER_POWER_PCT";
-    //     break;
-    // case FILLING_STATION_COMMAND_CODE_SET_DUMP_VALVE_HEATER_POWER_PCT:
-    //     lastBoardSentCommandName = "SET_DUMP_VALVE_HEATER_POWER_PCT";
-    //     break;
     case BOARD_COMMAND_CODE_ABORT:
         lastBoardSentCommandName = "ABORT";
         break;
@@ -127,15 +166,13 @@ void SerialComWindow::render() {
         ImGui::Text("Last commands");
         ImGui::PopFont();
 
-        ImGui::Text("Last board command received by : %s", lastReceivedBoardCommandName.c_str());
-        // TODO received by engine
-        // TODO received by filling station
+        ImGui::Text("Last command received by motor board: %s", lastReceivedMotorBoardCommandName.c_str());
+        ImGui::Text("Last command received by filling station board: %s", lastReceivedFillingStationBoardCommandName.c_str());
 
         ImGui::Text("Last command GS sent to boards: %s", lastBoardSentCommandName.c_str());
 
-        ImGui::Text("Time since last command (ms): %d", GSDataCenter::timeSinceLastCommand_ms);
-        // TODO for engine
-        // TODO for fill
+        ImGui::Text("Time since last command received by motor board (ms): %d", GSDataCenter::timeSinceLastCommandMotorBoard_ms);
+        ImGui::Text("Time since last command received by filling station board (ms): %d", GSDataCenter::timeSinceLastCommandFillingStationBoard_ms);
 
         // ImGui::Text("Last command sent to GS timestamp (ms): %d", GSDataCenter::lastReceivedGSCommandTimestamp_ms);
         // ImGui::Text("Last GCS command received timestamp (ms): %d", GSDataCenter::lastSentCommandTimestamp_ms);

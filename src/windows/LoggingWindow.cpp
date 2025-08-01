@@ -27,6 +27,7 @@ std::mutex mtx;
 } // namespace LoggingWindow
 
 void LoggingWindow::render() {
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
     if (ToggleButton(ICON_FA_BUG " Debug", &showDebug, UIConfig::BLUE_BUTTON_COLOR)) {
         logBuffer.updateVisibleLogs();
     }
@@ -42,6 +43,7 @@ void LoggingWindow::render() {
     if (ToggleButton(ICON_FA_BOMB " Error", &showError, UIConfig::RED_BUTTON_COLOR)) {
         logBuffer.updateVisibleLogs();
     }
+    ImGui::PopStyleColor();
     ImGui::SameLine();
     if (ImGui::Button("Clear")) {
         clear();

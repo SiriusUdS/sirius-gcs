@@ -4,6 +4,7 @@
 #include <WinSock2.h>
 // clang-format on
 
+#include "BoardsWindow.h"
 #include "ControlsWindow.h"
 #include "FontConfig.h"
 #include "ImGuiConfig.h"
@@ -115,17 +116,19 @@ std::vector<HelloImGui::DockingSplit> Application::createBaseDockingSplits() {
 }
 
 std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
+    HelloImGui::DockableWindow boardsDockWin("Boards", ImGuiConfig::Dockspace::MAP, []() { BoardsWindow::render(); });
+    HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::MAP, []() { ControlsWindow::render(); });
     HelloImGui::DockableWindow loggingDockWin("Logs", ImGuiConfig::Dockspace::LOGGING, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin("Map", ImGuiConfig::Dockspace::MAP, []() { MapWindow::render(); });
-    HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::MAP, []() { ControlsWindow::render(); });
     HelloImGui::DockableWindow serialComDockWin("Serial COM", ImGuiConfig::Dockspace::MAP, []() { SerialComWindow::render(); });
     HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
     HelloImGui::DockableWindow valvesDockWin("Valves", ImGuiConfig::Dockspace::MAP, []() { ValvesWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
+    dockableWindows.push_back(boardsDockWin);
+    dockableWindows.push_back(controlsDockWin);
     dockableWindows.push_back(loggingDockWin);
     dockableWindows.push_back(mapDockWin);
-    dockableWindows.push_back(controlsDockWin);
     dockableWindows.push_back(serialComDockWin);
     dockableWindows.push_back(switchesDockWin);
     dockableWindows.push_back(valvesDockWin);

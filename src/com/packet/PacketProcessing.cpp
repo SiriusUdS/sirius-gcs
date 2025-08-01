@@ -211,6 +211,8 @@ bool PacketProcessing::processGSControlPacket() {
     GSDataCenter::lastBoardSentCommandCode = packet->fields.lastBoardSentCommandCode;
     GSDataCenter::lastSentCommandTimestamp_ms = packet->fields.lastSentCommandTimestamp_ms;
 
+    GSDataCenter::gsControlBoardState = status.bits.state;
+
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::gsControlPacketRateMonitor.trackPacket();
     SerialTask::gsControlBoardComStateMonitor.trackSuccessfulPacketRead();
@@ -243,8 +245,10 @@ bool PacketProcessing::processEngineStatusPacket() {
 
     GSDataCenter::igniteTimestamp_ms = packet->fields.igniteTimestamp_ms;
     GSDataCenter::launchTimestamp_ms = packet->fields.launchTimestamp_ms;
-    GSDataCenter::timeSinceLastCommand_ms = packet->fields.timeSinceLastCommand_ms;
-    GSDataCenter::lastReceivedCommandCode = packet->fields.lastReceivedCommandCode;
+    GSDataCenter::timeSinceLastCommandMotorBoard_ms = packet->fields.timeSinceLastCommand_ms;
+    GSDataCenter::lastReceivedCommandCodeMotorBoard = packet->fields.lastReceivedCommandCode;
+
+    GSDataCenter::motorBoardState = packet->fields.status.bits.state;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
@@ -278,8 +282,10 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     GSDataCenter::dumpValveData.openedSwitchHigh = dumpValveStatus.bits.openedSwitchHigh;
     GSDataCenter::dumpValveData.positionOpened_pct = dumpValveStatus.bits.positionOpened_pct;
 
-    GSDataCenter::timeSinceLastCommand_ms = packet->fields.timeSinceLastCommand_ms;
-    GSDataCenter::lastReceivedCommandCode = packet->fields.lastReceivedCommandCode;
+    GSDataCenter::timeSinceLastCommandFillingStationBoard_ms = packet->fields.timeSinceLastCommand_ms;
+    GSDataCenter::lastReceivedCommandCodeFillingStationBoard = packet->fields.lastReceivedCommandCode;
+
+    GSDataCenter::fillingStationBoardState = packet->fields.status.bits.state;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
