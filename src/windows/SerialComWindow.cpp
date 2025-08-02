@@ -39,9 +39,9 @@ void SerialComWindow::render() {
             ImGui::TableSetupColumn("COM State");
             ImGui::TableHeadersRow();
 
-            renderBoardComStateTableRow("Motor Board", SerialTask::motorBoardComStateMonitor.getState());
-            renderBoardComStateTableRow("Filling Station Board", SerialTask::fillingStationBoardComStateMonitor.getState());
-            renderBoardComStateTableRow("GS Control Board", SerialTask::gsControlBoardComStateMonitor.getState());
+            renderBoardComStateTableRow("Motor", SerialTask::motorBoardComStateMonitor.getState());
+            renderBoardComStateTableRow("Filling Station", SerialTask::fillingStationBoardComStateMonitor.getState());
+            renderBoardComStateTableRow("GS Control", SerialTask::gsControlBoardComStateMonitor.getState());
             ImGui::EndTable();
         }
     }

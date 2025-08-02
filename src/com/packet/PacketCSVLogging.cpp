@@ -95,6 +95,8 @@ void PacketCSVLogging::init() {
 
     engineStatusLogger.openFile(dataLogDir + "/EngineStatus.log");
     engineStatusLogger.addColumn("Timestamp");
+    engineStatusLogger.addColumn("Ignite Timestamp");
+    engineStatusLogger.addColumn("Launch Timestamp");
     engineStatusLogger.addColumn("NOS Valve Idle");
     engineStatusLogger.addColumn("NOS Valve Closed Switch High");
     engineStatusLogger.addColumn("NOS Valve Opened Switch High");
@@ -224,12 +226,14 @@ void PacketCSVLogging::logEngineStatusPacket(const EngineStatusPacket* packet) {
     const ValveStatus& ipaValve = packet->fields.valveStatus[SerialConfig::IPA_VALVE_STATUS_INDEX];
 
     engineStatusLogger.setValue(0, static_cast<float>(packet->fields.timestamp_ms));
-    engineStatusLogger.setValue(1, static_cast<float>(nosValve.bits.isIdle));
-    engineStatusLogger.setValue(2, static_cast<float>(nosValve.bits.closedSwitchHigh));
-    engineStatusLogger.setValue(3, static_cast<float>(nosValve.bits.openedSwitchHigh));
-    engineStatusLogger.setValue(4, static_cast<float>(ipaValve.bits.isIdle));
-    engineStatusLogger.setValue(5, static_cast<float>(ipaValve.bits.closedSwitchHigh));
-    engineStatusLogger.setValue(6, static_cast<float>(ipaValve.bits.openedSwitchHigh));
+    engineStatusLogger.setValue(1, static_cast<float>(packet->fields.igniteTimestamp_ms));
+    engineStatusLogger.setValue(2, static_cast<float>(packet->fields.launchTimestamp_ms));
+    engineStatusLogger.setValue(3, static_cast<float>(nosValve.bits.isIdle));
+    engineStatusLogger.setValue(4, static_cast<float>(nosValve.bits.closedSwitchHigh));
+    engineStatusLogger.setValue(5, static_cast<float>(nosValve.bits.openedSwitchHigh));
+    engineStatusLogger.setValue(6, static_cast<float>(ipaValve.bits.isIdle));
+    engineStatusLogger.setValue(7, static_cast<float>(ipaValve.bits.closedSwitchHigh));
+    engineStatusLogger.setValue(8, static_cast<float>(ipaValve.bits.openedSwitchHigh));
     engineStatusLogger.log();
 }
 
