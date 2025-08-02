@@ -69,12 +69,6 @@ float TemperatureSensor::adcToTemperature(float adcValue) {
 
     static constexpr int RT_TABLE_SIZE = sizeof(RT_TABLE) / sizeof(RT_TABLE[0]);
 
-    // TODO: UNCOMMENT LATER
-    // if (adcValue < MIN_VALID_ADC || adcValue > MAX_VALID_ADC) {
-    //    GCS_LOG_DEBUG("TemperatureSensor: Invalid ADC value.");
-    //    return PlotConfig::INVALID_VALUE;
-    //}
-
     const float voltage = (adcValue / ADDITIVE_FACTOR) * 3.3f;
     const float resistance = (3.3f / voltage) * CONTROL_RESISTANCE;
 
@@ -86,9 +80,5 @@ float TemperatureSensor::adcToTemperature(float adcValue) {
         }
     }
 
-    // GCS_LOG_DEBUG("TemperatureSensor: Measured resistance not in RT table range.");
-    // GCS_LOG_INFO("TemperatureSensor: Measured resistance not in RT table range.");
-    // GCS_LOG_WARN("TemperatureSensor: Measured resistance not in RT table range.");
-    // GCS_LOG_ERROR("TemperatureSensor: Measured resistance not in RT table range.");
     return PlotConfig::INVALID_VALUE;
 }
