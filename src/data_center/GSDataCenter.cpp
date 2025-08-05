@@ -52,6 +52,9 @@ uint8_t gsControlBoardState{};
 uint32_t igniteTimestamp_ms{};
 uint32_t launchTimestamp_ms{};
 
+bool isMotorBoardSDCardIsPluggedIn;
+bool isFillingStationBoardSDCardIsPluggedIn;
+
 uint32_t lastReceivedCommandCodeMotorBoard{};
 uint32_t lastReceivedCommandCodeFillingStationBoard{};
 uint32_t lastBoardSentCommandCode;

@@ -42,6 +42,9 @@ extern uint8_t gsControlBoardState;
 extern uint32_t igniteTimestamp_ms;
 extern uint32_t launchTimestamp_ms;
 
+extern bool isMotorBoardSDCardIsPluggedIn;
+extern bool isFillingStationBoardSDCardIsPluggedIn;
+
 extern uint32_t lastReceivedCommandCodeMotorBoard;
 extern uint32_t lastReceivedCommandCodeFillingStationBoard;
 extern uint32_t lastBoardSentCommandCode;

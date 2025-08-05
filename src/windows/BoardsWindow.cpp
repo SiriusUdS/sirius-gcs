@@ -11,7 +11,7 @@
 #include <imgui.h>
 
 namespace BoardsWindow {
-void renderBoardTableRow(const char* name, const char* boardStateName, BoardComStateMonitor::State comState);
+void renderBoardTableRow(const char* name, const char* boardStateName, BoardComStateMonitor::State comState, std::optional<bool> sdCardPluggedIn);
 }
 
 void BoardsWindow::render() {
@@ -69,20 +69,30 @@ void BoardsWindow::render() {
         break;
     }
 
-    if (ImGui::BeginTable("BoardComStatesTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+    if (ImGui::BeginTable("BoardComStatesTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
         ImGui::TableSetupColumn("Board");
         ImGui::TableSetupColumn("State");
         ImGui::TableSetupColumn("COM State");
+        ImGui::TableSetupColumn("Is SD Card Plugged In");
         ImGui::TableHeadersRow();
 
-        renderBoardTableRow("Motor", motorBoardStateName, SerialTask::motorBoardComStateMonitor.getState());
-        renderBoardTableRow("Filling Station", fillingStationBoardStateName, SerialTask::fillingStationBoardComStateMonitor.getState());
-        renderBoardTableRow("GS Control", gsControlBoardStateName, SerialTask::gsControlBoardComStateMonitor.getState());
+        renderBoardTableRow("Motor",
+                            motorBoardStateName,
+                            SerialTask::motorBoardComStateMonitor.getState(),
+                            GSDataCenter::isMotorBoardSDCardIsPluggedIn);
+        renderBoardTableRow("Filling Station",
+                            fillingStationBoardStateName,
+                            SerialTask::fillingStationBoardComStateMonitor.getState(),
+                            GSDataCenter::isFillingStationBoardSDCardIsPluggedIn);
+        renderBoardTableRow("GS Control", gsControlBoardStateName, SerialTask::gsControlBoardComStateMonitor.getState(), std::nullopt);
         ImGui::EndTable();
     }
 }
 
-void BoardsWindow::renderBoardTableRow(const char* name, const char* boardStateName, BoardComStateMonitor::State comState) {
+void BoardsWindow::renderBoardTableRow(const char* name,
+                                       const char* boardStateName,
+                                       BoardComStateMonitor::State comState,
+                                       std::optional<bool> sdCardPluggedIn) {
     const char* comStateText = "Unknown";
     if (!SerialTask::com.comOpened()) {
         comStateText = "Disconnected";
@@ -100,6 +110,11 @@ void BoardsWindow::renderBoardTableRow(const char* name, const char* boardStateN
         }
     }
 
+    const char* sdCardPluggedInText = "N/A";
+    if (sdCardPluggedIn.has_value()) {
+        sdCardPluggedInText = sdCardPluggedIn.value() ? "Yes" : "No";
+    }
+
     ImGui::TableNextRow();
     ImGui::TableSetColumnIndex(0);
     ImGui::Text(name);
@@ -107,4 +122,6 @@ void BoardsWindow::renderBoardTableRow(const char* name, const char* boardStateN
     ImGui::Text(boardStateName);
     ImGui::TableSetColumnIndex(2);
     ImGui::Text(comStateText);
+    ImGui::TableSetColumnIndex(3);
+    ImGui::Text(sdCardPluggedInText);
 }
