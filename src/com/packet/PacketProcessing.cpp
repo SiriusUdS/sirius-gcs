@@ -139,7 +139,7 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     SerialTask::engineTelemetryPacketRateMonitor.trackPacket();
     SerialTask::motorBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketCSVLogging::logEngineTelemetryPacket(timestamp, thermistorValues, pressureSensorValues);
+    PacketCSVLogging::logEngineTelemetryPacket(timestamp, thermistorAdcValues, thermistorValues, pressureSensorAdcValues, pressureSensorValues);
     return true;
 }
 
@@ -181,7 +181,13 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     SerialTask::fillingStationTelemetryPacketRateMonitor.trackPacket();
     SerialTask::fillingStationBoardComStateMonitor.trackSuccessfulPacketRead();
 
-    PacketCSVLogging::logFillingStationTelemetryPacket(timestamp, thermistorValues, pressureSensorValues, loadCellValues);
+    PacketCSVLogging::logFillingStationTelemetryPacket(timestamp,
+                                                       thermistorAdcValues,
+                                                       thermistorValues,
+                                                       pressureSensorAdcValues,
+                                                       pressureSensorValues,
+                                                       loadCellAdcValues,
+                                                       loadCellValues);
     return true;
 }
 

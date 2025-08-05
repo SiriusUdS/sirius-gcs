@@ -10,6 +10,8 @@
 void CommandQueue::enqueue(CommandType type, uint32_t value) {
     size_t idx = static_cast<std::size_t>(type);
 
+    // TODO: Can't queue multiple commands of same type but different unit (ex. fill heat pad and dump heat pad overwrite each other, needs to be
+    // fixed)
     if (!values[idx].has_value()) {
         pendingTypes.push(type);
     }
