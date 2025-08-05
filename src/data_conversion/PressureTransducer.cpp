@@ -18,8 +18,10 @@ constexpr size_t PRESSURE_TRANSDUCER_AMOUNT = 4;
 constexpr PressureTransducerParams PRESSURE_TRANSDUCER_PARAMS_TABLE[PRESSURE_TRANSDUCER_AMOUNT] = {
     {.additiveFactor=-158.37, .functionRateOfChange=0.9767, .functionOffset=0.0},  // Filling Station - IPA
     {.additiveFactor=-442.65, .functionRateOfChange=0.9414, .functionOffset=0.0}, // Filling Station - NOS
-    {.additiveFactor=-55.316, .functionRateOfChange=0.9438, .functionOffset=0.0}, // Engine - Chamber
-	{.additiveFactor=-717.67, .functionRateOfChange=0.9202, .functionOffset=0.0}  // Engine - Tank
+    {.additiveFactor=43.0, .functionRateOfChange=0.9438, .functionOffset=0.0}, // Engine - Chamber
+	{.additiveFactor=-43.0, .functionRateOfChange=0.9202, .functionOffset=0.0}  // Engine - Tank
+    // OLD {.additiveFactor=-55.316, .functionRateOfChange=0.9438, .functionOffset=0.0}, // Engine - Chamber
+	// OLD {.additiveFactor=-717.67, .functionRateOfChange=0.9202, .functionOffset=0.0}  // Engine - Tank
 };
 // clang-format on
 } // namespace PressureTransducer
