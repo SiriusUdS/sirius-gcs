@@ -59,3 +59,20 @@ TEST_CASE("CommandQueue should be able to requeue commands normally after they'v
     checkCommand(queue.dequeue(), CommandType::Reset, 1);
     checkNoCommand(queue.dequeue());
 }
+
+TEST_CASE("CommandQueue valve and heat pad commands should not overwrite each other if they target different valves and heatpads") {
+    CommandQueue queue;
+    queue.enqueue(CommandType::FillHeatPad, 1);
+    queue.enqueue(CommandType::DumpHeatPad, 2);
+    queue.enqueue(CommandType::NosHeatPad, 3);
+    queue.enqueue(CommandType::IpaHeatPad, 4);
+    queue.enqueue(CommandType::DumpValve, 5);
+    queue.enqueue(CommandType::FillValve, 6);
+    checkCommand(queue.dequeue(), CommandType::FillHeatPad, 1);
+    checkCommand(queue.dequeue(), CommandType::DumpHeatPad, 2);
+    checkCommand(queue.dequeue(), CommandType::NosHeatPad, 3);
+    checkCommand(queue.dequeue(), CommandType::IpaHeatPad, 4);
+    checkCommand(queue.dequeue(), CommandType::DumpValve, 5);
+    checkCommand(queue.dequeue(), CommandType::FillValve, 6);
+    checkNoCommand(queue.dequeue());
+}
