@@ -103,6 +103,7 @@ void PacketCSVLogging::init() {
     engineStatusLogger.addColumn("IPA Valve Idle");
     engineStatusLogger.addColumn("IPA Valve Closed Switch High");
     engineStatusLogger.addColumn("IPA Valve Opened Switch High");
+    engineStatusLogger.addColumn("Storage Error Status");
 
     fillingStationStatusLogger.openFile(dataLogDir + "/FillingStationStatus.log");
     fillingStationStatusLogger.addColumn("Timestamp");
@@ -112,6 +113,7 @@ void PacketCSVLogging::init() {
     fillingStationStatusLogger.addColumn("Dump Valve Idle");
     fillingStationStatusLogger.addColumn("Dump Valve Closed Switch High");
     fillingStationStatusLogger.addColumn("Dump Valve Opened Switch High");
+    fillingStationStatusLogger.addColumn("Storage Error Status");
 }
 
 void PacketCSVLogging::logEngineTelemetryPacket(float timestamp,
@@ -234,6 +236,7 @@ void PacketCSVLogging::logEngineStatusPacket(const EngineStatusPacket* packet) {
     engineStatusLogger.setValue(6, static_cast<float>(ipaValve.bits.isIdle));
     engineStatusLogger.setValue(7, static_cast<float>(ipaValve.bits.closedSwitchHigh));
     engineStatusLogger.setValue(8, static_cast<float>(ipaValve.bits.openedSwitchHigh));
+    engineStatusLogger.setValue(9, static_cast<float>(packet->fields.storageErrorStatus.value));
     engineStatusLogger.log();
 }
 
@@ -257,6 +260,7 @@ void PacketCSVLogging::logFillingStationStatusPacket(const FillingStationStatusP
     fillingStationStatusLogger.setValue(4, static_cast<float>(dumpValve.bits.isIdle));
     fillingStationStatusLogger.setValue(5, static_cast<float>(dumpValve.bits.closedSwitchHigh));
     fillingStationStatusLogger.setValue(6, static_cast<float>(dumpValve.bits.openedSwitchHigh));
+    fillingStationStatusLogger.setValue(7, static_cast<float>(packet->fields.storageErrorStatus.value));
     fillingStationStatusLogger.log();
 }
 

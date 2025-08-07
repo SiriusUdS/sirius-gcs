@@ -255,7 +255,7 @@ bool PacketProcessing::processEngineStatusPacket() {
     GSDataCenter::lastReceivedCommandCodeMotorBoard = packet->fields.lastReceivedCommandCode;
 
     GSDataCenter::motorBoardState = packet->fields.status.bits.state;
-    GSDataCenter::isMotorBoardSDCardIsPluggedIn = packet->fields.storageStatus.bits.isPluggedIn;
+    GSDataCenter::motorBoardStorageErrorStatus = packet->fields.storageErrorStatus.value;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
@@ -293,7 +293,7 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     GSDataCenter::lastReceivedCommandCodeFillingStationBoard = packet->fields.lastReceivedCommandCode;
 
     GSDataCenter::fillingStationBoardState = packet->fields.status.bits.state;
-    GSDataCenter::isFillingStationBoardSDCardIsPluggedIn = packet->fields.storageStatus.bits.isPluggedIn;
+    GSDataCenter::fillingStationBoardStorageErrorStatus = packet->fields.storageErrorStatus.value;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();
