@@ -5,6 +5,8 @@
 #include "Telecommunication/PacketHeaderVariable.h"
 
 enum class CommandType : size_t {
+    NosValve,
+    IpaValve,
     FillValve,
     DumpValve,
     NosHeatPad,
@@ -26,7 +28,12 @@ struct Command {
     uint32_t value;   ///< Value of the command.
 };
 
-enum class ValveCommandType { Fill = FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT, Dump = FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT };
+enum class ValveCommandType {
+    Nos = ENGINE_COMMAND_CODE_SET_NOS_VALVE_HEATER_POWER_PCT,
+    Ipa = ENGINE_COMMAND_CODE_SET_IPA_VALVE_HEATER_POWER_PCT,
+    Fill = FILLING_STATION_COMMAND_CODE_OPEN_FILL_VALVE_PCT,
+    Dump = FILLING_STATION_COMMAND_CODE_OPEN_DUMP_VALVE_PCT
+};
 
 enum class HeatPadCommandType {
     Nos = ENGINE_COMMAND_CODE_SET_NOS_VALVE_HEATER_POWER_PCT,

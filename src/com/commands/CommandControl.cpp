@@ -74,6 +74,12 @@ void CommandControl::getNextCommand() {
     }
 
     switch (currentCommand.value().type) {
+    case CommandType::NosValve:
+        setupValveCommand(ValveCommandType::Nos);
+        break;
+    case CommandType::IpaValve:
+        setupValveCommand(ValveCommandType::Ipa);
+        break;
     case CommandType::FillValve:
         setupValveCommand(ValveCommandType::Fill);
         break;
