@@ -18,83 +18,87 @@ void renderStorageErrorStatusName(uint16_t storageErrorStatus);
 } // namespace BoardsWindow
 
 void BoardsWindow::render() {
-    const char* motorBoardStateName = "Unknown";
-    switch (GSDataCenter::motorBoardState) {
-    case ENGINE_STATE_INIT:
-        motorBoardStateName = "INIT";
-        break;
-    case ENGINE_STATE_SAFE:
-        motorBoardStateName = "SAFE";
-        break;
-    case ENGINE_STATE_UNSAFE:
-        motorBoardStateName = "UNSAFE";
-        break;
-    case ENGINE_STATE_ABORT:
-        motorBoardStateName = "ABORT";
-        break;
-    case ENGINE_STATE_IGNITION:
-        motorBoardStateName = "IGNITION";
-        break;
-    case ENGINE_STATE_LAUNCH:
-        motorBoardStateName = "LAUNCH";
-        break;
+    if (ImGui::CollapsingHeader("State")) {
+        const char* motorBoardStateName = "Unknown";
+        switch (GSDataCenter::motorBoardState) {
+        case ENGINE_STATE_INIT:
+            motorBoardStateName = "INIT";
+            break;
+        case ENGINE_STATE_SAFE:
+            motorBoardStateName = "SAFE";
+            break;
+        case ENGINE_STATE_UNSAFE:
+            motorBoardStateName = "UNSAFE";
+            break;
+        case ENGINE_STATE_ABORT:
+            motorBoardStateName = "ABORT";
+            break;
+        case ENGINE_STATE_IGNITION:
+            motorBoardStateName = "IGNITION";
+            break;
+        case ENGINE_STATE_LAUNCH:
+            motorBoardStateName = "LAUNCH";
+            break;
+        }
+
+        const char* fillingStationBoardStateName = "Unknown";
+        switch (GSDataCenter::fillingStationBoardState) {
+        case FILLING_STATION_STATE_INIT:
+            fillingStationBoardStateName = "INIT";
+            break;
+        case FILLING_STATION_STATE_SAFE:
+            fillingStationBoardStateName = "SAFE";
+            break;
+        case FILLING_STATION_STATE_UNSAFE:
+            fillingStationBoardStateName = "UNSAFE";
+            break;
+        case FILLING_STATION_STATE_ABORT:
+            fillingStationBoardStateName = "ABORT";
+            break;
+        }
+
+        const char* gsControlBoardStateName = "Unknown";
+        switch (GSDataCenter::gsControlBoardState) {
+        case GS_CONTROL_STATE_INIT:
+            gsControlBoardStateName = "INIT";
+            break;
+        case GS_CONTROL_STATE_SAFE:
+            gsControlBoardStateName = "SAFE";
+            break;
+        case GS_CONTROL_STATE_UNSAFE:
+            gsControlBoardStateName = "UNSAFE";
+            break;
+        case GS_CONTROL_STATE_ABORT:
+            gsControlBoardStateName = "ABORT";
+            break;
+        }
+
+        if (ImGui::BeginTable("BoardComStatesTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+            ImGui::TableSetupColumn("Board");
+            ImGui::TableSetupColumn("State");
+            ImGui::TableSetupColumn("COM State");
+            ImGui::TableHeadersRow();
+
+            renderBoardTableRow("Motor", motorBoardStateName, SerialTask::motorBoardComStateMonitor.getState());
+            renderBoardTableRow("Filling Station", fillingStationBoardStateName, SerialTask::fillingStationBoardComStateMonitor.getState());
+            renderBoardTableRow("GS Control", gsControlBoardStateName, SerialTask::gsControlBoardComStateMonitor.getState());
+            ImGui::EndTable();
+        }
     }
 
-    const char* fillingStationBoardStateName = "Unknown";
-    switch (GSDataCenter::fillingStationBoardState) {
-    case FILLING_STATION_STATE_INIT:
-        fillingStationBoardStateName = "INIT";
-        break;
-    case FILLING_STATION_STATE_SAFE:
-        fillingStationBoardStateName = "SAFE";
-        break;
-    case FILLING_STATION_STATE_UNSAFE:
-        fillingStationBoardStateName = "UNSAFE";
-        break;
-    case FILLING_STATION_STATE_ABORT:
-        fillingStationBoardStateName = "ABORT";
-        break;
+    if (ImGui::CollapsingHeader("Storage Error Status")) {
+        ImGui::PushFont(FontConfig::boldMainFont);
+        ImGui::Text("Any value other than 0 indicates an error.");
+        ImGui::PopFont();
+
+        ImGui::Text("Motor Board: ");
+        ImGui::SameLine();
+        renderStorageErrorStatusName(GSDataCenter::motorBoardStorageErrorStatus);
+
+        ImGui::Text("Filling Station Board: ");
+        ImGui::SameLine();
+        renderStorageErrorStatusName(GSDataCenter::fillingStationBoardStorageErrorStatus);
     }
-
-    const char* gsControlBoardStateName = "Unknown";
-    switch (GSDataCenter::gsControlBoardState) {
-    case GS_CONTROL_STATE_INIT:
-        gsControlBoardStateName = "INIT";
-        break;
-    case GS_CONTROL_STATE_SAFE:
-        gsControlBoardStateName = "SAFE";
-        break;
-    case GS_CONTROL_STATE_UNSAFE:
-        gsControlBoardStateName = "UNSAFE";
-        break;
-    case GS_CONTROL_STATE_ABORT:
-        gsControlBoardStateName = "ABORT";
-        break;
-    }
-
-    if (ImGui::BeginTable("BoardComStatesTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-        ImGui::TableSetupColumn("Board");
-        ImGui::TableSetupColumn("State");
-        ImGui::TableSetupColumn("COM State");
-        ImGui::TableHeadersRow();
-
-        renderBoardTableRow("Motor", motorBoardStateName, SerialTask::motorBoardComStateMonitor.getState());
-        renderBoardTableRow("Filling Station", fillingStationBoardStateName, SerialTask::fillingStationBoardComStateMonitor.getState());
-        renderBoardTableRow("GS Control", gsControlBoardStateName, SerialTask::gsControlBoardComStateMonitor.getState());
-        ImGui::EndTable();
-    }
-
-    ImGui::PushFont(FontConfig::boldDefaultFont);
-    ImGui::Text("SD Card Storage Status");
-    ImGui::PopFont();
-
-    ImGui::Text("Motor Board: ");
-    ImGui::SameLine();
-    renderStorageErrorStatusName(GSDataCenter::motorBoardStorageErrorStatus);
-
-    ImGui::Text("Filling Station Board: ");
-    ImGui::SameLine();
-    renderStorageErrorStatusName(GSDataCenter::fillingStationBoardStorageErrorStatus);
 }
 
 void BoardsWindow::renderBoardTableRow(const char* name, const char* boardStateName, BoardComStateMonitor::State comState) {

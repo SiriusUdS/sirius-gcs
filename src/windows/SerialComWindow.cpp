@@ -57,7 +57,7 @@ void SerialComWindow::render() {
             renderPacketRateTableRow("GS control", SerialTask::gsControlPacketRateMonitor.getRatePerSecond());
             renderPacketRateTableRow("Engine status", SerialTask::engineStatusPacketRateMonitor.getRatePerSecond());
             renderPacketRateTableRow("Filling station status", SerialTask::fillingStationStatusPacketRateMonitor.getRatePerSecond());
-            ImGui::PushFont(FontConfig::boldDefaultFont);
+            ImGui::PushFont(FontConfig::boldMainFont);
             renderPacketRateTableRow("Total", SerialTask::packetRateMonitor.getRatePerSecond());
             ImGui::PopFont();
 
@@ -152,8 +152,8 @@ void SerialComWindow::render() {
         break;
     }
 
-    if (ImGui::CollapsingHeader("Commands")) {
-        ImGui::PushFont(FontConfig::boldDefaultFont);
+    if (ImGui::CollapsingHeader("Misc")) {
+        ImGui::PushFont(FontConfig::boldMainFont);
         ImGui::Text("Launch steps");
         ImGui::PopFont();
 
@@ -162,7 +162,7 @@ void SerialComWindow::render() {
 
         ImGui::Separator();
 
-        ImGui::PushFont(FontConfig::boldDefaultFont);
+        ImGui::PushFont(FontConfig::boldMainFont);
         ImGui::Text("Last commands");
         ImGui::PopFont();
 
@@ -257,7 +257,7 @@ void SerialComWindow::recvBufferContentModal() {
 
         ImGui::BeginChild("RecvBufferBox", boxSize, true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
         ImGui::PushTextWrapPos(0.0f);
-        ImGui::PushFont(FontConfig::codeFont);
+        ImGui::PushFont(FontConfig::monospaceFont);
 
         if (recvBufferDisplayMode == TEXT) {
             ImGui::TextUnformatted(displayBuf, displayBuf + SerialConfig::PACKET_CIRCULAR_BUFFER_SIZE);
