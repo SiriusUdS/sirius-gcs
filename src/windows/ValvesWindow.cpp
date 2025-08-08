@@ -22,8 +22,8 @@ void ValvesWindow::render() {
         ImGui::TableSetupColumn("% Open");
         ImGui::TableHeadersRow();
 
-        renderValveStateRow("NOS", GSDataCenter::nosValveData);
-        renderValveStateRow("IPA", GSDataCenter::ipaValveData);
+        renderValveStateRow("IPA", GSDataCenter::nosValveData);
+        renderValveStateRow("NOS", GSDataCenter::ipaValveData);
         renderValveStateRow("Dump", GSDataCenter::dumpValveData);
         renderValveStateRow("Fill", GSDataCenter::fillValveData);
 
