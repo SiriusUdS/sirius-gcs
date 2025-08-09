@@ -63,4 +63,7 @@ uint32_t timeSinceLastCommandMotorBoard_ms{};
 uint32_t timeSinceLastCommandFillingStationBoard_ms{};
 uint32_t lastReceivedGSCommandTimestamp_ms{};
 uint32_t lastSentCommandTimestamp_ms{};
+
+float tankTemperature_C{};
+float tankPressure_psi{};
 } // namespace GSDataCenter

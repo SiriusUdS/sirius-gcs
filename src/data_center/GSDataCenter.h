@@ -53,6 +53,9 @@ extern uint32_t timeSinceLastCommandMotorBoard_ms;
 extern uint32_t timeSinceLastCommandFillingStationBoard_ms;
 extern uint32_t lastReceivedGSCommandTimestamp_ms;
 extern uint32_t lastSentCommandTimestamp_ms;
+
+extern float tankTemperature_C;
+extern float tankPressure_psi;
 } // namespace GSDataCenter
 
 #endif // GSDATACENTER_H
