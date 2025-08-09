@@ -39,6 +39,9 @@ extern uint8_t motorBoardState;
 extern uint8_t fillingStationBoardState;
 extern uint8_t gsControlBoardState;
 
+extern uint16_t motorBoardStorageErrorStatus;
+extern uint16_t fillingStationBoardStorageErrorStatus;
+
 extern uint32_t igniteTimestamp_ms;
 extern uint32_t launchTimestamp_ms;
 

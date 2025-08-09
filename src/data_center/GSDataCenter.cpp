@@ -49,6 +49,9 @@ uint8_t motorBoardState{};
 uint8_t fillingStationBoardState{};
 uint8_t gsControlBoardState{};
 
+uint16_t motorBoardStorageErrorStatus;
+uint16_t fillingStationBoardStorageErrorStatus;
+
 uint32_t igniteTimestamp_ms{};
 uint32_t launchTimestamp_ms{};
 

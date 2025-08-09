@@ -255,6 +255,7 @@ bool PacketProcessing::processEngineStatusPacket() {
     GSDataCenter::lastReceivedCommandCodeMotorBoard = packet->fields.lastReceivedCommandCode;
 
     GSDataCenter::motorBoardState = packet->fields.status.bits.state;
+    GSDataCenter::motorBoardStorageErrorStatus = packet->fields.storageErrorStatus.value;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::engineStatusPacketRateMonitor.trackPacket();
@@ -292,6 +293,7 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     GSDataCenter::lastReceivedCommandCodeFillingStationBoard = packet->fields.lastReceivedCommandCode;
 
     GSDataCenter::fillingStationBoardState = packet->fields.status.bits.state;
+    GSDataCenter::fillingStationBoardStorageErrorStatus = packet->fields.storageErrorStatus.value;
 
     SerialTask::packetRateMonitor.trackPacket();
     SerialTask::fillingStationStatusPacketRateMonitor.trackPacket();

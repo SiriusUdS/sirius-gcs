@@ -167,8 +167,8 @@ void PlotWindow::showAvgRecentValue(const char* name, float value, size_t idx) {
     ImDrawList* drawList = ImPlot::GetPlotDrawList();
     const ImVec2 plotPos = ImPlot::GetPlotPos();
     const ImVec2 plotSize = ImPlot::GetPlotSize();
-    const ImVec2 textSize = FontConfig::defaultFont->CalcTextSizeA(fontSize, FLT_MAX, -1.0f, avgValueText);
+    const ImVec2 textSize = FontConfig::mainFont->CalcTextSizeA(fontSize, FLT_MAX, -1.0f, avgValueText);
     const ImVec2 textPos = {plotPos.x + plotSize.x - textSize.x - 10.f, plotPos.y + (textSize.y + spacingBetweenLines) * (idx + 1) + 20.f};
     const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
-    drawList->AddText(FontConfig::defaultFont, fontSize, textPos, textColor, avgValueText);
+    drawList->AddText(FontConfig::mainFont, fontSize, textPos, textColor, avgValueText);
 }

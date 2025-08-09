@@ -4,10 +4,9 @@
 #include <imgui.h>
 
 namespace FontConfig {
-inline ImFont* defaultFont = nullptr;
-inline ImFont* boldDefaultFont = nullptr;
-inline ImFont* smallerDefaultFont = nullptr;
-inline ImFont* codeFont = nullptr;
+inline ImFont* mainFont = nullptr;
+inline ImFont* boldMainFont = nullptr;
+inline ImFont* monospaceFont = nullptr;
 } // namespace FontConfig
 
 #endif // FONTCONFIG_H

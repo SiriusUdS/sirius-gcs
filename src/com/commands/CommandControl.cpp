@@ -30,7 +30,7 @@ CommandQueue commandQueue;             ///< Queue containing all future commands
 std::optional<Command> currentCommand; ///< Current command being sent
 
 void getNextCommand();
-void setupValveCommand(ValveCommandType type);
+void setupValveCommand(ValveCommandType valveType, BoardType boardType);
 void setupHeatPadCommand(HeatPadCommandType heatPadtype, BoardType boardType);
 void setupAbort();
 void setupReset();
@@ -74,11 +74,17 @@ void CommandControl::getNextCommand() {
     }
 
     switch (currentCommand.value().type) {
+    case CommandType::NosValve:
+        setupValveCommand(ValveCommandType::Nos, BoardType::Engine);
+        break;
+    case CommandType::IpaValve:
+        setupValveCommand(ValveCommandType::Ipa, BoardType::Engine);
+        break;
     case CommandType::FillValve:
-        setupValveCommand(ValveCommandType::Fill);
+        setupValveCommand(ValveCommandType::Fill, BoardType::FillingStation);
         break;
     case CommandType::DumpValve:
-        setupValveCommand(ValveCommandType::Dump);
+        setupValveCommand(ValveCommandType::Dump, BoardType::FillingStation);
         break;
     case CommandType::NosHeatPad:
         setupHeatPadCommand(HeatPadCommandType::Nos, BoardType::Engine);
@@ -103,7 +109,7 @@ void CommandControl::getNextCommand() {
     }
 }
 
-void CommandControl::setupValveCommand(ValveCommandType type) {
+void CommandControl::setupValveCommand(ValveCommandType valveType, BoardType boardType) {
     if (!currentCommand.has_value()) {
         GCS_APP_LOG_ERROR("CommandControl: Couldn't setup valve command, no command available.");
         return;
@@ -118,8 +124,8 @@ void CommandControl::setupValveCommand(ValveCommandType type) {
     }
 
     BoardCommand* boardCommand = reinterpret_cast<BoardCommand*>(data);
-    boardCommand->fields.header.bits.boardId = FILLING_STATION_BOARD_ID;
-    boardCommand->fields.header.bits.commandCode = static_cast<int>(type);
+    boardCommand->fields.header.bits.boardId = static_cast<int>(boardType);
+    boardCommand->fields.header.bits.commandCode = static_cast<int>(valveType);
     boardCommand->fields.header.bits.commandIndex = 0;
     boardCommand->fields.header.bits.type = BOARD_COMMAND_UNICAST_TYPE_CODE;
     boardCommand->fields.value = percentageOpen;
