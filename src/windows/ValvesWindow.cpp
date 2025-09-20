@@ -40,10 +40,12 @@ void ValvesWindow::renderValveStateRow(const char* label, ValveData& data) {
     ImGui::Text(data.isIdle ? "Yes" : "No");
 
     ImGui::TableSetColumnIndex(2);
-    ImGui::Text(data.closedSwitchHigh ? "On" : "Off");
+    ImGui::Text(data.closedSwitchHigh ? "Unpressed"
+                                      : "Pressed"); // TODO: This is a temp hotfix for LC25, on and off are switched temporarily because elec
 
     ImGui::TableSetColumnIndex(3);
-    ImGui::Text(data.openedSwitchHigh ? "On" : "Off");
+    ImGui::Text(data.openedSwitchHigh ? "Unpressed"
+                                      : "Pressed"); // TODO: This is a temp hotfix for LC25, on and off are switched temporarily because elec
 
     ImGui::TableSetColumnIndex(4);
     ImGui::Text("%d", data.positionOpened_pct);

@@ -28,7 +28,7 @@ bool processFillingStationTelemetryPacket();
 bool processGSControlPacket();
 bool processEngineStatusPacket();
 bool processFillingStationStatusPacket();
-void computeThermistorValues(uint16_t thermistorAdcValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]);
+void computeThermistorValues(uint16_t thermistorAdcValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD], uint16_t boardId);
 void computePressureSensorValues(uint16_t pressureSensorAdcValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD], uint16_t boardId);
 void computeLoadCellValues(uint16_t loadCellAdcValues[GSDataCenter::LOAD_CELL_AMOUNT]);
 void addPlotData(SensorPlotData* plotData, uint16_t* adcValues, float* computedValues, size_t amount, float timestamp);
@@ -125,7 +125,7 @@ bool PacketProcessing::processEngineTelemetryPacket() {
     uint16_t* thermistorAdcValues = adcValues + SerialConfig::THERMISTOR_ADC_VALUES_INDEX_OFFSET;
     uint16_t* pressureSensorAdcValues = adcValues + SerialConfig::PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET;
 
-    computeThermistorValues(thermistorAdcValues);
+    computeThermistorValues(thermistorAdcValues, ENGINE_BOARD_ID);
     computePressureSensorValues(pressureSensorAdcValues, ENGINE_BOARD_ID);
 
     addPlotData(GSDataCenter::Thermistor_Motor_PlotData, thermistorAdcValues, thermistorValues, GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD, timestamp);
@@ -161,7 +161,7 @@ bool PacketProcessing::processFillingStationTelemetryPacket() {
     uint16_t* pressureSensorAdcValues = adcValues + SerialConfig::PRESSURE_SENSOR_ADC_VALUES_INDEX_OFFSET;
     uint16_t* loadCellAdcValues = adcValues + SerialConfig::LOAD_CELL_ADC_VALUES_INDEX_OFFSET;
 
-    computeThermistorValues(thermistorAdcValues);
+    computeThermistorValues(thermistorAdcValues, ENGINE_BOARD_ID);
     computePressureSensorValues(pressureSensorAdcValues, FILLING_STATION_BOARD_ID);
     computeLoadCellValues(loadCellAdcValues);
 
@@ -303,10 +303,15 @@ bool PacketProcessing::processFillingStationStatusPacket() {
     return true;
 }
 
-void PacketProcessing::computeThermistorValues(uint16_t thermistorAdcValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]) {
+void PacketProcessing::computeThermistorValues(uint16_t thermistorAdcValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD], uint16_t boardId) {
     for (size_t i = 0; i < GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD; i++) {
         float adcValue = static_cast<float>(thermistorAdcValues[i]);
         thermistorValues[i] = TemperatureSensor::adcToTemperature(adcValue);
+    }
+
+    if (boardId == ENGINE_BOARD_ID) {
+        constexpr size_t tankThermistorValueIdx = 2;
+        GSDataCenter::tankTemperature_C = thermistorValues[tankThermistorValueIdx];
     }
 }
 
@@ -317,6 +322,11 @@ void PacketProcessing::computePressureSensorValues(uint16_t pressureSensorAdcVal
         float adcValue = static_cast<float>(pressureSensorAdcValues[i]);
         uint16_t sensorIndex = static_cast<uint16_t>(i + indexOffset);
         pressureSensorValues[i] = PressureTransducer::adcToPressure(adcValue, sensorIndex);
+    }
+
+    if (boardId == ENGINE_BOARD_ID) {
+        constexpr size_t pressureSensorValueIdx = 0; // TODO: Is this the good index?
+        GSDataCenter::tankPressure_psi = pressureSensorValues[pressureSensorValueIdx];
     }
 }
 

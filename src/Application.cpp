@@ -11,6 +11,7 @@
 #include "Logging.h"
 #include "LoggingWindow.h"
 #include "MapWindow.h"
+#include "NOSPhaseDiagramWindow.h"
 #include "PacketCSVLogging.h"
 #include "PlotWindowCenter.h"
 #include "SerialComWindow.h"
@@ -53,6 +54,7 @@ void Application::init() {
     iniFile.read(iniStructure);
 
     MapWindow::init();
+    NOSPhaseDiagramWindow::init();
     PacketCSVLogging::init();
 
     LoggingWindow::loadState(iniStructure);
@@ -103,6 +105,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow controlsDockWin("Controls", ImGuiConfig::Dockspace::MAP, []() { ControlsWindow::render(); });
     HelloImGui::DockableWindow loggingDockWin("Logs", ImGuiConfig::Dockspace::LOGGING, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin("Map", ImGuiConfig::Dockspace::MAP, []() { MapWindow::render(); });
+    HelloImGui::DockableWindow nosPhaseDiagramDockWin("NOS Phase Diagram", ImGuiConfig::Dockspace::PLOT, []() { NOSPhaseDiagramWindow::render(); });
     HelloImGui::DockableWindow serialComDockWin("Serial COM", ImGuiConfig::Dockspace::MAP, []() { SerialComWindow::render(); });
     HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
     HelloImGui::DockableWindow valvesDockWin("Valves", ImGuiConfig::Dockspace::MAP, []() { ValvesWindow::render(); });
@@ -112,6 +115,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     dockableWindows.push_back(controlsDockWin);
     dockableWindows.push_back(loggingDockWin);
     dockableWindows.push_back(mapDockWin);
+    dockableWindows.push_back(nosPhaseDiagramDockWin);
     dockableWindows.push_back(serialComDockWin);
     dockableWindows.push_back(switchesDockWin);
     dockableWindows.push_back(valvesDockWin);
