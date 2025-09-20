@@ -70,7 +70,7 @@ float TemperatureSensor::adcToTemperature(float adcValue) {
     static constexpr int RT_TABLE_SIZE = sizeof(RT_TABLE) / sizeof(RT_TABLE[0]);
 
     const float voltage = (adcValue / ADDITIVE_FACTOR) * 3.3f;
-    const float resistance = (3.3f / voltage) * CONTROL_RESISTANCE;
+    const float resistance = (3.3f * CONTROL_RESISTANCE / voltage) - CONTROL_RESISTANCE;
 
     for (int i = 0; i < RT_TABLE_SIZE - 1; i++) {
         if (resistance <= RT_TABLE[i].resistance && resistance >= RT_TABLE[i + 1].resistance) {
