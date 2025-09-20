@@ -32,7 +32,8 @@ PercentageSlider ipaHeatPadSlider;
 PercentageSlider fillHeatPadSlider;
 PercentageSlider dumpHeatPadSlider;
 
-static void renderSlider(const char* name, PercentageSlider& slider, CommandType commandType, bool sliderEnabled = true);
+static void
+renderSlider(const char* name, PercentageSlider& slider, CommandType commandType, bool sliderEnabled = true, bool onlyFullyClosedOrOpen = false);
 } // namespace ControlsWindow
 
 void ControlsWindow::render() {
@@ -63,11 +64,22 @@ void ControlsWindow::render() {
         }
     }
 
+    if (ImGui::CollapsingHeader("Solenoid valve")) {
+        const bool solenoidValveSliderEnabled = GSDataCenter::motorBoardState == ENGINE_STATE_UNSAFE;
+        renderSlider("Solenoid Valve",
+                     dumpHeatPadSlider,
+                     CommandType::DumpHeatPad,
+                     solenoidValveSliderEnabled,
+                     true); // TODO: This is a temp hotfix for LC25
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !solenoidValveSliderEnabled) {
+            ImGui::SetTooltip("To control the solenoid valve -> [UNSAFE] needs to be ON.");
+        }
+    }
+
     if (ImGui::CollapsingHeader("Heat pads")) {
         renderSlider("Nos Heat Pad", nosHeatPadSlider, CommandType::NosHeatPad);
         renderSlider("Ipa Heat Pad", ipaHeatPadSlider, CommandType::IpaHeatPad);
         renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad);
-        renderSlider("Dump Heat Pad", dumpHeatPadSlider, CommandType::DumpHeatPad);
     }
 
     if (ImGui::CollapsingHeader("Reset & Abort")) {
@@ -81,9 +93,20 @@ void ControlsWindow::render() {
     }
 }
 
-void ControlsWindow::renderSlider(const char* name, PercentageSlider& slider, CommandType commandType, bool sliderEnabled) {
+void ControlsWindow::renderSlider(const char* name,
+                                  PercentageSlider& slider,
+                                  CommandType commandType,
+                                  bool sliderEnabled,
+                                  bool onlyFullyClosedOrOpen) {
     ImGui::BeginDisabled(!sliderEnabled);
-    ImGui::SliderInt(name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp);
+    if (ImGui::SliderInt(name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp) && onlyFullyClosedOrOpen) {
+        // TODO: The onlyFullyClosedOrOpen param and the code in this if statement are a temp hotfix for LC25
+        if (slider.openedValue_perc >= 50) {
+            slider.openedValue_perc = 100;
+        } else {
+            slider.openedValue_perc = 0;
+        }
+    }
     ImGui::EndDisabled();
 
     const bool sliderEnableChangedLastFrame = slider.wasSliderEnabled != sliderEnabled;
