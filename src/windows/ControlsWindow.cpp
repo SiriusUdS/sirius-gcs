@@ -17,23 +17,28 @@ namespace ControlsWindow {
  * @struct ValveSlider
  * @brief Holds the state of a valve slider.
  */
-struct PercentageSlider {
-    int openedValue_perc{};       ///< Current value of the slider in percentage.
-    int lastOpenedValue_perc{};   ///< Last value sent to the command control.
-    bool wasSliderEnabled = true; ///< Whether the slider was last enabled.
+struct PercentageInput {
+    int openedValue_perc{};        ///< Value in percentage of the input.
+    int lastSetOpenedValue_perc{}; ///< Value in percentage of the input that was last sent.
+    int lastOpenedValue_perc{};    ///< Last value sent to the command control.
+    bool wasSliderEnabled = true;  ///< Whether the slider was last enabled.
 };
 
-PercentageSlider nosValveSlider;
-PercentageSlider ipaValveSlider;
-PercentageSlider fillValveSlider;
-PercentageSlider dumpValveSlider;
-PercentageSlider nosHeatPadSlider;
-PercentageSlider ipaHeatPadSlider;
-PercentageSlider fillHeatPadSlider;
-PercentageSlider dumpHeatPadSlider;
+PercentageInput nosValveSlider;
+PercentageInput ipaValveSlider;
+PercentageInput fillValveSlider;
+PercentageInput dumpValveSlider;
+PercentageInput nosHeatPadSlider;
+PercentageInput ipaHeatPadSlider;
+PercentageInput fillHeatPadSlider;
+PercentageInput dumpHeatPadSlider;
 
-static void
-renderSlider(const char* name, PercentageSlider& slider, CommandType commandType, bool sliderEnabled = true, bool onlyFullyClosedOrOpen = false);
+static void renderPercentageInput(const char* name,
+                                  PercentageInput& slider,
+                                  CommandType commandType,
+                                  const char* tooltipDisabled = "",
+                                  bool inputEnabled = true,
+                                  bool onlyFullyClosedOrOpen = false);
 } // namespace ControlsWindow
 
 void ControlsWindow::render() {
@@ -44,42 +49,45 @@ void ControlsWindow::render() {
         const bool fillValveSliderEnabled = GSDataCenter::AllowFillSwitchData.isOn;
         const bool dumpValveSliderEnabled = GSDataCenter::AllowDumpSwitchData.isOn;
 
-        renderSlider("NOS Valve", nosValveSlider, CommandType::NosValve, nosAndIpaValveSliderEnabled);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !nosAndIpaValveSliderEnabled) {
-            ImGui::SetTooltip("To control the NOS valve -> [UNSAFE, ARM VALVE] need to be ON, [DUMP, FILL, ARM IGNITER] need to be OFF.");
-        }
+        renderPercentageInput("NOS Valve",
+                              nosValveSlider,
+                              CommandType::NosValve,
+                              "To control the NOS valve -> [UNSAFE, ARM VALVE] need to be ON, [DUMP, FILL, ARM IGNITER] need to be OFF.",
+                              nosAndIpaValveSliderEnabled);
 
-        renderSlider("IPA Valve", ipaValveSlider, CommandType::IpaValve, nosAndIpaValveSliderEnabled);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !nosAndIpaValveSliderEnabled) {
-            ImGui::SetTooltip("To control the IPA valve -> [UNSAFE, ARM VALVE] need to be ON, [DUMP, FILL, ARM IGNITER] need to be OFF.");
-        }
+        renderPercentageInput("IPA Valve",
+                              ipaValveSlider,
+                              CommandType::IpaValve,
+                              "To control the IPA valve -> [UNSAFE, ARM VALVE] need to be ON, [DUMP, FILL, ARM IGNITER] need to be OFF.",
+                              nosAndIpaValveSliderEnabled);
 
-        renderSlider("Fill Valve", fillValveSlider, CommandType::FillValve, GSDataCenter::AllowFillSwitchData.isOn);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !fillValveSliderEnabled) {
-            ImGui::SetTooltip("To control the FILL valve -> [UNSAFE, FILL] need to be ON.");
-        }
-        renderSlider("Dump Valve", dumpValveSlider, CommandType::DumpValve, GSDataCenter::AllowDumpSwitchData.isOn);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !dumpValveSliderEnabled) {
-            ImGui::SetTooltip("To control the DUMP valve -> [UNSAFE, DUMP] need to be ON.");
-        }
+        renderPercentageInput("Fill Valve",
+                              fillValveSlider,
+                              CommandType::FillValve,
+                              "To control the FILL valve -> [UNSAFE, FILL] need to be ON.",
+                              GSDataCenter::AllowFillSwitchData.isOn);
+
+        renderPercentageInput("Dump Valve",
+                              dumpValveSlider,
+                              CommandType::DumpValve,
+                              "To control the DUMP valve -> [UNSAFE, DUMP] need to be ON.",
+                              GSDataCenter::AllowDumpSwitchData.isOn);
     }
 
     if (ImGui::CollapsingHeader("Solenoid valve")) {
         const bool solenoidValveSliderEnabled = GSDataCenter::motorBoardState == ENGINE_STATE_UNSAFE;
-        renderSlider("Solenoid Valve",
-                     dumpHeatPadSlider,
-                     CommandType::DumpHeatPad,
-                     solenoidValveSliderEnabled,
-                     true); // TODO: This is a temp hotfix for LC25
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !solenoidValveSliderEnabled) {
-            ImGui::SetTooltip("To control the solenoid valve -> [UNSAFE] needs to be ON.");
-        }
+        renderPercentageInput("Solenoid Valve",
+                              dumpHeatPadSlider,
+                              CommandType::DumpHeatPad,
+                              "To control the solenoid valve -> [UNSAFE] needs to be ON.",
+                              solenoidValveSliderEnabled,
+                              true); // TODO: This is a temp hotfix for LC25
     }
 
     if (ImGui::CollapsingHeader("Heat pads")) {
-        renderSlider("Nos Heat Pad", nosHeatPadSlider, CommandType::NosHeatPad);
-        renderSlider("Ipa Heat Pad", ipaHeatPadSlider, CommandType::IpaHeatPad);
-        renderSlider("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad);
+        renderPercentageInput("Nos Heat Pad", nosHeatPadSlider, CommandType::NosHeatPad);
+        renderPercentageInput("Ipa Heat Pad", ipaHeatPadSlider, CommandType::IpaHeatPad);
+        renderPercentageInput("Fill Heat Pad", fillHeatPadSlider, CommandType::FillHeatPad);
     }
 
     if (ImGui::CollapsingHeader("Reset & Abort")) {
@@ -93,28 +101,49 @@ void ControlsWindow::render() {
     }
 }
 
-void ControlsWindow::renderSlider(const char* name,
-                                  PercentageSlider& slider,
-                                  CommandType commandType,
-                                  bool sliderEnabled,
-                                  bool onlyFullyClosedOrOpen) {
-    ImGui::BeginDisabled(!sliderEnabled);
-    if (ImGui::SliderInt(name, &slider.openedValue_perc, 0, 100, "%d%% Open", ImGuiSliderFlags_AlwaysClamp) && onlyFullyClosedOrOpen) {
-        // TODO: The onlyFullyClosedOrOpen param and the code in this if statement are a temp hotfix for LC25
-        if (slider.openedValue_perc >= 50) {
-            slider.openedValue_perc = 100;
-        } else {
-            slider.openedValue_perc = 0;
-        }
+void ControlsWindow::renderPercentageInput(const char* name,
+                                           PercentageInput& slider,
+                                           CommandType commandType,
+                                           const char* tooltipDisabled,
+                                           bool inputEnabled,
+                                           bool onlyFullyClosedOrOpen) {
+    // TODO: Do we implement onlyFullyClosedOrOpen in this function or do we just remove it?
+
+    constexpr float inputWidth = 200.0f;
+
+    ImGui::BeginDisabled(!inputEnabled);
+
+    // Render int input
+    ImGui::SetNextItemWidth(inputWidth);
+    ImGui::InputInt(name, &slider.openedValue_perc);
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !inputEnabled) {
+        ImGui::SetTooltip(tooltipDisabled);
     }
-    ImGui::EndDisabled();
+    ImGui::SameLine(inputWidth + 200.0f);
 
-    const bool sliderEnableChangedLastFrame = slider.wasSliderEnabled != sliderEnabled;
-    const bool needToSynchronize = slider.openedValue_perc != slider.lastOpenedValue_perc;
+    // Prevent out of bound percentage value
+    if (slider.openedValue_perc < 0) {
+        slider.openedValue_perc = 0;
+    } else if (slider.openedValue_perc > 100) {
+        slider.openedValue_perc = 100;
+    }
 
-    if (sliderEnabled && (sliderEnableChangedLastFrame || needToSynchronize)) {
-        slider.wasSliderEnabled = sliderEnabled;
-        slider.lastOpenedValue_perc = slider.openedValue_perc;
+    // Current value text
+    ImGui::Text("Open: %d%%", slider.lastSetOpenedValue_perc);
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !inputEnabled) {
+        ImGui::SetTooltip(tooltipDisabled);
+    }
+    ImGui::SameLine(inputWidth + 375.0f);
+
+    // Button to set the percentage value
+    std::string buttonStr = std::string("Set Value") + "##" + name;
+    if (ImGui::Button(buttonStr.c_str())) {
+        slider.lastSetOpenedValue_perc = slider.openedValue_perc;
         CommandControl::sendCommand(commandType, slider.openedValue_perc);
     }
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) && !inputEnabled) {
+        ImGui::SetTooltip(tooltipDisabled);
+    }
+
+    ImGui::EndDisabled();
 }
