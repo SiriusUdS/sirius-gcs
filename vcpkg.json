@@ -1,5 +1,6 @@
 {
     "dependencies": [
+        "coolprop",
         "curl",
         "glad",
         "glfw3",

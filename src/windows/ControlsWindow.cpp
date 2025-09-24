@@ -21,7 +21,6 @@ struct PercentageInput {
     int openedValue_perc{};        ///< Value in percentage of the input.
     int lastSetOpenedValue_perc{}; ///< Value in percentage of the input that was last sent.
     int lastOpenedValue_perc{};    ///< Last value sent to the command control.
-    bool wasSliderEnabled = true;  ///< Whether the slider was last enabled.
 };
 
 PercentageInput nosValveSlider;
