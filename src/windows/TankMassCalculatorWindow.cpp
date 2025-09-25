@@ -1,15 +1,15 @@
-#include "TankMassCalculator.h"
+#include "TankMassCalculatorWindow.h"
 
 #include <CoolPropLib.h>
 #include <cmath>
 #include <imgui.h>
 
-namespace TankMassCalculator {
+namespace TankMassCalculatorWindow {
 double tankTemperature_C{};
 double tankPressure_psi{};
-} // namespace TankMassCalculator
+} // namespace TankMassCalculatorWindow
 
-void TankMassCalculator::render() {
+void TankMassCalculatorWindow::render() {
     constexpr double TANK_VOLUME_M3 = 0.060516;
 
     ImGui::Text("Tank Volume (m^3): %f", TANK_VOLUME_M3);
@@ -18,7 +18,7 @@ void TankMassCalculator::render() {
 
     const double tankTemperature_K = tankTemperature_C + 273.5;
     const double tankPressure_Pa = tankPressure_psi * 6894.76;
-    double rho = PropsSI("D", "T", tankTemperature_K, "P", tankPressure_Pa, "NitrousOxide");
+    const double rho = PropsSI("D", "T", tankTemperature_K, "P", tankPressure_Pa, "NitrousOxide");
 
     ImGui::Text("Tank Mass (kg): ");
     ImGui::SameLine();

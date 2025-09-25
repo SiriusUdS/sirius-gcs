@@ -17,7 +17,8 @@
 #include "SerialComWindow.h"
 #include "SerialTask.h"
 #include "SwitchesWindow.h"
-#include "TankMassCalculator.h"
+#include "TankMassCalculatorWindow.h"
+#include "TankMassWindow.h"
 #include "ValvesWindow.h"
 
 #include <imgui.h>
@@ -109,7 +110,8 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow nosPhaseDiagramDockWin("NOS Phase Diagram", ImGuiConfig::Dockspace::PLOT, []() { NOSPhaseDiagramWindow::render(); });
     HelloImGui::DockableWindow serialComDockWin("Serial COM", ImGuiConfig::Dockspace::MAP, []() { SerialComWindow::render(); });
     HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
-    HelloImGui::DockableWindow tankMassCalculatorDockWin("Tank Mass Calculator", ImGuiConfig::Dockspace::MAP, []() { TankMassCalculator::render(); });
+    HelloImGui::DockableWindow tankMassCalcDockWin("Tank Mass Calculator", ImGuiConfig::Dockspace::MAP, []() { TankMassCalculatorWindow::render(); });
+    HelloImGui::DockableWindow tankMassDockWin("Tank Mass", ImGuiConfig::Dockspace::PLOT, []() { TankMassWindow::render(); });
     HelloImGui::DockableWindow valvesDockWin("Valves", ImGuiConfig::Dockspace::MAP, []() { ValvesWindow::render(); });
 
     std::vector<HelloImGui::DockableWindow> dockableWindows = PlotWindowCenter::createDockableWindows();
@@ -120,7 +122,8 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     dockableWindows.push_back(nosPhaseDiagramDockWin);
     dockableWindows.push_back(serialComDockWin);
     dockableWindows.push_back(switchesDockWin);
-    dockableWindows.push_back(tankMassCalculatorDockWin);
+    dockableWindows.push_back(tankMassCalcDockWin);
+    dockableWindows.push_back(tankMassDockWin);
     dockableWindows.push_back(valvesDockWin);
 
     return dockableWindows;
