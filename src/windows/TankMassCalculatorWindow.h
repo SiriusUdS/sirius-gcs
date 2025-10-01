@@ -5,4 +5,4 @@ namespace TankMassCalculatorWindow {
 void render();
 }
 
-#endif // TANKMASSCALCULATOR_H
+#endif // TANKMASSCALCULATORWINDOW_H

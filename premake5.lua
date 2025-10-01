@@ -22,6 +22,7 @@ workspace "sirius-gcs"
         "src/data_conversion",
         "src/logging",
         "src/map",
+        "src/params",
         "src/plot",
         "src/switch",
         "src/utils",

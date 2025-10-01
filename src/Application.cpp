@@ -14,6 +14,7 @@
 #include "NOSPhaseDiagramWindow.h"
 #include "PacketCSVLogging.h"
 #include "PlotWindowCenter.h"
+#include "RocketParametersWindow.h"
 #include "SerialComWindow.h"
 #include "SerialTask.h"
 #include "SwitchesWindow.h"
@@ -108,6 +109,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     HelloImGui::DockableWindow loggingDockWin("Logs", ImGuiConfig::Dockspace::LOGGING, []() { LoggingWindow::render(); });
     HelloImGui::DockableWindow mapDockWin("Map", ImGuiConfig::Dockspace::MAP, []() { MapWindow::render(); });
     HelloImGui::DockableWindow nosPhaseDiagramDockWin("NOS Phase Diagram", ImGuiConfig::Dockspace::PLOT, []() { NOSPhaseDiagramWindow::render(); });
+    HelloImGui::DockableWindow rocketParamsDockWin("Rocket Parameters", ImGuiConfig::Dockspace::LOGGING, []() { RocketParametersWindow::render(); });
     HelloImGui::DockableWindow serialComDockWin("Serial COM", ImGuiConfig::Dockspace::MAP, []() { SerialComWindow::render(); });
     HelloImGui::DockableWindow switchesDockWin("Switches", ImGuiConfig::Dockspace::MAP, []() { SwitchesWindow::render(); });
     HelloImGui::DockableWindow tankMassCalcDockWin("Tank Mass Calculator", ImGuiConfig::Dockspace::MAP, []() { TankMassCalculatorWindow::render(); });
@@ -120,6 +122,7 @@ std::vector<HelloImGui::DockableWindow> Application::createDockableWindows() {
     dockableWindows.push_back(loggingDockWin);
     dockableWindows.push_back(mapDockWin);
     dockableWindows.push_back(nosPhaseDiagramDockWin);
+    dockableWindows.push_back(rocketParamsDockWin);
     dockableWindows.push_back(serialComDockWin);
     dockableWindows.push_back(switchesDockWin);
     dockableWindows.push_back(tankMassCalcDockWin);

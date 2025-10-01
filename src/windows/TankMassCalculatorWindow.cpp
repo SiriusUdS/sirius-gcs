@@ -1,5 +1,8 @@
 #include "TankMassCalculatorWindow.h"
 
+#include "FontAwesome.h"
+#include "RocketParams.h"
+
 #include <CoolPropLib.h>
 #include <cmath>
 #include <imgui.h>
@@ -10,9 +13,19 @@ double tankPressure_psi{};
 } // namespace TankMassCalculatorWindow
 
 void TankMassCalculatorWindow::render() {
-    constexpr double TANK_VOLUME_M3 = 0.060516;
+    ImGui::Text("Tank Volume (m^3): %f", RocketParams::tankVolume_m3);
+    ImGui::SameLine();
 
-    ImGui::Text("Tank Volume (m^3): %f", TANK_VOLUME_M3);
+    const ImVec4 buttonColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, buttonColor);
+    ImGui::Button(ICON_FA_QUESTION);
+    ImGui::PopStyleColor(2);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("The tank volume can be modified applicationwide in the \"Rocket Parameters\" window.");
+    }
+
     ImGui::InputDouble("Temperature (C)", &tankTemperature_C);
     ImGui::InputDouble("Pressure (psi)", &tankPressure_psi);
 
@@ -25,7 +38,9 @@ void TankMassCalculatorWindow::render() {
 
     if (std::isnan(rho) || rho <= 0) {
         ImGui::Text("Invalid");
+    } else if (std::isinf(rho)) {
+        ImGui::Text("Infinity");
     } else {
-        ImGui::Text("%f", rho * TANK_VOLUME_M3);
+        ImGui::Text("%f", rho * RocketParams::tankVolume_m3);
     }
 }
