@@ -8,7 +8,13 @@ void TankMassWindow::render() {
     constexpr float TEMP_X[5] = {1, 2, 3, 4, 5};
     constexpr float TEMP_Y[5] = {0, 3, 1, 2, 5};
 
-    if (ImGui::BeginTable("Tank Mass", 2)) {
+    constexpr int PLOT_ROWS = 2;
+
+    const ImVec2 avail = ImGui::GetContentRegionAvail();
+    const float paddingY = ImGui::GetStyle().CellPadding.y * 3.0f;
+    const float plotRowHeight = (avail.y / PLOT_ROWS) - paddingY;
+
+    if (ImGui::BeginTable("Tank Mass", PLOT_ROWS)) {
         ImGui::TableSetupColumn("Data", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Plots");
         ImGui::TableNextRow();
@@ -26,25 +32,25 @@ void TankMassWindow::render() {
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            if (ImPlot::BeginPlot("Test 1")) {
-                ImPlot::PlotLine("Test 1-1", TEMP_X, TEMP_Y, 5);
+            if (ImPlot::BeginPlot("Tank Pressure", ImVec2(-1, plotRowHeight))) {
+                ImPlot::PlotLine("Tank Pressure", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
             ImGui::TableSetColumnIndex(1);
-            if (ImPlot::BeginPlot("Test 2")) {
-                ImPlot::PlotLine("Test 2-1", TEMP_X, TEMP_Y, 5);
+            if (ImPlot::BeginPlot("Tank Temperature", ImVec2(-1, plotRowHeight))) {
+                ImPlot::PlotLine("Tank Temperature", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            if (ImPlot::BeginPlot("Test 3")) {
-                ImPlot::PlotLine("Test 3-1", TEMP_X, TEMP_Y, 5);
+            if (ImPlot::BeginPlot("Mot. Mass", ImVec2(-1, plotRowHeight))) {
+                ImPlot::PlotLine("Mot. Mass", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
             ImGui::TableSetColumnIndex(1);
-            if (ImPlot::BeginPlot("Test 4")) {
-                ImPlot::PlotLine("Test 4-1", TEMP_X, TEMP_Y, 5);
+            if (ImPlot::BeginPlot("Tank Mass", ImVec2(-1, plotRowHeight))) {
+                ImPlot::PlotLine("Tank Mass", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
 
