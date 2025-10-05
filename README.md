@@ -40,6 +40,6 @@ In Visual Studio:
 
 If you come across the following error when trying to compile/run the program:
 
-![Screenshot of the "fmtd.dll was not found" Windows error.](./assets/images/fmtd_dll_not_found.png)
+![Screenshot of the "fmtd.dll was not found" Windows error.](./.github/images/fmtd_dll_not_found.png)
 
 Delete the entire **sirius-gcs/out** folder before recompiling and running the program.

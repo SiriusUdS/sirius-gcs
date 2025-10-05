@@ -27,7 +27,7 @@ public:
     };
 
 public:
-    PlotData(const char* n, ImVec4 c);
+    PlotData(const char* n, ImVec4 c); // TODO: Just call this name and color, unnecessary single letter variables
     void addData(float x, float y);
     void clear();
     void plot(bool showCompressedData) const;

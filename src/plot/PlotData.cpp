@@ -27,7 +27,7 @@ const PlotStyle& PlotData::LockedView::getStyle() const {
  * @param n Name of the plot data
  * @param c Color of the plot data line
  */
-PlotData::PlotData(const char* n, ImVec4 c) : style{n, c, 2} {
+PlotData::PlotData(const char* n, ImVec4 c) : style{n, c, 2} { // TODO: Put this "2" in a constant somewhere
 }
 
 /**

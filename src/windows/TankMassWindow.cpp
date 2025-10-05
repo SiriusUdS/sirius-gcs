@@ -9,7 +9,7 @@
 
 namespace TankMassWindow {
 RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(),
-                                  100}; // TODO - Add constants for index and window X
+                                  100}; // TODO: Add constants for index and window X
 }
 
 void TankMassWindow::render() {
