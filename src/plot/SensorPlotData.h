@@ -17,6 +17,8 @@ public:
     float averageRecentAdc(size_t durationMs) const;
     float averageRecentValue(size_t durationMs) const;
     const char* getName() const;
+    const PlotData& getAdcPlotData() const;
+    const PlotData& getValuePlotData() const;
 
 private:
     PlotData adcPlotData;

@@ -12,12 +12,28 @@
  */
 class PlotData {
 public:
+    class LockedView {
+    public:
+        LockedView(std::mutex& mtx, const PlotRawData& data, const PlotRawData& compressedData, const PlotStyle& style);
+        const PlotRawData& getData() const;
+        const PlotRawData& getCompressedData() const;
+        const PlotStyle& getStyle() const;
+
+    private:
+        const std::lock_guard<std::mutex> lock;
+        const PlotRawData& data;
+        const PlotRawData& compressedData;
+        const PlotStyle& style;
+    };
+
+public:
     PlotData(const char* n, ImVec4 c);
     void addData(float x, float y);
     void clear();
     void plot(bool showCompressedData) const;
     float recentAverageValue(size_t durationMs) const;
     const char* getName() const;
+    LockedView makeLockedView() const;
 
 private:
     void dropOldData(size_t amount);

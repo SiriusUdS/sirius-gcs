@@ -61,3 +61,11 @@ float SensorPlotData::averageRecentValue(size_t durationMs) const {
 const char* SensorPlotData::getName() const {
     return valuePlotData.getName();
 }
+
+const PlotData& SensorPlotData::getAdcPlotData() const {
+    return adcPlotData;
+}
+
+const PlotData& SensorPlotData::getValuePlotData() const {
+    return valuePlotData;
+}

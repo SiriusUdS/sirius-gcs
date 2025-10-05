@@ -6,6 +6,22 @@
 
 #include <implot.h>
 
+PlotData::LockedView::LockedView(std::mutex& mtx, const PlotRawData& data, const PlotRawData& compressedData, const PlotStyle& style)
+    : lock(mtx), data(data), compressedData(compressedData), style(style) {
+}
+
+const PlotRawData& PlotData::LockedView::getData() const {
+    return data;
+}
+
+const PlotRawData& PlotData::LockedView::getCompressedData() const {
+    return compressedData;
+}
+
+const PlotStyle& PlotData::LockedView::getStyle() const {
+    return style;
+}
+
 /**
  * @brief Constructs a plot data from a name and a color of the plot data line
  * @param n Name of the plot data
@@ -56,7 +72,7 @@ void PlotData::plot(bool showCompressedData) const {
 
     ImPlot::SetNextLineStyle(style.color, style.weight);
     const PlotRawData& dataToPlot = showCompressedData ? compressedData : data;
-    ImPlot::PlotLine(style.name, dataToPlot.getRawX(), dataToPlot.getRawY(), (int) dataToPlot.size());
+    ImPlot::PlotLine(style.name, dataToPlot.getRawX(), dataToPlot.getRawY(), static_cast<int>(dataToPlot.size()));
 }
 
 /**
@@ -98,6 +114,10 @@ float PlotData::recentAverageValue(size_t durationMs) const {
  */
 const char* PlotData::getName() const {
     return style.name;
+}
+
+PlotData::LockedView PlotData::makeLockedView() const {
+    return LockedView(mtx, data, compressedData, style);
 }
 
 /**

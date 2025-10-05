@@ -1,7 +1,16 @@
 #include "TankMassWindow.h"
 
+#include "GSDataCenter.h"
+#include "RecentPlotData.h"
+#include "SensorPlotData.h"
+
 #include <imgui.h>
 #include <implot.h>
+
+namespace TankMassWindow {
+RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(),
+                                  100}; // TODO - Add constants for index and window X
+}
 
 void TankMassWindow::render() {
     constexpr double TEMP_VALUE = 1.0;
@@ -44,8 +53,10 @@ void TankMassWindow::render() {
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            if (ImPlot::BeginPlot("Mot. Mass", ImVec2(-1, plotRowHeight))) {
-                ImPlot::PlotLine("Mot. Mass", TEMP_X, TEMP_Y, 5);
+            ImPlot::SetNextAxesToFit();
+            if (ImPlot::BeginPlot("Engine Thrust", ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
+                // ImPlot::PlotLine("Engine Thrust", TEMP_X, TEMP_Y, 5);
+                recentEngineThrust.plot(false);
                 ImPlot::EndPlot();
             }
             ImGui::TableSetColumnIndex(1);
