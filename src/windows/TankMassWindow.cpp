@@ -8,9 +8,10 @@
 #include <implot.h>
 
 namespace TankMassWindow {
-RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(),
-                                  100}; // TODO: Add constants for index and window X
-}
+constexpr size_t RECENT_TIME_WINDOW_MS = 60000;
+
+RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_MS};
+} // namespace TankMassWindow
 
 void TankMassWindow::render() {
     constexpr double TEMP_VALUE = 1.0;
@@ -42,11 +43,13 @@ void TankMassWindow::render() {
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
             if (ImPlot::BeginPlot("Tank Pressure", ImVec2(-1, plotRowHeight))) {
+                ImPlot::SetupAxes("Timestamp (ms)", "Pressure (psi)");
                 ImPlot::PlotLine("Tank Pressure", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
             ImGui::TableSetColumnIndex(1);
             if (ImPlot::BeginPlot("Tank Temperature", ImVec2(-1, plotRowHeight))) {
+                ImPlot::SetupAxes("Timestamp (ms)", "Temperature (C)");
                 ImPlot::PlotLine("Tank Temperature", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
@@ -56,11 +59,13 @@ void TankMassWindow::render() {
             ImPlot::SetNextAxesToFit();
             if (ImPlot::BeginPlot("Engine Thrust", ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 // ImPlot::PlotLine("Engine Thrust", TEMP_X, TEMP_Y, 5);
+                ImPlot::SetupAxes("Timestamp (ms)", "Thrust (lb)");
                 recentEngineThrust.plot(false);
                 ImPlot::EndPlot();
             }
             ImGui::TableSetColumnIndex(1);
             if (ImPlot::BeginPlot("Tank Mass", ImVec2(-1, plotRowHeight))) {
+                ImPlot::SetupAxes("Timestamp (ms)", "Mass (lb)");
                 ImPlot::PlotLine("Tank Mass", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
