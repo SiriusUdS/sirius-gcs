@@ -30,6 +30,8 @@ SensorPlotData PressureSensor_FillingStation_PlotData[PRESSURE_SENSOR_AMOUNT_PER
                                                                                            {"Pressure Sensor 2", PlotColors::RED}};
 SensorPlotData LoadCell_FillingStation_PlotData[LOAD_CELL_AMOUNT] = {{"Motor Load Cell", PlotColors::BLUE}, {"Tank Load Cell", PlotColors::RED}};
 
+PlotData TankMass_PlotData{"Tank Mass", PlotColors::BLUE};
+
 SwitchData AllowDumpSwitchData;
 SwitchData AllowFillSwitchData;
 SwitchData ArmIgniterSwitchData;

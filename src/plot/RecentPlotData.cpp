@@ -32,8 +32,6 @@ void RecentPlotData::plot(bool showCompressedData) {
     }
 
     const size_t visibleCount = size - start;
-    if (visibleCount) {
-        ImPlot::SetNextLineStyle(style.color, style.weight);
-        ImPlot::PlotLine(style.name, data.getRawX() + start, data.getRawY() + start, static_cast<int>(visibleCount));
-    }
+    ImPlot::SetNextLineStyle(style.color, style.weight);
+    ImPlot::PlotLine(style.name, data.getRawX() + start, data.getRawY() + start, static_cast<int>(visibleCount));
 }

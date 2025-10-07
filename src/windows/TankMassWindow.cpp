@@ -6,17 +6,28 @@
 
 #include <imgui.h>
 #include <implot.h>
+#include <string>
 
 namespace TankMassWindow {
-constexpr size_t RECENT_TIME_WINDOW_MS = 60000;
+std::string getRecentPlotTitle(std::string title, size_t seconds);
 
-RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_MS};
+constexpr size_t RECENT_TIME_WINDOW_SEC = 60;
+const std::string TANK_PRESSURE_PLOT_TITLE = getRecentPlotTitle("Tank Pressure", RECENT_TIME_WINDOW_SEC);
+const std::string TANK_TEMPERATURE_PLOT_TITLE = getRecentPlotTitle("Tank Temperature", RECENT_TIME_WINDOW_SEC);
+const std::string TANK_THRUST_PLOT_TITLE = getRecentPlotTitle("Engine Thrust", RECENT_TIME_WINDOW_SEC);
+const std::string TANK_MASS_PLOT_TITLE = getRecentPlotTitle("Tank Mass", RECENT_TIME_WINDOW_SEC);
+
+// TODO: Replace these indexes with constants
+RecentPlotData recentMotorPressureSensor1{GSDataCenter::PressureSensor_Motor_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
+RecentPlotData recentMotorPressureSensor2{GSDataCenter::PressureSensor_Motor_PlotData[1].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
+RecentPlotData recentFillPressureSensor1{GSDataCenter::PressureSensor_FillingStation_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
+RecentPlotData recentFillPressureSensor2{GSDataCenter::PressureSensor_FillingStation_PlotData[1].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
+RecentPlotData recentTankTemperature{GSDataCenter::Thermistor_Motor_PlotData[2].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
+RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
 } // namespace TankMassWindow
 
 void TankMassWindow::render() {
     constexpr double TEMP_VALUE = 1.0;
-    constexpr float TEMP_X[5] = {1, 2, 3, 4, 5};
-    constexpr float TEMP_Y[5] = {0, 3, 1, 2, 5};
 
     constexpr int PLOT_ROWS = 2;
 
@@ -37,36 +48,37 @@ void TankMassWindow::render() {
 
         ImGui::TableSetColumnIndex(1);
         if (ImGui::BeginTable("Plots", 2)) {
-            ImGui::TableSetupColumn("Col1");
-            ImGui::TableSetupColumn("Col2");
-
             ImGui::TableNextRow();
+            ImPlot::SetNextAxesToFit();
             ImGui::TableSetColumnIndex(0);
-            if (ImPlot::BeginPlot("Tank Pressure", ImVec2(-1, plotRowHeight))) {
+            if (ImPlot::BeginPlot(TANK_PRESSURE_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Pressure (psi)");
-                ImPlot::PlotLine("Tank Pressure", TEMP_X, TEMP_Y, 5);
+                recentMotorPressureSensor1.plot(false);
+                recentMotorPressureSensor2.plot(false);
+                recentFillPressureSensor1.plot(false);
+                recentFillPressureSensor2.plot(false);
                 ImPlot::EndPlot();
             }
+            ImPlot::SetNextAxesToFit();
             ImGui::TableSetColumnIndex(1);
-            if (ImPlot::BeginPlot("Tank Temperature", ImVec2(-1, plotRowHeight))) {
+            if (ImPlot::BeginPlot(TANK_TEMPERATURE_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Temperature (C)");
-                ImPlot::PlotLine("Tank Temperature", TEMP_X, TEMP_Y, 5);
+                recentTankTemperature.plot(false);
                 ImPlot::EndPlot();
             }
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
             ImPlot::SetNextAxesToFit();
-            if (ImPlot::BeginPlot("Engine Thrust", ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
-                // ImPlot::PlotLine("Engine Thrust", TEMP_X, TEMP_Y, 5);
+            if (ImPlot::BeginPlot(TANK_THRUST_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Thrust (lb)");
                 recentEngineThrust.plot(false);
                 ImPlot::EndPlot();
             }
             ImGui::TableSetColumnIndex(1);
-            if (ImPlot::BeginPlot("Tank Mass", ImVec2(-1, plotRowHeight))) {
+            ImPlot::SetNextAxesToFit();
+            if (ImPlot::BeginPlot(TANK_MASS_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Mass (lb)");
-                ImPlot::PlotLine("Tank Mass", TEMP_X, TEMP_Y, 5);
                 ImPlot::EndPlot();
             }
 
@@ -75,4 +87,8 @@ void TankMassWindow::render() {
 
         ImGui::EndTable();
     }
+}
+
+std::string TankMassWindow::getRecentPlotTitle(std::string title, size_t seconds) {
+    return title + " (last " + std::to_string(seconds) + " seconds)";
 }
