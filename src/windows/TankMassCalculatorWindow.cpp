@@ -2,8 +2,8 @@
 
 #include "FontAwesome.h"
 #include "RocketParams.h"
+#include "TankMass.h"
 
-#include <CoolPropLib.h>
 #include <cmath>
 #include <imgui.h>
 
@@ -13,7 +13,7 @@ double tankPressure_psi{};
 } // namespace TankMassCalculatorWindow
 
 void TankMassCalculatorWindow::render() {
-    ImGui::Text("Tank Volume (m^3): %f", RocketParams::tankVolume_m3);
+    ImGui::Text("Tank Volume (m^3): %f", RocketParams::NOSTankVolume_m3);
     ImGui::SameLine();
 
     const ImVec4 buttonColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
@@ -29,18 +29,16 @@ void TankMassCalculatorWindow::render() {
     ImGui::InputDouble("Temperature (C)", &tankTemperature_C);
     ImGui::InputDouble("Pressure (psi)", &tankPressure_psi);
 
-    const double tankTemperature_K = tankTemperature_C + 273.5;
-    const double tankPressure_Pa = tankPressure_psi * 6894.76;
-    const double rho = PropsSI("D", "T", tankTemperature_K, "P", tankPressure_Pa, "NitrousOxide");
-
     ImGui::Text("Tank Mass (kg): ");
     ImGui::SameLine();
 
-    if (std::isnan(rho) || rho <= 0) {
+    const float tankMass_kg = TankMass::getNOSTankMass(tankTemperature_C, tankPressure_psi);
+
+    if (std::isnan(tankMass_kg)) {
         ImGui::Text("Invalid");
-    } else if (std::isinf(rho)) {
+    } else if (std::isinf(tankMass_kg)) {
         ImGui::Text("Infinity");
     } else {
-        ImGui::Text("%f", rho * RocketParams::tankVolume_m3);
+        ImGui::Text("%f", tankMass_kg);
     }
 }
