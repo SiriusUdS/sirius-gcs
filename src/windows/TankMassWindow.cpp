@@ -24,6 +24,7 @@ RecentPlotData recentFillPressureSensor1{GSDataCenter::PressureSensor_FillingSta
 RecentPlotData recentFillPressureSensor2{GSDataCenter::PressureSensor_FillingStation_PlotData[1].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
 RecentPlotData recentTankTemperature{GSDataCenter::Thermistor_Motor_PlotData[2].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
 RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
+RecentPlotData recentTankMass{GSDataCenter::NOSTankMass_PlotData, RECENT_TIME_WINDOW_SEC * 1000};
 } // namespace TankMassWindow
 
 void TankMassWindow::render() {
@@ -79,6 +80,7 @@ void TankMassWindow::render() {
             ImPlot::SetNextAxesToFit();
             if (ImPlot::BeginPlot(TANK_MASS_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Mass (lb)");
+                recentTankMass.plot(false);
                 ImPlot::EndPlot();
             }
 
@@ -86,6 +88,20 @@ void TankMassWindow::render() {
         }
 
         ImGui::EndTable();
+    }
+
+    // TODO: THIS IS A TEST TO REMOVE LATER
+    static float tempY = 0;
+    static float pressureY = 0;
+    ImGui::InputFloat("Test Temp", &tempY);
+    ImGui::InputFloat("Test Pressure", &pressureY);
+    if (ImGui::Button("Add temp")) {
+        static float thermistorX = 0;
+        GSDataCenter::Thermistor_Motor_PlotData[2].addData(1, tempY, thermistorX++);
+    }
+    if (ImGui::Button("Add pressure")) {
+        static float pressureX = 0;
+        GSDataCenter::PressureSensor_Motor_PlotData[0].addData(1, pressureY, pressureX++);
     }
 }
 

@@ -15,10 +15,12 @@
 #include "PacketCSVLogging.h"
 #include "PlotWindowCenter.h"
 #include "RocketParametersWindow.h"
+#include "SensorPlotData.h"
 #include "SerialComWindow.h"
 #include "SerialTask.h"
 #include "SwitchesWindow.h"
 #include "TankMassCalculatorWindow.h"
+#include "TankMassPlotDataUpdater.h"
 #include "TankMassWindow.h"
 #include "ValvesWindow.h"
 
@@ -30,6 +32,7 @@
 namespace Application {
 mINI::INIFile iniFile("sirius_gcs.ini");
 mINI::INIStructure iniStructure;
+TankMassPlotDataUpdater tankMassPlotDataUpdater;
 } // namespace Application
 
 void Application::loadFonts() {
@@ -64,6 +67,12 @@ void Application::init() {
     MapWindow::loadState(iniStructure);
     PlotWindowCenter::loadState(iniStructure);
     SerialComWindow::loadState(iniStructure);
+
+    // TODO: Make it so we don't have to make both parties subscribe to each other here
+    GSDataCenter::Thermistor_Motor_PlotData[2].addListenerValue(&tankMassPlotDataUpdater);
+    GSDataCenter::PressureSensor_Motor_PlotData[0].addListenerValue(&tankMassPlotDataUpdater);
+    tankMassPlotDataUpdater.subscribeToPlotData(&GSDataCenter::Thermistor_Motor_PlotData[2].getValuePlotData());
+    tankMassPlotDataUpdater.subscribeToPlotData(&GSDataCenter::PressureSensor_Motor_PlotData[0].getValuePlotData());
 
     SerialTask::start();
 }

@@ -36,6 +36,9 @@ bool validateIncomingPacketSize(size_t targetPacketSize, const char* packetName)
 
 size_t packetSize{};
 uint8_t packetBuf[SerialConfig::MAX_PACKET_SIZE];
+
+// TODO: Think about declaring these arrays in their respective functions instead of declaring them globally to improve code clarity
+// TODO: Add units to these array variable names
 float thermistorValues[GSDataCenter::THERMISTOR_AMOUNT_PER_BOARD]{};
 float pressureSensorValues[GSDataCenter::PRESSURE_SENSOR_AMOUNT_PER_BOARD]{};
 float loadCellValues[GSDataCenter::LOAD_CELL_AMOUNT]{};

@@ -3,6 +3,8 @@
 
 #include "PlotData.h"
 
+class PlotDataUpdateListener;
+
 /**
  * @class SensorPlotData
  * @brief Plot data for sensor that includes ADC and value data.
@@ -12,6 +14,7 @@ public:
     SensorPlotData(const char* name, ImVec4 color);
     void addData(float adc, float value, float timestamp);
     void clear();
+    void addListenerValue(PlotDataUpdateListener* listener);
     void plotAdc(bool showCompressedData) const;
     void plotValue(bool showCompressedData) const;
     float averageRecentAdc(size_t durationMs) const;

@@ -6,7 +6,6 @@ class PlotData;
 class PlotDataUpdateListener {
 public:
     virtual void onAddData(const PlotData* plotData, float x, float y) = 0;
-    virtual void onClearData() = 0;
 };
 
 #endif // PLOTDATAUPDATELISTENER_H

@@ -3,6 +3,7 @@
 
 #include <vector>
 
+class PlotData;
 class SensorPlotData;
 struct SwitchData;
 struct ValveStateData;
@@ -19,6 +20,8 @@ extern SensorPlotData PressureSensor_Motor_PlotData[PRESSURE_SENSOR_AMOUNT_PER_B
 extern SensorPlotData Thermistor_FillingStation_PlotData[THERMISTOR_AMOUNT_PER_BOARD];
 extern SensorPlotData PressureSensor_FillingStation_PlotData[PRESSURE_SENSOR_AMOUNT_PER_BOARD];
 extern SensorPlotData LoadCell_FillingStation_PlotData[LOAD_CELL_AMOUNT];
+
+extern PlotData NOSTankMass_PlotData;
 
 extern SwitchData AllowDumpSwitchData;
 extern SwitchData AllowFillSwitchData;

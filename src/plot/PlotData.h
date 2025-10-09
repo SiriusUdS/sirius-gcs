@@ -6,6 +6,8 @@
 
 #include <mutex>
 
+class PlotDataUpdateListener;
+
 /**
  * @class PlotData
  * @brief Represents data of a single plot line to be shown on an ImPlot ImGui component
@@ -30,6 +32,7 @@ public:
     PlotData(const char* n, ImVec4 c); // TODO: Just call this name and color, unnecessary single letter variables
     void addData(float x, float y);
     void clear();
+    void addListener(PlotDataUpdateListener* listener);
     void plot(bool showCompressedData) const;
     float recentAverageValue(size_t durationMs) const;
     const char* getName() const;
@@ -46,6 +49,7 @@ private:
     PlotRawData data;
     PlotRawData compressedData;
     PlotStyle style;
+    std::vector<PlotDataUpdateListener*> listeners;
     mutable std::mutex mtx;
 };
 

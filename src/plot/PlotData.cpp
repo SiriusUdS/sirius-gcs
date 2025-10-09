@@ -3,6 +3,7 @@
 #include "Logging.h"
 #include "PlotColors.h"
 #include "PlotDataCompression.h"
+#include "PlotDataUpdateListener.h"
 
 #include <implot.h>
 
@@ -46,6 +47,10 @@ void PlotData::addData(float x, float y) {
     data.add(x, y);
     compressedData.add(x, y);
 
+    for (PlotDataUpdateListener* listener : listeners) {
+        listener->onAddData(this, x, y);
+    }
+
     if (data.size() > MAX_ORIGINAL_DATA_SIZE) {
         dropOldData(DATA_AMOUNT_TO_DROP_IF_MAX_REACHED);
     }
@@ -61,6 +66,10 @@ void PlotData::addData(float x, float y) {
 void PlotData::clear() {
     data.clear();
     compressedData.clear();
+}
+
+void PlotData::addListener(PlotDataUpdateListener* listener) {
+    listeners.push_back(listener);
 }
 
 /**

@@ -22,6 +22,10 @@ void SensorPlotData::clear() {
     valuePlotData.clear();
 }
 
+void SensorPlotData::addListenerValue(PlotDataUpdateListener* listener) {
+    valuePlotData.addListener(listener);
+}
+
 /**
  * @brief Plot the ADC data for the sensor.
  */
