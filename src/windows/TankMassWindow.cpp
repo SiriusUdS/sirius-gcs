@@ -97,11 +97,13 @@ void TankMassWindow::render() {
     ImGui::InputFloat("Test Pressure", &pressureY);
     if (ImGui::Button("Add temp")) {
         static float thermistorX = 0;
-        GSDataCenter::Thermistor_Motor_PlotData[2].addData(1, tempY, thermistorX++);
+        GSDataCenter::Thermistor_Motor_PlotData[2].addData(1, tempY, thermistorX);
+        thermistorX += 10000;
     }
     if (ImGui::Button("Add pressure")) {
         static float pressureX = 0;
-        GSDataCenter::PressureSensor_Motor_PlotData[0].addData(1, pressureY, pressureX++);
+        GSDataCenter::PressureSensor_Motor_PlotData[0].addData(1, pressureY, pressureX);
+        pressureX += 10000;
     }
 }
 

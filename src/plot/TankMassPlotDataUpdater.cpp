@@ -5,7 +5,7 @@
 #include "SensorPlotData.h"
 #include "TankMass.h"
 
-void TankMassPlotDataUpdater::subscribeToPlotData(const PlotData* plotData) {
+void TankMassPlotDataUpdater::onSubscribe(const PlotData* plotData) {
     std::lock_guard<std::mutex> lock(mtx);
     plotDataUpdateMap.emplace(plotData, PlotDataUpdate());
 }

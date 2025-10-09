@@ -68,11 +68,9 @@ void Application::init() {
     PlotWindowCenter::loadState(iniStructure);
     SerialComWindow::loadState(iniStructure);
 
-    // TODO: Make it so we don't have to make both parties subscribe to each other here
+    // TODO: Use constants for indexes and maybe move this elsewhere
     GSDataCenter::Thermistor_Motor_PlotData[2].addListenerValue(&tankMassPlotDataUpdater);
     GSDataCenter::PressureSensor_Motor_PlotData[0].addListenerValue(&tankMassPlotDataUpdater);
-    tankMassPlotDataUpdater.subscribeToPlotData(&GSDataCenter::Thermistor_Motor_PlotData[2].getValuePlotData());
-    tankMassPlotDataUpdater.subscribeToPlotData(&GSDataCenter::PressureSensor_Motor_PlotData[0].getValuePlotData());
 
     SerialTask::start();
 }

@@ -70,6 +70,7 @@ void PlotData::clear() {
 
 void PlotData::addListener(PlotDataUpdateListener* listener) {
     listeners.push_back(listener);
+    listener->onSubscribe(this);
 }
 
 /**

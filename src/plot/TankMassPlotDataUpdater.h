@@ -9,7 +9,7 @@
 
 class TankMassPlotDataUpdater : public PlotDataUpdateListener {
 public:
-    void subscribeToPlotData(const PlotData* plotDataVec);
+    void onSubscribe(const PlotData* plotData) override;
     void onAddData(const PlotData* plotData, float x, float y) override;
 
 private:
