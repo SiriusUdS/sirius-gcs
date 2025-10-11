@@ -1,6 +1,7 @@
 #include "TankMassWindow.h"
 
 #include "GSDataCenter.h"
+#include "PlotColors.h"
 #include "RecentPlotData.h"
 #include "SensorPlotData.h"
 
@@ -26,6 +27,11 @@ RecentPlotData recentTankTemperature{GSDataCenter::Thermistor_Motor_PlotData[2].
 RecentPlotData recentEngineThrust{GSDataCenter::LoadCell_FillingStation_PlotData[0].getValuePlotData(), RECENT_TIME_WINDOW_SEC * 1000};
 RecentPlotData recentTankMass{GSDataCenter::NOSTankMass_PlotData, RECENT_TIME_WINDOW_SEC * 1000};
 } // namespace TankMassWindow
+
+void TankMassWindow::init() {
+    recentFillPressureSensor1.setColor(PlotColors::GREEN);
+    recentFillPressureSensor2.setColor(PlotColors::YELLOW);
+}
 
 void TankMassWindow::render() {
     constexpr double TEMP_VALUE = 1.0;

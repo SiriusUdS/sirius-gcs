@@ -61,6 +61,7 @@ void Application::init() {
 
     MapWindow::init();
     NOSPhaseDiagramWindow::init();
+    TankMassWindow::init();
     PacketCSVLogging::init();
 
     LoggingWindow::loadState(iniStructure);
