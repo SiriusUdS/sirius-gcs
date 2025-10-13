@@ -10,7 +10,7 @@
 namespace GSDataCenter {
 SensorPlotData Thermistor_Motor_PlotData[THERMISTOR_AMOUNT_PER_BOARD] = {{"Thermistor 1", PlotColors::BLUE},
                                                                          {"Thermistor 2", PlotColors::RED},
-                                                                         {"Thermistor 3", PlotColors::GREEN},
+                                                                         {"Tank Thermistor", PlotColors::GREEN},
                                                                          {"Thermistor 4", PlotColors::YELLOW},
                                                                          {"Thermistor 5", PlotColors::ORANGE},
                                                                          {"Thermistor 6", PlotColors::CYAN},

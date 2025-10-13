@@ -31,6 +31,7 @@ RecentPlotData recentTankMass{GSDataCenter::NOSTankMass_PlotData, RECENT_TIME_WI
 void TankMassWindow::init() {
     recentFillPressureSensor1.setColor(PlotColors::GREEN);
     recentFillPressureSensor2.setColor(PlotColors::YELLOW);
+    recentTankMass.setColor(PlotColors::RED);
 }
 
 void TankMassWindow::render() {
@@ -73,24 +74,15 @@ void TankMassWindow::render() {
                 recentTankTemperature.plot(false);
                 ImPlot::EndPlot();
             }
+            ImGui::EndTable();
 
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
             ImPlot::SetNextAxesToFit();
             if (ImPlot::BeginPlot(TANK_THRUST_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
-                ImPlot::SetupAxes("Timestamp (ms)", "Thrust (lb)");
-                recentEngineThrust.plot(false);
-                ImPlot::EndPlot();
-            }
-            ImGui::TableSetColumnIndex(1);
-            ImPlot::SetNextAxesToFit();
-            if (ImPlot::BeginPlot(TANK_MASS_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Mass (lb)");
+                recentEngineThrust.plot(false);
                 recentTankMass.plot(false);
                 ImPlot::EndPlot();
             }
-
-            ImGui::EndTable();
         }
 
         ImGui::EndTable();
