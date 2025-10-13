@@ -314,6 +314,7 @@ void PacketProcessing::computeThermistorValues(uint16_t thermistorAdcValues[GSDa
 
     if (boardId == ENGINE_BOARD_ID) {
         constexpr size_t tankThermistorValueIdx = 2;
+        // TODO: This is temp
         GSDataCenter::tankTemperature_C = thermistorValues[tankThermistorValueIdx];
     }
 }
@@ -338,6 +339,9 @@ void PacketProcessing::computeLoadCellValues(uint16_t loadCellAdcValues[GSDataCe
         float adcValue = static_cast<float>(loadCellAdcValues[i]);
         loadCellValues[i] = LoadCell::adcToForce(adcValue, 0); // TODO: Change this index later?
     }
+
+    // TODO: This is temp .?
+    GSDataCenter::tankLoadCell_lb = loadCellAdcValues[1];
 }
 
 void PacketProcessing::addPlotData(SensorPlotData* plotData, uint16_t* adcValues, float* computedValues, size_t amount, float timestamp) {

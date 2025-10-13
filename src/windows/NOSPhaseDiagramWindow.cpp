@@ -2,6 +2,7 @@
 
 #include "GSDataCenter.h"
 #include "PlotRawData.h"
+#include "VaporPressure.h"
 
 #include <cmath>
 #include <imgui.h>
@@ -19,8 +20,6 @@ constexpr float maxTempAntoineEquation_C = 40.f;
 PlotRawData vaporizationCurve;
 ImVector<float> topLine;
 ImVector<float> bottomLine;
-
-double vaporPressureNOS_psi(float temperature_C);
 } // namespace NOSPhaseDiagramWindow
 
 void NOSPhaseDiagramWindow::init() {
@@ -29,7 +28,7 @@ void NOSPhaseDiagramWindow::init() {
     bottomLine.clear();
 
     for (float temp_C = minTempAntoineEquation_C; temp_C <= maxTempAntoineEquation_C; temp_C += .1f) {
-        const float pressure_psi = static_cast<float>(vaporPressureNOS_psi(temp_C));
+        const float pressure_psi = static_cast<float>(VaporPressure::vaporPressureNOS_psi(temp_C));
         vaporizationCurve.add(temp_C, pressure_psi);
     }
 
@@ -74,22 +73,4 @@ void NOSPhaseDiagramWindow::render() {
 
         ImPlot::EndPlot();
     }
-}
-
-double NOSPhaseDiagramWindow::vaporPressureNOS_psi(float temperature_C) {
-    // Reference: Nitrous oxide: Saturation properties and the phase diagram
-    // DOI: 10.1016/j.jct.2009.06.017;
-    // 3.1. Vapourization, Equation (1)
-
-    constexpr double tc = 309.548; // K
-    constexpr double pc = 7238;    // kPa
-    constexpr double a1 = -6.8657;
-    constexpr double a2 = 1.9373;
-    constexpr double a3 = -2.6440;
-    constexpr double a4 = 0.0387;
-    const double t = temperature_C + 273.15; // K
-    const double tau = 1 - (t / tc);
-    const double p = pc * std::exp((a1 * tau + a2 * std::pow(tau, 1.5) + a3 * std::pow(tau, 2.5) + a4 * std::pow(tau, 5)) / (t / tc)); // kPa
-
-    return p * 0.145037738; // psi
 }

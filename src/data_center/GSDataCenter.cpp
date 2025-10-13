@@ -30,7 +30,7 @@ SensorPlotData PressureSensor_FillingStation_PlotData[PRESSURE_SENSOR_AMOUNT_PER
                                                                                            {"Pressure Sensor 2 (Fill)", PlotColors::RED}};
 SensorPlotData LoadCell_FillingStation_PlotData[LOAD_CELL_AMOUNT] = {{"Motor Load Cell", PlotColors::BLUE}, {"Tank Load Cell", PlotColors::RED}};
 
-PlotData NOSTankMass_PlotData{"NOS Tank Mass", PlotColors::BLUE};
+PlotData NOSTankMass_PlotData{"NOS Tank Mass (Computed)", PlotColors::BLUE};
 
 SwitchData AllowDumpSwitchData;
 SwitchData AllowFillSwitchData;
@@ -68,4 +68,5 @@ uint32_t lastSentCommandTimestamp_ms{};
 
 float tankTemperature_C{};
 float tankPressure_psi{};
+float tankLoadCell_lb{};
 } // namespace GSDataCenter
