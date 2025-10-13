@@ -82,6 +82,7 @@ void TankMassWindow::render() {
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
+            ImPlot::SetNextAxesToFit();
             if (ImPlot::BeginPlot(ENGINE_THRUST_PLOT_TITLE.c_str(), ImVec2(-1, plotRowHeight), ImPlotFlags_NoInputs)) {
                 ImPlot::SetupAxes("Timestamp (ms)", "Thrust (lb)");
                 recentEngineThrust.plot(false);
