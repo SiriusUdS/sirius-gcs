@@ -13,6 +13,7 @@
 #include "MapWindow.h"
 #include "NOSPhaseDiagramWindow.h"
 #include "PacketCSVLogging.h"
+#include "Params.h"
 #include "PlotWindowCenter.h"
 #include "RocketParametersWindow.h"
 #include "SensorPlotData.h"
@@ -69,6 +70,8 @@ void Application::init() {
     PlotWindowCenter::loadState(iniStructure);
     SerialComWindow::loadState(iniStructure);
 
+    Params::loadParams(iniStructure);
+
     // TODO: Use constants for indexes and maybe move this elsewhere
     GSDataCenter::Thermistor_Motor_PlotData[2].addListenerValue(&tankMassPlotDataUpdater);
     GSDataCenter::PressureSensor_Motor_PlotData[0].addListenerValue(&tankMassPlotDataUpdater);
@@ -81,6 +84,8 @@ void Application::preNewFrame() {
 
 void Application::shutdown() {
     SerialTask::stop();
+
+    Params::saveParams(iniStructure);
 
     LoggingWindow::saveState(iniStructure);
     MapWindow::saveState(iniStructure);

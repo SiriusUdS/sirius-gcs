@@ -29,16 +29,16 @@ void TankMassCalculatorWindow::render() {
     ImGui::InputDouble("Temperature (C)", &tankTemperature_C);
     ImGui::InputDouble("Pressure (psi)", &tankPressure_psi);
 
-    ImGui::Text("Tank Mass (kg): ");
+    ImGui::Text("Tank Mass (lb): ");
     ImGui::SameLine();
 
-    const float tankMass_kg = TankMass::getNOSTankMass(tankTemperature_C, tankPressure_psi);
+    const float tankMass_lb = TankMass::getNOSTankMass_lb(tankTemperature_C, tankPressure_psi);
 
-    if (std::isnan(tankMass_kg)) {
+    if (std::isnan(tankMass_lb)) {
         ImGui::Text("Invalid");
-    } else if (std::isinf(tankMass_kg)) {
+    } else if (std::isinf(tankMass_lb)) {
         ImGui::Text("Infinity");
     } else {
-        ImGui::Text("%f", tankMass_kg);
+        ImGui::Text("%f", tankMass_lb);
     }
 }

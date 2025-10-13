@@ -70,7 +70,7 @@ void TankMassPlotDataUpdater::onAddData(const PlotData* plotData, float x, float
 
     const double tankTemperature_C = static_cast<double>(tankTempPlotDataUpdate.y);
     const double tankPressure_psi = static_cast<double>(tankPressurePlotDataUpdate.y);
-    const float tankMass = TankMass::getNOSTankMass(tankTemperature_C, tankPressure_psi);
+    const float tankMass = TankMass::getNOSTankMass_lb(tankTemperature_C, tankPressure_psi);
 
     // Get latest timestamp for new tank mass data point
     float latestX = 0.0f;

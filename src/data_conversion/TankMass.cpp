@@ -6,7 +6,7 @@
 #include <cmath>
 #include <limits>
 
-float TankMass::getNOSTankMass(double tankTemperature_C, double tankPressure_psi) {
+float TankMass::getNOSTankMass_lb(double tankTemperature_C, double tankPressure_psi) {
     const double tankTemperature_K = tankTemperature_C + 273.5;
     const double tankPressure_Pa = tankPressure_psi * 6894.76;
     const double rho = PropsSI("D", "T", tankTemperature_K, "P", tankPressure_Pa, "NitrousOxide");
@@ -17,5 +17,6 @@ float TankMass::getNOSTankMass(double tankTemperature_C, double tankPressure_psi
         return std::numeric_limits<float>::infinity();
     }
 
-    return (float) rho * RocketParams::NOSTankVolume_m3; // kg
+    const double tankMass_kg = rho * RocketParams::NOSTankVolume_m3.currentValue;
+    return (float) (tankMass_kg * 2.20462262185);
 }

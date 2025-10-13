@@ -1,8 +1,10 @@
 #ifndef ROCKETPARAMS_H
 #define ROCKETPARAMS_H
 
+#include "Param.h"
+
 namespace RocketParams {
-extern float NOSTankVolume_m3;
+extern Param<float> NOSTankVolume_m3;
 }
 
 #endif // ROCKETPARAMS_H
