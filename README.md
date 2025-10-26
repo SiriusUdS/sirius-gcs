@@ -1,6 +1,6 @@
-# sirius-gcs
+# Desktop GCS
 
-Sirius GCS is a ground control station application for managing and monitoring rocket flights. It provides features such as real-time mapping, data visualization, and command transmission.
+This repository is a ground control station application for managing and monitoring rocket flights. It provides features such as real-time mapping, data visualization, and command transmission.
 
 ## Table of Contents
 
